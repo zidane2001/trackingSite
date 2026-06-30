@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Lock, Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { IMAGES } from '../config/images';
 
 export function Register() {
   const { register, loading } = useAuth();
@@ -65,7 +66,7 @@ export function Register() {
           </p>
           <Link
             to="/login"
-            className="inline-flex items-center gap-2 bg-yellow-400 text-[#060f24] px-6 py-3 rounded-lg font-bold text-sm hover:bg-yellow-300 transition"
+            className="inline-flex items-center gap-2 bg-gold text-[#060f24] px-6 py-3 rounded-lg font-bold text-sm hover:bg-gold-400 transition"
           >
             Se connecter
           </Link>
@@ -79,10 +80,8 @@ export function Register() {
       <div className="bg-[#060f24] py-16">
         <div className="max-w-md mx-auto px-6 text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
-              <span className="text-[#060f24] font-bold text-lg">N</span>
-            </div>
-            <span className="text-white font-bold text-xl">Novahexa Move</span>
+            <img src={IMAGES.LOGO} alt="Youms Logistics" className="h-12 w-12 object-contain" />
+            <span className="text-white font-bold text-xl">Youms Logistics</span>
           </Link>
           <h1 className="text-3xl font-bold text-white">Créer un compte</h1>
           <p className="text-slate-400 mt-2">Rejoignez-nous et commencez à expédier</p>
@@ -97,28 +96,28 @@ export function Register() {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nom complet</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="text" required value={form.fullName} onChange={set('fullName')} placeholder="Ex : Ulrich Tenkeu" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition" />
+                  <input type="text" required value={form.fullName} onChange={set('fullName')} placeholder="Ex : Ulrich Tenkeu" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="email" required value={form.email} onChange={set('email')} placeholder="vous@email.com" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition" />
+                  <input type="email" required value={form.email} onChange={set('email')} placeholder="vous@email.com" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Téléphone <span className="text-slate-400 font-normal">(optionnel)</span></label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="tel" value={form.phone} onChange={set('phone')} placeholder="+33 6 00 00 00 00" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition" />
+                  <input type="tel" value={form.phone} onChange={set('phone')} placeholder="+33 6 00 00 00 00" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Mot de passe</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type={showPassword ? 'text' : 'password'} required value={form.password} onChange={set('password')} placeholder="6 caractères minimum" className="w-full border border-slate-300 rounded-lg pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition" />
+                  <input type={showPassword ? 'text' : 'password'} required value={form.password} onChange={set('password')} placeholder="6 caractères minimum" className="w-full border border-slate-300 rounded-lg pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition" />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -136,7 +135,7 @@ export function Register() {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Confirmer le mot de passe</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="password" required value={form.confirmPassword} onChange={set('confirmPassword')} placeholder="Retapez le mot de passe" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition" />
+                  <input type="password" required value={form.confirmPassword} onChange={set('confirmPassword')} placeholder="Retapez le mot de passe" className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition" />
                 </div>
               </div>
             </div>
@@ -147,7 +146,7 @@ export function Register() {
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="w-full bg-yellow-400 text-[#060f24] py-3 rounded-lg font-bold text-sm hover:bg-yellow-300 transition disabled:opacity-50 flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading} className="w-full bg-gold text-[#060f24] py-3 rounded-lg font-bold text-sm hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Créer mon compte
             </button>
@@ -155,7 +154,7 @@ export function Register() {
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Déjà un compte ?{' '}
-            <Link to="/login" className="text-yellow-500 hover:underline font-medium">
+            <Link to="/login" className="text-gold hover:underline font-medium">
               Se connecter
             </Link>
           </p>

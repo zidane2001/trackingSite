@@ -20,8 +20,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const TOKEN_KEY = 'novahexa_token';
-const USER_KEY = 'novahexa_user';
+const TOKEN_KEY = 'youms_token';
+const USER_KEY = 'youms_user';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {

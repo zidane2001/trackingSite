@@ -12,7 +12,7 @@ const FAQ_DATA = [
   { q: 'Comment fonctionne la validation des colis ?', a: 'Après soumission, votre colis passe en statut "En attente". Notre équipe vérifie les informations et valide ou refuse la demande. Vous recevez une notification à chaque étape.' },
   { q: 'Que faire en cas de retard ?', a: 'Les retards sont notifiés automatiquement via email et dans votre espace client. En cas de retard important, contactez notre support 24/7 qui vous tiendra informé de la situation.' },
   { q: 'Proposez-vous un service de stockage ?', a: 'Oui, nous disposons d\'entrepôts permettant le stockage temporaire ou permanent de vos marchandises. Contactez-nous pour un devis adapté à vos besoins.' },
-  { q: 'Comment contacter le support ?', a: 'Vous pouvez nous contacter via le formulaire de contact, par email à contact@novahexa.move, ou par téléphone au +33 3 21 00 00 00. Notre équipe est disponible du lundi au samedi.' },
+  { q: 'Comment contacter le support ?', a: 'Vous pouvez nous contacter via le formulaire de contact, par email à contact@youmslogistics.com, ou par téléphone au +33 3 21 00 00 00. Notre équipe est disponible du lundi au samedi.' },
 ];
 
 export function FAQ() {

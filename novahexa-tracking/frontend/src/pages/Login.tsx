@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { IMAGES } from '../config/images';
 
 export function Login() {
   const { login, loading } = useAuth();
@@ -19,7 +20,7 @@ export function Login() {
       // Redirect based on role — user will be set in context
       // Small delay to ensure state is updated
       setTimeout(() => {
-        const userStr = localStorage.getItem('novahexa_user');
+        const userStr = localStorage.getItem('youms_user');
         if (userStr) {
           const user = JSON.parse(userStr);
           navigate(user.role === 'ADMIN' ? '/admin' : '/client', { replace: true });
@@ -38,10 +39,8 @@ export function Login() {
       <div className="bg-[#060f24] py-16">
         <div className="max-w-md mx-auto px-6 text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
-              <span className="text-[#060f24] font-bold text-lg">N</span>
-            </div>
-            <span className="text-white font-bold text-xl">Novahexa Move</span>
+            <img src={IMAGES.LOGO} alt="Youms Logistics" className="h-12 w-12 object-contain" />
+            <span className="text-white font-bold text-xl">Youms Logistics</span>
           </Link>
           <h1 className="text-3xl font-bold text-white">Connexion</h1>
           <p className="text-slate-400 mt-2">Accédez à votre espace personnel</p>
@@ -63,7 +62,7 @@ export function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="vous@email.com"
-                    className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition"
+                    className="w-full border border-slate-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition"
                   />
                 </div>
               </div>
@@ -77,7 +76,7 @@ export function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full border border-slate-300 rounded-lg pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/40 transition"
+                    className="w-full border border-slate-300 rounded-lg pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 transition"
                   />
                   <button
                     type="button"
@@ -99,7 +98,7 @@ export function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-yellow-400 text-[#060f24] py-3 rounded-lg font-bold text-sm hover:bg-yellow-300 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-gold text-[#060f24] py-3 rounded-lg font-bold text-sm hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Se connecter
@@ -108,13 +107,13 @@ export function Login() {
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-slate-500">
-              <a href="#" className="text-yellow-500 hover:underline font-medium">
+              <a href="#" className="text-gold hover:underline font-medium">
                 Mot de passe oublié ?
               </a>
             </p>
             <p className="text-sm text-slate-500">
               Pas encore de compte ?{' '}
-              <Link to="/register" className="text-yellow-500 hover:underline font-medium">
+              <Link to="/register" className="text-gold hover:underline font-medium">
                 Créer un compte
               </Link>
             </p>

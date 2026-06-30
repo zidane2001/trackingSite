@@ -7,7 +7,7 @@ const BASE_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
 
 function authHeaders(): Record<string, string> {
-  const token = localStorage.getItem('novahexa_token');
+  const token = localStorage.getItem('youms_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -100,7 +100,7 @@ export const contactApi = {
 export async function uploadPhoto(file: File): Promise<string> {
   const form = new FormData();
   form.append('file', file);
-  const token = localStorage.getItem('novahexa_token');
+  const token = localStorage.getItem('youms_token');
   const res = await fetch(`${BASE_URL}/api/uploads`, {
     method: 'POST',
     headers: token ? { Authorization: `Bearer ${token}` } : {},

@@ -27,7 +27,7 @@ const SERVICES = [
     description:
       'Expédition économique de gros volumes par voie maritime. Idéal pour les envois internationaux non urgents avec un excellent rapport qualité-prix.',
     features: [
-      'Conteneurs 20\' et 40\'',
+      "Conteneurs 20' et 40'",
       'Couverture mondiale',
       'Tarifs compétitifs',
       'Dédouanement inclus',
@@ -57,7 +57,7 @@ export function Services() {
       {/* Hero */}
       <section className="bg-[#060f24] text-white py-20">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 text-center">
-          <span className="text-yellow-400 text-xs font-bold uppercase tracking-[0.2em]">
+          <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
             Nos solutions
           </span>
           <h1 className="text-4xl lg:text-5xl font-bold mt-3 mb-5">
@@ -65,7 +65,7 @@ export function Services() {
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto text-lg">
             Qu'il s'agisse d'un envoi national urgent ou d'un transport maritime de gros
-            volumes, Novahexa Move offre la solution qu'il vous faut.
+            volumes, Youms Logistics offre la solution qu'il vous faut.
           </p>
         </div>
       </section>
@@ -86,13 +86,13 @@ export function Services() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#060f24]/60 to-transparent" />
                 <div className="absolute bottom-6 left-6">
-                  <div className="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <div className="w-14 h-14 bg-gold rounded-full flex items-center justify-center">
                     <s.icon className="w-7 h-7 text-[#060f24]" />
                   </div>
                 </div>
               </div>
               <div className="p-8 lg:p-10">
-                <span className="text-xs font-bold text-yellow-500 uppercase tracking-wider">
+                <span className="text-xs font-bold text-gold uppercase tracking-wider">
                   {s.subtitle}
                 </span>
                 <h2 className="text-2xl font-bold text-slate-900 mt-2 mb-4">{s.title}</h2>
@@ -100,7 +100,7 @@ export function Services() {
                 <ul className="space-y-2 mb-8">
                   {s.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
-                      <CheckCircle2 className="w-4 h-4 text-yellow-500 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-gold shrink-0" />
                       {f}
                     </li>
                   ))}

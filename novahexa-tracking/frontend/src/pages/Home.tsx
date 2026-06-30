@@ -72,7 +72,7 @@ const METRICS = [
 
 const TESTIMONIALS = [
   { name: 'Amina K.', city: 'Paris', text: "Service impeccable ! Mon colis est arrivé à Dakar en 4 jours. Le suivi en temps réel m'a rassuré tout au long du trajet.", stars: 5 },
-  { name: 'Jean-Pierre M.', city: 'Calais', text: "Très professionnel. L'équipe a été réactive pour la validation de ma soumission. Je recommande vivement Novahexa Move.", stars: 5 },
+  { name: 'Jean-Pierre M.', city: 'Calais', text: "Très professionnel. L'équipe a été réactive pour la validation de ma soumission. Je recommande vivement Youms Logistics.", stars: 5 },
   { name: 'Fatou D.', city: 'Bruxelles', text: "J'ai envoyé des pièces auto au Cameroun. Le transport routier était la bonne solution et tout s'est bien passé. Merci !", stars: 5 },
 ];
 
@@ -90,13 +90,13 @@ export function Home() {
 
         <div className="relative max-w-[1400px] mx-auto px-6 lg:px-8 pt-16 pb-24 grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
           <div>
-            <span className="inline-flex items-center gap-2 text-yellow-400 text-xs font-bold uppercase tracking-[0.2em] mb-4">
-              <span className="h-px w-8 bg-yellow-400" />
+            <span className="inline-flex items-center gap-2 text-gold text-xs font-bold uppercase tracking-[0.2em] mb-4">
+              <span className="h-px w-8 bg-gold" />
               Transport &amp; logistique
             </span>
             <h1 className="text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight mb-4">
               Déposez et suivez vos colis en{' '}
-              <span className="text-yellow-400">temps réel</span>
+              <span className="text-gold">temps réel</span>
             </h1>
             <p className="text-slate-300/90 mb-7 max-w-xl">
               Remplissez votre demande, obtenez un devis instantané et un numéro de
@@ -109,15 +109,15 @@ export function Home() {
             <div className="relative rounded-2xl overflow-hidden border border-white/10">
               <img
                 src={IMAGES.heroSubject}
-                alt="Service de livraison Novahexa"
+                alt="Service de livraison Youms Logistics"
                 className="w-full h-[520px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[#060f24]" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#060f24]/80 via-transparent to-transparent" />
             </div>
             <div className="absolute bottom-5 left-5 bg-[#0a1530]/90 backdrop-blur border border-white/10 rounded-xl px-5 py-3 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-yellow-400/15 flex items-center justify-center">
-                <Truck className="w-5 h-5 text-yellow-400" />
+              <div className="w-10 h-10 rounded-full bg-gold/15 flex items-center justify-center">
+                <Truck className="w-5 h-5 text-gold" />
               </div>
               <div>
                 <div className="text-sm font-bold leading-none">Livraison express</div>
@@ -134,7 +134,7 @@ export function Home() {
           {SERVICES.map((s) => (
             <div
               key={s.title}
-              className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:border-yellow-400 transition-colors group"
+              className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:border-gold transition-colors group"
             >
               <div className="h-36 overflow-hidden">
                 <img
@@ -144,12 +144,12 @@ export function Home() {
                 />
               </div>
               <div className="p-7">
-                <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mb-5 -mt-12 relative border-4 border-white">
-                  <s.icon className="w-6 h-6 text-yellow-500" />
+                <div className="w-12 h-12 bg-gold-50 rounded-full flex items-center justify-center mb-5 -mt-12 relative border-4 border-white">
+                  <s.icon className="w-6 h-6 text-gold" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{s.title}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed mb-5">{s.text}</p>
-                <Link to="/services" className="text-[#060f24] font-bold text-sm flex items-center gap-2 group-hover:text-yellow-500 transition-colors">
+                <Link to="/services" className="text-[#060f24] font-bold text-sm flex items-center gap-2 group-hover:text-gold transition-colors">
                   En savoir plus <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -162,19 +162,19 @@ export function Home() {
       <section className="bg-[#060f24] py-20 mb-0">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
-            <span className="text-yellow-400 text-xs font-bold uppercase tracking-[0.2em]">
+            <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
               Comment ça marche
             </span>
             <h2 className="text-3xl font-bold text-white mt-3">Votre colis, en 4 étapes</h2>
           </div>
           <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="hidden md:block absolute top-9 left-[12%] right-[12%] border-t-2 border-dashed border-yellow-400/30" aria-hidden />
+            <div className="hidden md:block absolute top-9 left-[12%] right-[12%] border-t-2 border-dashed border-gold/30" aria-hidden />
             {STEPS.map((step) => (
               <div key={step.title} className="relative text-center">
-                <div className="w-[72px] h-[72px] rounded-full bg-yellow-400 flex items-center justify-center mx-auto mb-5 relative z-10 shadow-lg shadow-yellow-400/20">
+                <div className="w-[72px] h-[72px] rounded-full bg-gold flex items-center justify-center mx-auto mb-5 relative z-10 shadow-lg shadow-gold/20">
                   <step.icon className="w-8 h-8 text-[#060f24]" />
                 </div>
-                <h3 className="text-yellow-400 font-bold mb-2">{step.title}</h3>
+                <h3 className="text-gold font-bold mb-2">{step.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{step.text}</p>
               </div>
             ))}
@@ -200,7 +200,7 @@ export function Home() {
                 </p>
                 <a
                   href="#services"
-                  className="inline-flex items-center gap-2 bg-yellow-400 text-[#060f24] px-7 py-3 rounded-lg font-bold hover:bg-yellow-300 transition"
+                  className="inline-flex items-center gap-2 bg-gold text-[#060f24] px-7 py-3 rounded-lg font-bold hover:bg-gold-400 transition"
                 >
                   Découvrir <ArrowRight className="w-4 h-4" />
                 </a>
@@ -215,8 +215,8 @@ export function Home() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {METRICS.map((m) => (
             <div key={m.label} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center shrink-0">
-                <m.icon className="w-6 h-6 text-yellow-500" />
+              <div className="w-12 h-12 rounded-full bg-gold-50 flex items-center justify-center shrink-0">
+                <m.icon className="w-6 h-6 text-gold" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900 leading-none mb-1">{m.value}</div>
@@ -231,7 +231,7 @@ export function Home() {
       <section className="bg-white py-20">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
-            <span className="text-yellow-500 text-xs font-bold uppercase tracking-[0.2em]">
+            <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
               Témoignages
             </span>
             <h2 className="text-3xl font-bold text-slate-900 mt-3">Ce que disent nos clients</h2>
@@ -241,10 +241,10 @@ export function Home() {
               <div key={t.name} className="bg-[#eef2f6] rounded-2xl p-7 border border-slate-200">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(t.stars)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-4 h-4 fill-gold text-gold" />
                   ))}
                 </div>
-                <Quote className="w-8 h-8 text-yellow-400/30 mb-3" />
+                <Quote className="w-8 h-8 text-gold/30 mb-3" />
                 <p className="text-slate-600 text-sm leading-relaxed mb-5">&ldquo;{t.text}&rdquo;</p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#060f24] flex items-center justify-center text-white font-bold text-sm">
@@ -273,7 +273,7 @@ export function Home() {
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link
               to="/register"
-              className="bg-yellow-400 text-[#060f24] px-8 py-3.5 rounded-lg font-bold hover:bg-yellow-300 transition flex items-center gap-2"
+              className="bg-gold text-[#060f24] px-8 py-3.5 rounded-lg font-bold hover:bg-gold-400 transition flex items-center gap-2"
             >
               Créer un compte <ArrowRight className="w-4 h-4" />
             </Link>

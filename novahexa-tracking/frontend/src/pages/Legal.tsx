@@ -13,13 +13,13 @@ export function Legal() {
       <section className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 prose prose-slate max-w-none">
           <h2>Article 1 — Objet</h2>
-          <p>Les présentes Conditions Générales d'Utilisation (CGU) ont pour objet de définir les modalités et conditions dans lesquelles la société Novahexa Move met à disposition de ses utilisateurs le site et les services proposés, ainsi que de définir les droits et obligations des parties dans ce cadre.</p>
+          <p>Les présentes Conditions Générales d'Utilisation (CGU) ont pour objet de définir les modalités et conditions dans lesquelles la société Youms Logistics met à disposition de ses utilisateurs le site et les services proposés, ainsi que de définir les droits et obligations des parties dans ce cadre.</p>
 
           <h2>Article 2 — Acceptation</h2>
-          <p>Tout utilisateur du site novahexa.move reconnaît avoir pris connaissance des présentes CGU et les accepte sans réserve. L'utilisation des services implique l'acceptation pleine et entière des présentes CGU.</p>
+          <p>Tout utilisateur du site youmslogistics.com reconnaît avoir pris connaissance des présentes CGU et les accepte sans réserve. L'utilisation des services implique l'acceptation pleine et entière des présentes CGU.</p>
 
           <h2>Article 3 — Services proposés</h2>
-          <p>Le site novahexa.move permet de :</p>
+          <p>Le site youmslogistics.com permet de :</p>
           <ul>
             <li>Suivre publiquement un colis via son numéro de suivi</li>
             <li>Soumettre une demande d'enregistrement de colis (utilisateurs inscrits)</li>
@@ -34,13 +34,13 @@ export function Legal() {
           <p>Les données personnelles collectées sont traitées conformément au RGPD. Pour plus d'informations, consultez notre <Link to="/legal/privacy" className="text-yellow-500 hover:underline">Politique de confidentialité</Link>.</p>
 
           <h2>Article 6 — Propriété intellectuelle</h2>
-          <p>L'ensemble du contenu du site (textes, images, logos, graphismes) est la propriété exclusive de Novahexa Move ou de ses partenaires et est protégé par les lois en vigueur sur la propriété intellectuelle.</p>
+          <p>L'ensemble du contenu du site (textes, images, logos, graphismes) est la propriété exclusive de Youms Logistics ou de ses partenaires et est protégé par les lois en vigueur sur la propriété intellectuelle.</p>
 
           <h2>Article 7 — Responsabilité</h2>
-          <p>Novahexa Move s'efforce d'assurer l'exactitude des informations publiées sur le site. Cependant, elle ne peut garantir l'absence d'erreurs et décline toute responsabilité concernant les dommages résultant de l'utilisation du site.</p>
+          <p>Youms Logistics s'efforce d'assurer l'exactitude des informations publiées sur le site. Cependant, elle ne peut garantir l'absence d'erreurs et décline toute responsabilité concernant les dommages résultant de l'utilisation du site.</p>
 
           <h2>Article 8 — Modification des CGU</h2>
-          <p>Novahexa Move se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés de toute modification substantielle.</p>
+          <p>Youms Logistics se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés de toute modification substantielle.</p>
 
           <p className="text-sm text-slate-400 mt-8">Dernière mise à jour : Juin 2026</p>
         </div>
@@ -84,7 +84,7 @@ export function PrivacyPolicy() {
           <p>Vos données personnelles sont conservées pendant la durée de votre compte et pendant 3 ans après la dernière connexion.</p>
 
           <h2>5. Vos droits</h2>
-          <p>Conformément au RGPD, vous disposez des droits suivants : accès, rectification, effacement, portabilité, opposition et limitation du traitement. Exercez vos droits en contactant privacy@novahexa.move.</p>
+          <p>Conformément au RGPD, vous disposez des droits suivants : accès, rectification, effacement, portabilité, opposition et limitation du traitement. Exercez vos droits en contactant privacy@youmslogistics.com.</p>
 
           <p className="text-sm text-slate-400 mt-8">Dernière mise à jour : Juin 2026</p>
         </div>
