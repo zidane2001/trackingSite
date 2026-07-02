@@ -23,6 +23,8 @@ Stack : **Spring Boot 3.3 · Java 17+ · PostgreSQL (Neon) · Cloudinary · Spri
 | `CLOUDINARY_API_SECRET` | `abcd…` | Cloudinary |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Origines front autorisées |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | `admin@novahexa.local` / `admin123` | Admin créé au démarrage |
+| `RESEND_API_KEY` | `re_...` | Envoi d'emails (optionnel) |
+| `GEOCODING_ENABLED` | `true` | Activer le géocodage Nominatim |
 
 > ⚠️ L'URL Neon doit être au format **JDBC** (`jdbc:postgresql://…`), pas l'URL `postgres://` brute.
 
@@ -48,9 +50,15 @@ Au premier démarrage, les tables sont créées (`ddl-auto=update`) et un compte
 ### Admin (HTTP Basic, rôle ADMIN)
 | Méthode | Route | Rôle |
 |---|---|---|
-| `GET` | `/api/admin/packages?status=PENDING\|ALL` | File de validation |
+| `GET` | `/api/admin/packages?status=PENDING|ALL` | File de validation |
+| `GET` | `/api/admin/packages/{id}` | Récupérer un colis par ID |
 | `PATCH` | `/api/admin/packages/{trackingNumber}/validate` | Valider |
 | `PATCH` | `/api/admin/packages/{trackingNumber}/refuse` | Refuser (body `{ "reason": "…" }`) |
+| `PATCH` | `/api/admin/packages/{trackingNumber}/in-transit` | Mettre en transit |
+| `PATCH` | `/api/admin/packages/{trackingNumber}/delivered` | Marquer livré |
+| `POST` | `/api/admin/packages/{parcelId}/waypoints` | Ajouter un waypoint |
+| `DELETE` | `/api/admin/packages/{parcelId}/waypoints/{waypointId}` | Supprimer un waypoint |
+| `DELETE` | `/api/admin/packages/{parcelId}` | Supprimer un colis |
 
 ## 5. Tester la soumission (cURL)
 ```bash
@@ -65,7 +73,9 @@ curl -X POST http://localhost:8080/api/packages \
   }'
 ```
 
-## 6. Reste à faire (Phase 3)
-- Câbler le Dashboard React sur `/api/admin/packages` (file de validation réelle).
-- Auth front (login admin) pour envoyer l'en-tête HTTP Basic / JWT.
-- Géocodage (Nominatim) + simulation de trajet (cahier §7) + notifications email.
+## 6. Phase 3 (implémentée)
+- ✅ Dashboard React connecté sur `/api/admin/packages`
+- ✅ Auth front (login admin) avec JWT/Bearer token
+- ✅ Géocodage Nominatim (adresses → coordonnées)
+- ✅ Simulation de trajet sur carte (AdminMap)
+- ✅ Notifications email via Resend (optionnel)

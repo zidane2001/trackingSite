@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ParcelService {
@@ -19,13 +20,16 @@ public class ParcelService {
     private final TrackingNumberService trackingNumbers;
     private final NotificationService notificationService;
     private final PricingService pricingService;
+    private final GeocodingService geocodingService;
 
     public ParcelService(ParcelRepository parcels, TrackingNumberService trackingNumbers,
-                         NotificationService notificationService, PricingService pricingService) {
+                         NotificationService notificationService, PricingService pricingService,
+                         GeocodingService geocodingService) {
         this.parcels = parcels;
         this.trackingNumbers = trackingNumbers;
         this.notificationService = notificationService;
         this.pricingService = pricingService;
+        this.geocodingService = geocodingService;
     }
 
     /** Cahier §5.2 : soumission client -> statut PENDING + n° de suivi auto. */
@@ -60,6 +64,18 @@ public class ParcelService {
         p.setPhotoUrl(req.photoUrl());
         p.setStatus(ParcelStatus.PENDING);
 
+        // Géocodage des adresses
+        double[] originCoords = geocodingService.geocode(req.originAddress());
+        if (originCoords != null) {
+            p.setOriginLat(originCoords[0]);
+            p.setOriginLng(originCoords[1]);
+        }
+        double[] destCoords = geocodingService.geocode(req.destinationAddress());
+        if (destCoords != null) {
+            p.setDestinationLat(destCoords[0]);
+            p.setDestinationLng(destCoords[1]);
+        }
+
         p.getEvents().add(new TrackingEvent(p, EventType.SUBMITTED,
                 "Demande soumise par le client"));
 
@@ -74,6 +90,12 @@ public class ParcelService {
     @Transactional(readOnly = true)
     public Parcel getByTrackingNumber(String trackingNumber) {
         return parcels.findByTrackingNumber(trackingNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colis introuvable"));
+    }
+
+    @Transactional(readOnly = true)
+    public Parcel getById(UUID id) {
+        return parcels.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colis introuvable"));
     }
 
@@ -124,5 +146,64 @@ public class ParcelService {
         notificationService.onRefusal(saved, reason);
 
         return saved;
+    }
+
+    /** Mettre le colis en transit (après validation). */
+    @Transactional
+    public Parcel setInTransit(String trackingNumber, AppUser admin) {
+        Parcel p = getByTrackingNumber(trackingNumber);
+        if (p.getStatus() != ParcelStatus.VALIDATED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le colis n'est pas validé");
+        }
+        p.setStatus(ParcelStatus.IN_TRANSIT);
+        p.getEvents().add(new TrackingEvent(p, EventType.IN_TRANSIT,
+                "Colis en transit"));
+        return parcels.save(p);
+    }
+
+    /** Marquer le colis comme livré. */
+    @Transactional
+    public Parcel setDelivered(String trackingNumber, AppUser admin) {
+        Parcel p = getByTrackingNumber(trackingNumber);
+        if (p.getStatus() != ParcelStatus.IN_TRANSIT) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le colis n'est pas en transit");
+        }
+        p.setStatus(ParcelStatus.DELIVERED);
+        p.getEvents().add(new TrackingEvent(p, EventType.DELIVERED,
+                "Colis livré"));
+        Parcel saved = parcels.save(p);
+
+        // Cahier §9 : notification de livraison
+        notificationService.onDelivery(saved);
+
+        return saved;
+    }
+
+    /** Ajouter un waypoint à un colis. */
+    @Transactional
+    public Waypoint addWaypoint(String parcelId, String label, double lat, double lng) {
+        Parcel p = getById(UUID.fromString(parcelId));
+        Waypoint wp = new Waypoint();
+        wp.setParcel(p);
+        wp.setLabel(label);
+        wp.setLat(lat);
+        wp.setLng(lng);
+        wp.setOrderIndex(p.getWaypoints().size());
+        p.getWaypoints().add(wp);
+        return parcels.save(p).getWaypoints().get(p.getWaypoints().size() - 1);
+    }
+
+    /** Supprimer un waypoint. */
+    @Transactional
+    public void deleteWaypoint(String parcelId, Long waypointId) {
+        Parcel p = getById(UUID.fromString(parcelId));
+        p.getWaypoints().removeIf(wp -> wp.getId().equals(waypointId));
+        parcels.save(p);
+    }
+
+    /** Supprimer un colis. */
+    @Transactional
+    public void delete(String parcelId) {
+        parcels.deleteById(UUID.fromString(parcelId));
     }
 }

@@ -1,6 +1,6 @@
 # Novahexa Move — Suivi de colis
 
-Livraison **Phase 1 (front)** + **Phase 2 (back Spring Boot)**.
+Livraison **Phase 1 (front)** + **Phase 2 (back Spring Boot)** + **Phase 3 (complétée)**.
 
 ## Ce qui a été fait
 
@@ -20,6 +20,15 @@ Fichiers clés ajoutés :
 ### Phase 2 — Back (`backend/`)
 API Spring Boot (Neon + Cloudinary) avec : soumission, suivi public, file de validation admin
 (valider/refuser), upload photo, contact. Détails et lancement → **`backend/README.md`**.
+
+### Phase 3 — Complétée ✅
+- **Dashboard React** connecté sur `/api/admin/packages` (données réelles)
+- **Auth admin** (login → JWT/Bearer token) avec protection des routes
+- **Géocodage Nominatim** : les adresses sont automatiquement converties en coordonnées lat/lng
+- **Carte interactive** (`AdminMap.tsx`) : affichage des colis validés/en transit avec simulation de position
+- **Gestion des waypoints** : ajout/suppression d'arrêts sur la carte
+- **Workflow complet** : `PENDING → VALIDATED → IN_TRANSIT → DELIVERED`
+- **Notifications email** via Resend (optionnel, configurable)
 
 ## Lancer en local
 ```bash
@@ -41,6 +50,8 @@ Le cahier §12.1 prévoyait Node.js : **remplacé par Spring Boot + Neon + Cloud
 Le reste du cahier (entités, statuts `PENDING → VALIDATED/REFUSED → IN_TRANSIT → DELIVERED`,
 workflow de validation) est respecté.
 
-## Phase 3 (prochaine étape, non incluse)
-Câbler le **Dashboard** existant sur `/api/admin/packages`, l'auth admin (login → HTTP Basic/JWT),
-puis le géocodage + la simulation de trajet sur carte (cahier §7) et les notifications email.
+## Fonctionnalités clés
+- **Soumission** : formulaire hero → API `/api/packages` → géocodage automatique des adresses
+- **Validation** : admin valide/refuse depuis `/admin/submissions`
+- **Suivi** : carte interactive sur `/admin/map` avec simulation de position
+- **Notifications** : emails automatiques à chaque étape (si RESEND_API_KEY configuré)

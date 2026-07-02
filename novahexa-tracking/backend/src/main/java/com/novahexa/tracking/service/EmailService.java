@@ -9,8 +9,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-import static org.apache.coyote.http11.Constants.a;
-
 /**
  * Envoie d'emails transactionnels via Resend API (https://api.resend.com/emails).
  * Si RESEND_API_KEY n'est pas configuré, les emails sont logués en WARN sans erreur.
@@ -155,7 +153,7 @@ public class EmailService {
                 "Vérifiez votre email",
                 "Bonjour " + clientName + ",",
                 "Bienvenue sur Youms Logistics ! Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :",
-                "<a href=\"" + verifyUrl + "\" style=\"display:inline-block;background:#C8A951;color:#060f24;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:8px 0;">Vérifier mon email</a>",
+                "<a href=\"" + verifyUrl + "\" style=\"display:inline-block;background:#C8A951;color:#060f24;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:8px 0;\">Vérifier mon email</a>",
                 "Ce lien expire dans 24 heures. Si vous n'avez pas créé de compte, ignorez cet email.",
                 "#C8A951"
         );
@@ -167,7 +165,7 @@ public class EmailService {
                 "Réinitialisation du mot de passe",
                 "Bonjour " + clientName + ",",
                 "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour en créer un nouveau :",
-                "<a href=\"" + resetUrl + "\" style=\"display:inline-block;background:#C8A951;color:#060f24;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:8px 0;">Réinitialiser mon mot de passe</a>",
+                "<a href=\"" + resetUrl + "\" style=\"display:inline-block;background:#C8A951;color:#060f24;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:8px 0;\">Réinitialiser mon mot de passe</a>",
                 "Ce lien expire dans 1 heure. Si vous n'avez pas fait cette demande, ignorez cet email.",
                 "#C8A951"
         );

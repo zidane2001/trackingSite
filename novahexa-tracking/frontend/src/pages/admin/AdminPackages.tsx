@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Package, Trash2, Search, X, FileText, Tag } from 'lucide-react';
+import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2 } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TrackingQR } from '../../components/TrackingQR';
@@ -12,6 +12,7 @@ export function AdminPackages() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PackageStatus | ''>('');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const loadPackages = () => {
     packagesApi.list().then(setPackages).catch(() => []).finally(() => setLoading(false));
@@ -21,7 +22,20 @@ export function AdminPackages() {
 
   const handleDelete = async (pkg: PackageItem) => {
     if (!confirm(`Supprimer le colis "${pkg.name}" (${pkg.trackingNumber}) ?`)) return;
+    setActionLoading(pkg.id);
     await packagesApi.delete(pkg.id).catch(() => {});
+    loadPackages();
+  };
+
+  const handleSetInTransit = async (pkg: PackageItem) => {
+    setActionLoading(pkg.id);
+    await packagesApi.setInTransit(pkg.trackingNumber).catch(() => {});
+    loadPackages();
+  };
+
+  const handleSetDelivered = async (pkg: PackageItem) => {
+    setActionLoading(pkg.id);
+    await packagesApi.setDelivered(pkg.trackingNumber).catch(() => {});
     loadPackages();
   };
 
@@ -92,6 +106,7 @@ export function AdminPackages() {
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">QR</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Client</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Trajet</th>
+                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Transport</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Statut</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Date</th>
                     <th className="text-right px-6 py-3 font-semibold text-slate-500">Actions</th>
@@ -108,11 +123,32 @@ export function AdminPackages() {
                         <TrackingQR trackingNumber={pkg.trackingNumber} size={48} showActions={false} />
                       </td>
                       <td className="px-6 py-3 text-slate-600">{pkg.ownerName || pkg.ownerEmail || '—'}</td>
-                      <td className="px-6 py-3 text-slate-600">{pkg.originAddress} → {pkg.destinationAddress}</td>
+                      <td className="px-6 py-3 text-slate-600 text-xs">{pkg.originAddress} → {pkg.destinationAddress}</td>
+                      <td className="px-6 py-3 text-slate-500 text-xs">{pkg.transportMode || '—'}</td>
                       <td className="px-6 py-3"><StatusBadge status={pkg.status} size="sm" /></td>
                       <td className="px-6 py-3 text-slate-400 text-xs">{new Date(pkg.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-6 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
+                          {pkg.status === 'VALIDATED' && (
+                            <button
+                              onClick={() => handleSetInTransit(pkg)}
+                              disabled={actionLoading === pkg.id}
+                              className="text-indigo-500 hover:text-indigo-700 transition-colors p-1"
+                              title="Mettre en transit"
+                            >
+                              {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
+                            </button>
+                          )}
+                          {pkg.status === 'IN_TRANSIT' && (
+                            <button
+                              onClick={() => handleSetDelivered(pkg)}
+                              disabled={actionLoading === pkg.id}
+                              className="text-emerald-500 hover:text-emerald-700 transition-colors p-1"
+                              title="Marquer livré"
+                            >
+                              {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                            </button>
+                          )}
                           <button
                             onClick={() => pdfApi.downloadQuote(pkg.trackingNumber)}
                             className="text-slate-400 hover:text-blue-500 transition-colors p-1"
@@ -129,6 +165,7 @@ export function AdminPackages() {
                           </button>
                           <button
                             onClick={() => handleDelete(pkg)}
+                            disabled={actionLoading === pkg.id}
                             className="text-slate-400 hover:text-red-500 transition-colors p-1"
                             title="Supprimer"
                           >

@@ -56,32 +56,35 @@ export const authApi = {
 
 // ── Packages ─────────────────────────────────────────────────
 export const packagesApi = {
-  list: () => api.get<PackageItem[]>('/api/packages'),
-  listByOwner: (ownerId: string) =>
-    api.get<PackageItem[]>(`/api/packages?ownerId=${ownerId}`),
-  get: (id: string) => api.get<PackageItem>(`/api/packages/${id}`),
+  list: () => api.get<PackageItem[]>('/api/admin/packages?status=ALL'),
+  listPending: () => api.get<PackageItem[]>('/api/admin/packages'),
+  get: (id: string) => api.get<PackageItem>(`/api/admin/packages/${id}`),
   getByTracking: (trackingNumber: string) =>
-    api.get<PackageItem>(`/api/packages/tracking/${trackingNumber}`),
+    api.get<PackageItem>(`/api/track/${trackingNumber}`),
   submit: (data: Record<string, unknown>) =>
     api.post<{ trackingNumber: string; status: string; estimatedCost: number }>(
       '/api/packages',
       data,
     ),
   update: (id: string, data: Record<string, unknown>) =>
-    api.put(`/api/packages/${id}`, data),
-  delete: (id: string) => api.delete(`/api/packages/${id}`),
+    api.put(`/api/admin/packages/${id}`, data),
+  delete: (id: string) => api.delete(`/api/admin/packages/${id}`),
   validate: (trackingNumber: string, data?: Record<string, unknown>) =>
     api.patch(`/api/admin/packages/${trackingNumber}/validate`, data ?? {}),
   refuse: (trackingNumber: string, reason: string) =>
     api.patch(`/api/admin/packages/${trackingNumber}/refuse`, { reason }),
-  addWaypoint: (id: string, data: Record<string, unknown>) =>
-    api.post(`/api/packages/${id}/waypoints`, data),
+  setInTransit: (trackingNumber: string) =>
+    api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/in-transit`, {}),
+  setDelivered: (trackingNumber: string) =>
+    api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/delivered`, {}),
+  addWaypoint: (id: string, data: { label: string; lat: number; lng: number }) =>
+    api.post<PackageItem>(`/api/admin/packages/${id}/waypoints`, data),
   deleteWaypoint: (packageId: string, waypointId: string) =>
-    api.delete(`/api/packages/${packageId}/waypoints/${waypointId}`),
+    api.delete<PackageItem>(`/api/admin/packages/${packageId}/waypoints/${waypointId}`),
   sendMessage: (id: string, data: { subject: string; body: string }) =>
-    api.post(`/api/packages/${id}/messages`, data),
+    api.post(`/api/admin/packages/${id}/messages`, data),
   getMessages: (id: string) =>
-    api.get(`/api/packages/${id}/messages`),
+    api.get(`/api/admin/packages/${id}/messages`),
 };
 
 // ── Dashboard stats ──────────────────────────────────────────

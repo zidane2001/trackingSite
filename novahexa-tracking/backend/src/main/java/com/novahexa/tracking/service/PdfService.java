@@ -32,6 +32,8 @@ public class PdfService {
     private static final Color DARK = new Color(6, 15, 36);
     private static final Color LIGHT_BG = new Color(249, 250, 251);
 
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
+
     /**
      * Génère un devis PDF pour un colis soumis.
      */
@@ -65,7 +67,7 @@ public class PdfService {
             ref.setSpacingAfter(4);
             doc.add(ref);
             Paragraph date = new Paragraph("Date : " + java.time.LocalDate.now()
-                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), BODY_FONT);
+                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT)), BODY_FONT);
             date.setSpacingAfter(12);
             doc.add(date);
 
@@ -108,21 +110,7 @@ public class PdfService {
             doc.add(new Paragraph(" "));
 
             // Total
-            PdfPTable totalTable = new PdfPTable(2);
-            totalTable.setWidthPercentage(100);
-            totalTable.setWidths(new float[]{70, 30});
-            PdfPCell totalLabel = new PdfPCell(new Paragraph("COÛT ESTIMÉ", new Font(Font.HELVETICA, 14, Font.BOLD, DARK)));
-            totalLabel.setBorder(Rectangle.NO_BORDER);
-            totalLabel.setPadding(12);
-            totalLabel.setBackgroundColor(LIGHT_BG);
-            totalTable.addCell(totalLabel);
-            String costStr = parcel.getEstimatedCost() != null ? String.format("%.2f €", parcel.getEstimatedCost()) : "—";
-            PdfPCell totalValue = new PdfPCell(new Paragraph(costStr, new Font(Font.HELVETICA, 14, Font.BOLD, GOLD)));
-            totalValue.setBorder(Rectangle.NO_BORDER);
-            totalValue.setPadding(12);
-            totalValue.setBackgroundColor(LIGHT_BG);
-            totalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            totalTable.addCell(totalValue);
+            PdfPTable totalTable = buildTotalTable(parcel.getEstimatedCost());
             doc.add(totalTable);
 
             // Footer
@@ -131,7 +119,7 @@ public class PdfService {
 
             doc.close();
         } catch (Exception e) {
-            throw new RuntimeException("Erreur génération devis PDF", e);
+            throw new PdfGenerationException("Erreur génération devis PDF", e);
         }
         return out.toByteArray();
     }
@@ -169,12 +157,12 @@ public class PdfService {
             ref.setSpacingAfter(4);
             doc.add(ref);
             Paragraph date = new Paragraph("Date : " + java.time.LocalDate.now()
-                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), BODY_FONT);
+                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT)), BODY_FONT);
             date.setSpacingAfter(4);
             doc.add(date);
             if (parcel.getValidatedAt() != null) {
-                Paragraph validated = new Paragraph("Date de validation : " + parcel.getValidatedAt()
-                        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), BODY_FONT);
+                Paragraph validated = new Paragraph("Date de validation : " + java.time.LocalDateTime.ofInstant(parcel.getValidatedAt(), java.time.ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT)), BODY_FONT);
                 validated.setSpacingAfter(12);
                 doc.add(validated);
             } else {
@@ -214,21 +202,7 @@ public class PdfService {
             doc.add(new Paragraph(" "));
 
             // Total
-            PdfPTable totalTable = new PdfPTable(2);
-            totalTable.setWidthPercentage(100);
-            totalTable.setWidths(new float[]{70, 30});
-            PdfPCell totalLabel = new PdfPCell(new Paragraph("TOTAL À PAYER", new Font(Font.HELVETICA, 14, Font.BOLD, DARK)));
-            totalLabel.setBorder(Rectangle.NO_BORDER);
-            totalLabel.setPadding(12);
-            totalLabel.setBackgroundColor(LIGHT_BG);
-            totalTable.addCell(totalLabel);
-            String costStr = parcel.getEstimatedCost() != null ? String.format("%.2f €", parcel.getEstimatedCost()) : "—";
-            PdfPCell totalValue = new PdfPCell(new Paragraph(costStr, new Font(Font.HELVETICA, 14, Font.BOLD, GOLD)));
-            totalValue.setBorder(Rectangle.NO_BORDER);
-            totalValue.setPadding(12);
-            totalValue.setBackgroundColor(LIGHT_BG);
-            totalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            totalTable.addCell(totalValue);
+            PdfPTable totalTable = buildTotalTable(parcel.getEstimatedCost());
             doc.add(totalTable);
 
             doc.add(new Paragraph(" "));
@@ -236,7 +210,7 @@ public class PdfService {
 
             doc.close();
         } catch (Exception e) {
-            throw new RuntimeException("Erreur génération facture PDF", e);
+            throw new PdfGenerationException("Erreur génération facture PDF", e);
         }
         return out.toByteArray();
     }
@@ -246,7 +220,7 @@ public class PdfService {
      */
     public byte[] generateShippingLabel(Parcel parcel) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Document doc = new Document(new PageSize(226, 340), 15, 15, 15, 15); // ~8cm x 12cm label
+        Document doc = new Document(new Rectangle(226, 340), 15, 15, 15, 15); // ~8cm x 12cm label
         try {
             PdfWriter writer = PdfWriter.getInstance(doc, out);
             doc.open();
@@ -280,12 +254,11 @@ public class PdfService {
             barcode.setCodeType(Barcode.CODE128);
             barcode.setBarHeight(30);
             barcode.setX(0.8f);
-            Image barcodeImg = barcode.createAwtImage(writer.getDirectContent(), Color.BLACK, Color.WHITE);
+            Image barcodeImg = barcode.createImageWithBarcode(writer.getDirectContent(), Color.BLACK, Color.WHITE);
             Paragraph barcodePara = new Paragraph();
             barcodePara.setAlignment(Element.ALIGN_CENTER);
-            Image scaledBarcode = Image.getInstance(barcodeImg);
-            scaledBarcode.scaleToFit(180, 35);
-            barcodePara.add(scaledBarcode);
+            barcodeImg.scaleToFit(180, 35);
+            barcodePara.add(barcodeImg);
             doc.add(barcodePara);
             doc.add(new Paragraph(" "));
 
@@ -318,7 +291,7 @@ public class PdfService {
 
             doc.close();
         } catch (Exception e) {
-            throw new RuntimeException("Erreur génération étiquette PDF", e);
+            throw new PdfGenerationException("Erreur génération étiquette PDF", e);
         }
         return out.toByteArray();
     }
@@ -372,6 +345,25 @@ public class PdfService {
         doc.add(footer);
     }
 
+    private PdfPTable buildTotalTable(java.math.BigDecimal cost) throws DocumentException {
+        PdfPTable totalTable = new PdfPTable(2);
+        totalTable.setWidthPercentage(100);
+        totalTable.setWidths(new float[]{70, 30});
+        PdfPCell totalLabel = new PdfPCell(new Paragraph("TOTAL À PAYER", new Font(Font.HELVETICA, 14, Font.BOLD, DARK)));
+        totalLabel.setBorder(Rectangle.NO_BORDER);
+        totalLabel.setPadding(12);
+        totalLabel.setBackgroundColor(LIGHT_BG);
+        totalTable.addCell(totalLabel);
+        String costStr = cost != null ? String.format("%.2f €", cost) : "—";
+        PdfPCell totalValue = new PdfPCell(new Paragraph(costStr, new Font(Font.HELVETICA, 14, Font.BOLD, GOLD)));
+        totalValue.setBorder(Rectangle.NO_BORDER);
+        totalValue.setPadding(12);
+        totalValue.setBackgroundColor(LIGHT_BG);
+        totalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        totalTable.addCell(totalValue);
+        return totalTable;
+    }
+
     private String formatEnum(String name) {
         return switch (name) {
             case "ROUTIER" -> "Routier";
@@ -387,5 +379,12 @@ public class PdfService {
             case "DOCUMENTS" -> "Documents";
             default -> name;
         };
+    }
+
+    /** Custom exception for PDF generation errors. */
+    public static class PdfGenerationException extends RuntimeException {
+        public PdfGenerationException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

@@ -19,16 +19,16 @@ public class PricingService {
 
     // --- Base rate per transport mode (EUR) ---
     private static final Map<TransportMode, BigDecimal> MODE_BASE = Map.of(
-            TransportMode.ROUTIER, BigDecimal.valueOf(10),
-            TransportMode.MARITIME, BigDecimal.valueOf(25),
-            TransportMode.AERIEN, BigDecimal.valueOf(40)
+            TransportMode.ROUTE, BigDecimal.valueOf(10),
+            TransportMode.MER, BigDecimal.valueOf(25),
+            TransportMode.AIR, BigDecimal.valueOf(40)
     );
 
     // --- Rate per billable kg (EUR/kg) ---
     private static final Map<TransportMode, BigDecimal> MODE_RATE_PER_KG = Map.of(
-            TransportMode.ROUTIER, BigDecimal.valueOf(1.2),
-            TransportMode.MARITIME, BigDecimal.valueOf(0.9),
-            TransportMode.AERIEN, BigDecimal.valueOf(3.5)
+            TransportMode.ROUTE, BigDecimal.valueOf(1.2),
+            TransportMode.MER, BigDecimal.valueOf(0.9),
+            TransportMode.AIR, BigDecimal.valueOf(3.5)
     );
 
     // --- Delay multipliers ---
