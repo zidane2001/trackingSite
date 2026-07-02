@@ -107,9 +107,9 @@ export function Login() {
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-slate-500">
-              <a href="#" className="text-gold hover:underline font-medium">
+              <Link to="/forgot-password" className="text-gold hover:underline font-medium">
                 Mot de passe oublié ?
-              </a>
+              </Link>
             </p>
             <p className="text-sm text-slate-500">
               Pas encore de compte ?{' '}

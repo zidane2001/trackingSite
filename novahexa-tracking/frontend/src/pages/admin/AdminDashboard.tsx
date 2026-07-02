@@ -1,69 +1,313 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import {
-  Package, Clock, Truck, CheckCircle2, ClipboardCheck, MessageSquare,
+  Package, Truck, CheckCircle2, ClipboardCheck, MapPin,
+  RefreshCw, TrendingUp, AlertCircle,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
-import { packagesApi, dashboardApi, contactApi } from '../../lib/api';
+import { packagesApi, contactApi } from '../../lib/api';
 import type { PackageItem, ContactMessage } from '../../types';
+import { STATUS_LABELS } from '../../types';
 
+// ── Chart colours ───────────────────────────────────────────
+const STATUS_CHART_COLORS: Record<string, string> = {
+  PENDING: '#f59e0b',
+  VALIDATED: '#3b82f6',
+  REFUSED: '#ef4444',
+  IN_TRANSIT: '#6366f1',
+  DELIVERED: '#10b981',
+};
+
+const TRANSPORT_COLORS: Record<string, string> = {
+  ROUTIER: '#6366f1',
+  AERIEN: '#3b82f6',
+  MARITIME: '#06b6d4',
+};
+
+// ── Helper: group packages by month ─────────────────────────
+function groupByMonth(packages: PackageItem[]): { month: string; count: number }[] {
+  const map = new Map<string, number>();
+  for (const p of packages) {
+    const d = new Date(p.createdAt);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    map.set(key, (map.get(key) ?? 0) + 1);
+  }
+  const entries = Array.from(map.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6); // last 6 months
+  return entries.map(([key, count]) => {
+    const [y, m] = key.split('-');
+    const monthName = new Date(parseInt(y), parseInt(m) - 1).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+    return { month: monthName, count };
+  });
+}
+
+// ── Helper: group by transport mode ─────────────────────────
+function groupByTransport(packages: PackageItem[]): { mode: string; count: number }[] {
+  const map = new Map<string, number>();
+  for (const p of packages) {
+    const mode = p.transportMode ?? 'Non défini';
+    map.set(mode, (map.get(mode) ?? 0) + 1);
+  }
+  return Array.from(map.entries())
+    .map(([mode, count]) => ({ mode, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// ── AdminDashboard ──────────────────────────────────────────
 export function AdminDashboard() {
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    Promise.all([packagesApi.list().catch(() => []), contactApi.list().catch(() => [])])
-      .then(([pkgs, msgs]) => {
-        setPackages(pkgs);
-        setMessages(msgs);
-      })
-      .finally(() => setLoading(false));
+  const load = useCallback(async () => {
+    setRefreshing(true);
+    setError('');
+    try {
+      const [pkgs, msgs] = await Promise.all([
+        packagesApi.list().catch(() => []),
+        contactApi.list().catch(() => []),
+      ]);
+      setPackages(pkgs);
+      setMessages(msgs);
+    } catch {
+      setError('Erreur lors du chargement des données.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
-  const pending = packages.filter((p) => p.status === 'PENDING');
-  const inTransit = packages.filter((p) => p.status === 'IN_TRANSIT');
-  const delivered = packages.filter((p) => p.status === 'DELIVERED');
+  useEffect(() => { load(); }, [load]);
 
+  // ── Derived data ─────────────────────────────────────────
+  const stats = useMemo(() => {
+    const pending = packages.filter((p) => p.status === 'PENDING');
+    const validated = packages.filter((p) => p.status === 'VALIDATED');
+    const inTransit = packages.filter((p) => p.status === 'IN_TRANSIT');
+    const delivered = packages.filter((p) => p.status === 'DELIVERED');
+    const refused = packages.filter((p) => p.status === 'REFUSED');
+    return { pending, validated, inTransit, delivered, refused };
+  }, [packages]);
+
+  const pieData = useMemo(() => {
+    return Object.entries(stats)
+      .filter(([_, arr]) => arr.length > 0)
+      .map(([key, arr]) => ({
+        name: STATUS_LABELS[key.toUpperCase() as keyof typeof STATUS_LABELS] ?? key,
+        value: arr.length,
+        status: key.toUpperCase(),
+      }));
+  }, [stats]);
+
+  const monthlyData = useMemo(() => groupByMonth(packages), [packages]);
+  const transportData = useMemo(() => groupByTransport(packages), [packages]);
+
+  const recentPkgs = useMemo(
+    () => [...packages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 8),
+    [packages],
+  );
+
+  const recentMessages = useMemo(
+    () => [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5),
+    [messages],
+  );
+
+  // ── Stat cards config ────────────────────────────────────
   const statCards = [
     { label: 'Total colis', value: packages.length, icon: Package, color: 'bg-slate-100 text-slate-600', href: '/admin/packages' },
-    { label: 'En attente', value: pending.length, icon: ClipboardCheck, color: 'bg-amber-50 text-amber-600', href: '/admin/submissions' },
-    { label: 'En transit', value: inTransit.length, icon: Truck, color: 'bg-indigo-50 text-indigo-600', href: '/admin/map' },
-    { label: 'Livrés', value: delivered.length, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600', href: '/admin/packages' },
+    { label: 'En attente', value: stats.pending.length, icon: ClipboardCheck, color: 'bg-amber-50 text-amber-600', href: '/admin/submissions' },
+    { label: 'En transit', value: stats.inTransit.length, icon: Truck, color: 'bg-indigo-50 text-indigo-600', href: '/admin/map' },
+    { label: 'Livrés', value: stats.delivered.length, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600', href: '/admin/packages' },
+    { label: 'Validés', value: stats.validated.length, icon: MapPin, color: 'bg-blue-50 text-blue-600', href: '/admin/packages' },
+    { label: 'Refusés', value: stats.refused.length, icon: AlertCircle, color: 'bg-red-50 text-red-600', href: '/admin/packages' },
   ];
 
+  // ── Render ───────────────────────────────────────────────
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Tableau de bord admin</h1>
-          <p className="text-sm text-slate-500 mt-1">Vue d'ensemble de l'activité</p>
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Tableau de bord admin</h1>
+            <p className="text-sm text-slate-500 mt-1">Vue d'ensemble de l'activité</p>
+          </div>
+          <button
+            onClick={() => load()}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Actualiser
+          </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Error banner */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Stat Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {statCards.map((s) => (
             <Link
               key={s.label}
               to={s.href}
-              className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${s.color}`}>
-                  <s.icon className="w-5 h-5" />
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${s.color}`}>
+                  <s.icon className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-semibold text-slate-600">{s.label}</span>
+                <span className="text-xs font-semibold text-slate-500">{s.label}</span>
               </div>
-              <div className="text-3xl font-bold text-slate-900">{s.value}</div>
+              <div className="text-2xl font-bold text-slate-900">{s.value}</div>
             </Link>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Pending submissions */}
+        {/* Charts Row */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Status Distribution Pie */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-yellow-500" />
+              Répartition par statut
+            </h3>
+            {pieData.length === 0 ? (
+              <div className="h-64 flex items-center justify-center text-slate-400 text-sm">
+                Aucune donnée
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={85}
+                      paddingAngle={3}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {pieData.map((entry) => (
+                        <Cell
+                          key={entry.status}
+                          fill={STATUS_CHART_COLORS[entry.status] ?? '#94a3b8'}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number, name: string) => [`${value} colis`, name]}
+                      contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      iconType="circle"
+                      iconSize={8}
+                      formatter={(value: string) => <span className="text-xs text-slate-600">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          {/* Packages per Month Bar */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-yellow-500" />
+              Colis par mois
+            </h3>
+            {monthlyData.length === 0 ? (
+              <div className="h-64 flex items-center justify-center text-slate-400 text-sm">
+                Aucune donnée
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis
+                      dataKey="month"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 500 }}
+                    />
+                    <YAxis
+                      allowDecimals={false}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 500 }}
+                    />
+                    <Tooltip
+                      contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12 }}
+                      formatter={(value: number) => [`${value} colis`, 'Créés']}
+                    />
+                    <Bar dataKey="count" fill="#C8A951" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          {/* Transport Mode Breakdown */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+              <Truck className="w-4 h-4 text-yellow-500" />
+              Modes de transport
+            </h3>
+            {transportData.length === 0 ? (
+              <div className="h-64 flex items-center justify-center text-slate-400 text-sm">
+                Aucune donnée
+              </div>
+            ) : (
+              <div className="space-y-4 pt-2">
+                {transportData.map((t) => {
+                  const pct = packages.length > 0 ? (t.count / packages.length) * 100 : 0;
+                  return (
+                    <div key={t.mode}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-slate-700">{t.mode}</span>
+                        <span className="text-xs text-slate-500">
+                          {t.count} colis ({Math.round(pct)}%)
+                        </span>
+                      </div>
+                      <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor: TRANSPORT_COLORS[t.mode] ?? '#94a3b8',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Row: Pending + Recent Messages + Recent Packages */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Pending Submissions */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <h2 className="font-bold text-slate-900 text-sm">Soumissions en attente</h2>
               <Link to="/admin/submissions" className="text-xs text-yellow-500 hover:underline font-medium">
                 Voir tout
@@ -71,15 +315,15 @@ export function AdminDashboard() {
             </div>
             {loading ? (
               <div className="p-8 text-center text-slate-400 text-sm">Chargement...</div>
-            ) : pending.length === 0 ? (
+            ) : stats.pending.length === 0 ? (
               <div className="p-8 text-center text-slate-400 text-sm">Aucune soumission en attente</div>
             ) : (
               <div className="divide-y divide-slate-100">
-                {pending.slice(0, 5).map((pkg) => (
+                {stats.pending.slice(0, 5).map((pkg) => (
                   <Link
                     key={pkg.id}
-                    to={`/admin/submissions`}
-                    className="flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition-colors"
+                    to="/admin/submissions"
+                    className="flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-colors"
                   >
                     <div>
                       <div className="text-sm font-bold text-slate-900">{pkg.name}</div>
@@ -94,9 +338,9 @@ export function AdminDashboard() {
             )}
           </div>
 
-          {/* Recent contact messages */}
+          {/* Recent Contact Messages */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <h2 className="font-bold text-slate-900 text-sm">Messages contact</h2>
               <Link to="/admin/contact-messages" className="text-xs text-yellow-500 hover:underline font-medium">
                 Voir tout
@@ -104,12 +348,12 @@ export function AdminDashboard() {
             </div>
             {loading ? (
               <div className="p-8 text-center text-slate-400 text-sm">Chargement...</div>
-            ) : messages.length === 0 ? (
+            ) : recentMessages.length === 0 ? (
               <div className="p-8 text-center text-slate-400 text-sm">Aucun message</div>
             ) : (
               <div className="divide-y divide-slate-100">
-                {messages.slice(0, 5).map((msg) => (
-                  <div key={msg.id} className="px-6 py-3">
+                {recentMessages.map((msg) => (
+                  <div key={msg.id} className="px-5 py-3">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-bold text-slate-900">{msg.name}</span>
                       {msg.status === 'NON_TRAITE' && (
@@ -127,35 +371,73 @@ export function AdminDashboard() {
               </div>
             )}
           </div>
+
+          {/* Recent Activity */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h2 className="font-bold text-slate-900 text-sm">Activité récente</h2>
+            </div>
+            {loading ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Chargement...</div>
+            ) : recentPkgs.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">Aucune activité</div>
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {recentPkgs.map((pkg) => (
+                  <div key={pkg.id} className="px-5 py-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <Package className="w-4 h-4 text-slate-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-slate-900 truncate">{pkg.name}</div>
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {pkg.originAddress} → {pkg.destinationAddress}
+                      </div>
+                    </div>
+                    <StatusBadge status={pkg.status} size="sm" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Active packages in transit */}
+        {/* Full Packages Table */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-bold text-slate-900 text-sm">Colis en transit</h2>
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-bold text-slate-900 text-sm">Tous les colis</h2>
+            <Link to="/admin/packages" className="text-xs text-yellow-500 hover:underline font-medium">
+              Gérer les colis
+            </Link>
           </div>
-          {inTransit.length === 0 ? (
-            <div className="p-8 text-center text-slate-400 text-sm">Aucun colis en transit</div>
+          {loading ? (
+            <div className="p-8 text-center text-slate-400 text-sm">Chargement...</div>
+          ) : packages.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 text-sm">Aucun colis</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100">
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Colis</th>
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">N° suivi</th>
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Départ</th>
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Arrivée</th>
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Statut</th>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">Colis</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">N° suivi</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">Client</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">Trajet</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">Transport</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">Statut</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-500">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {inTransit.map((pkg) => (
+                  {recentPkgs.map((pkg) => (
                     <tr key={pkg.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-3 font-medium text-slate-900">{pkg.name}</td>
-                      <td className="px-6 py-3 font-mono text-slate-500">{pkg.trackingNumber}</td>
-                      <td className="px-6 py-3 text-slate-600">{pkg.originAddress}</td>
-                      <td className="px-6 py-3 text-slate-600">{pkg.destinationAddress}</td>
-                      <td className="px-6 py-3"><StatusBadge status={pkg.status} size="sm" /></td>
+                      <td className="px-5 py-3 font-medium text-slate-900">{pkg.name}</td>
+                      <td className="px-5 py-3 font-mono text-slate-500 text-xs">{pkg.trackingNumber}</td>
+                      <td className="px-5 py-3 text-slate-600">{pkg.ownerName || pkg.ownerEmail || '—'}</td>
+                      <td className="px-5 py-3 text-slate-600 text-xs">{pkg.originAddress} → {pkg.destinationAddress}</td>
+                      <td className="px-5 py-3 text-slate-500 text-xs">{pkg.transportMode || '—'}</td>
+                      <td className="px-5 py-3"><StatusBadge status={pkg.status} size="sm" /></td>
+                      <td className="px-5 py-3 text-slate-400 text-xs">{new Date(pkg.createdAt).toLocaleDateString('fr-FR')}</td>
                     </tr>
                   ))}
                 </tbody>

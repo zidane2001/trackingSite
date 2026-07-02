@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Package, MapPin, Clock, Truck, Plane, Ship } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, Package, Clock, Truck, Plane, Ship } from 'lucide-react';
 import { packagesApi } from '../lib/api';
+import { ParcelMap } from '../components/ParcelMap';
+import { TrackingQR } from '../components/TrackingQR';
 import type { PackageItem } from '../types';
 import { STATUS_LABELS, STATUS_COLORS } from '../types';
 
@@ -104,17 +105,21 @@ export function Tracking() {
               </div>
             )}
 
-            {/* Map placeholder */}
-            <div className="h-64 bg-slate-100 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                  <p className="text-sm text-slate-400">Carte interactive</p>
-                  <p className="text-xs text-slate-300 mt-1">
-                    {result.originAddress} → {result.destinationAddress}
-                  </p>
-                </div>
-              </div>
+            {/* Real Leaflet map */}
+            <div className="relative">
+              <ParcelMap pkg={result} height="280px" showPosition={true} />
+            </div>
+
+            {/* QR Code */}
+            <div className="px-6 py-4 border-b border-slate-100">
+              <TrackingQR
+                trackingNumber={result.trackingNumber}
+                name={result.name}
+                origin={result.originAddress}
+                destination={result.destinationAddress}
+                size={120}
+                showLabel={true}
+              />
             </div>
 
             {/* Details */}

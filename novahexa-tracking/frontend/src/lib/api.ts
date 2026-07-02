@@ -44,6 +44,14 @@ export const authApi = {
     api.post<AuthResponse>('/api/auth/login', { email, password }),
   register: (data: { fullName: string; email: string; password: string; phone?: string }) =>
     api.post('/api/auth/register', data),
+  verifyEmail: (token: string) =>
+    api.post<{ status: string; message: string }>('/api/auth/verify-email', { token }),
+  resendVerification: (email: string) =>
+    api.post<{ status: string; message: string }>('/api/auth/resend-verification', { email }),
+  forgotPassword: (email: string) =>
+    api.post<{ status: string; message: string }>('/api/auth/forgot-password', { email }),
+  resetPassword: (token: string, password: string) =>
+    api.post<{ status: string; message: string }>('/api/auth/reset-password', { token, password }),
 };
 
 // ── Packages ─────────────────────────────────────────────────
@@ -84,7 +92,8 @@ export const dashboardApi = {
 // ── Notifications ────────────────────────────────────────────
 export const notificationsApi = {
   list: () => api.get<Notification[]>('/api/notifications'),
-  markRead: (id: number) => api.put(`/api/notifications/${id}/read`, {}),
+  unreadCount: () => api.get<{ count: number }>('/api/notifications/unread-count'),
+  markRead: (id: string) => api.put(`/api/notifications/${id}/read`, {}),
   markAllRead: () => api.put('/api/notifications/read-all', {}),
 };
 
@@ -110,6 +119,78 @@ export async function uploadPhoto(file: File): Promise<string> {
   const data = await res.json();
   return data.url as string;
 }
+
+// ── Pricing ──────────────────────────────────────────────
+export const pricingApi = {
+  estimate: (data: {
+    mode: string;
+    delay: string;
+    material: string;
+    weightKg?: number;
+    heightCm?: number;
+    widthCm?: number;
+    lengthCm?: number;
+  }) =>
+    api.post<{ estimatedCost: number; billableWeight: number; mode: string; delay: string; material: string }>(
+      '/api/pricing/estimate',
+      data,
+    ),
+};
+
+// ── PDF ────────────────────────────────────────────────
+const BASE_URL_PDF =
+  (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
+
+export const pdfApi = {
+  downloadQuote: (trackingNumber: string) =>
+    window.open(`${BASE_URL_PDF}/api/pdf/quote/${trackingNumber}`, '_blank'),
+  downloadInvoice: (trackingNumber: string) =>
+    window.open(`${BASE_URL_PDF}/api/pdf/invoice/${trackingNumber}`, '_blank'),
+  downloadLabel: (trackingNumber: string) =>
+    window.open(`${BASE_URL_PDF}/api/pdf/label/${trackingNumber}`, '_blank'),
+};
+
+// ── Analytics ──────────────────────────────────────────────
+export interface AnalyticsData {
+  overview: {
+    totalParcels: number;
+    delivered: number;
+    inTransit: number;
+    pending: number;
+    refused: number;
+    totalRevenue: number;
+    currentMonthRevenue: number;
+    deliveryRate: number;
+    activeShipments: number;
+  };
+  statusDistribution: { status: string; label: string; count: number }[];
+  monthlyShipments: { month: string; count: number }[];
+  revenue: { total: number; average: number; count: number };
+  transportDistribution: { mode: string; count: number }[];
+  deliveryPerformance: { totalDelivered: number; deliveryRate: number };
+  topRoutes: { route: string; count: number }[];
+  materialDistribution: { material: string; count: number }[];
+}
+
+export const analyticsApi = {
+  get: () => api.get<AnalyticsData>('/api/admin/analytics'),
+};
+
+// ── Messages ──────────────────────────────────────────────
+export interface MessageItem {
+  id: string;
+  subject: string;
+  body: string;
+  senderName: string;
+  sentAt: string;
+}
+
+export const messagesApi = {
+  send: (parcelId: string, data: { subject: string; body: string }) =>
+    api.post<MessageItem>(`/api/admin/packages/${parcelId}/messages`, data),
+  list: (parcelId: string) =>
+    api.get<MessageItem[]>(`/api/admin/packages/${parcelId}/messages`),
+};
 
 // ── Legacy submitPackage (used by PackageHeroForm) ──────
 export async function submitPackage(

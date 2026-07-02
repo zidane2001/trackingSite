@@ -37,7 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(c -> c.configurationSource(corsSource()))
-            .csrf(cs -> csrf.disable())
+            .csrf(cs -> cs.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/packages").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/packages/**").permitAll()
@@ -45,11 +45,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/uploads").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/pricing/**").permitAll()
+                .requestMatchers("/api/pdf/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/notifications").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/notifications/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/contact").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/contact/**").hasRole("ADMIN")
+                .requestMatchers("/ws/**").permitAll()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(bearerAuthFilter(), UsernamePasswordAuthenticationFilter.class)

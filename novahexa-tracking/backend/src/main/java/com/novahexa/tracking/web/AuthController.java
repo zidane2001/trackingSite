@@ -3,18 +3,18 @@ package com.novahexa.tracking.web;
 import com.novahexa.tracking.domain.AppUser;
 import com.novahexa.tracking.domain.Role;
 import com.novahexa.tracking.repository.AppUserRepository;
+import com.novahexa.tracking.service.AuthService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,10 +22,12 @@ public class AuthController {
 
     private final AppUserRepository users;
     private final PasswordEncoder encoder;
+    private final AuthService authService;
 
-    public AuthController(AppUserRepository users, PasswordEncoder encoder) {
+    public AuthController(AppUserRepository users, PasswordEncoder encoder, AuthService authService) {
         this.users = users;
         this.encoder = encoder;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -37,7 +39,6 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identifiants incorrects");
         }
 
-        // Simple token: user ID + role encoded (production should use JWT library)
         String token = generateToken(user);
 
         return ResponseEntity.ok(Map.of(
@@ -47,6 +48,7 @@ public class AuthController {
                         "fullName", user.getFullName(),
                         "email", user.getEmail(),
                         "role", user.getRole().name(),
+                        "verified", user.isVerified(),
                         "createdAt", user.getCreatedAt().toString()
                 )
         ));
@@ -54,7 +56,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> register(@Valid @RequestBody RegisterRequest body) {
+    public Map<String, Object> register(@Valid @RequestBody RegisterRequest body) {
         if (users.existsByEmail(body.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cet email est déjà utilisé");
         }
@@ -65,19 +67,65 @@ public class AuthController {
         user.setPasswordHash(encoder.encode(body.password()));
         user.setPhone(body.phone());
         user.setRole(Role.CLIENT);
-        user.setVerified(true);
+        user.setVerified(false);
         users.save(user);
 
-        return Map.of("status", "registered");
+        // Envoyer l'email de vérification
+        authService.sendVerificationEmail(user);
+
+        return Map.of(
+                "status", "registered",
+                "message", "Un email de vérification a été envoyé à " + body.email()
+        );
     }
 
+    // ── Email Verification ─────────────────────────────────────
+
+    @PostMapping("/verify-email")
+    public Map<String, String> verifyEmail(@RequestBody VerifyEmailRequest body) {
+        authService.verifyEmail(body.token());
+        return Map.of("status", "verified", "message", "Email vérifié avec succès");
+    }
+
+    @PostMapping("/resend-verification")
+    public Map<String, String> resendVerification(@RequestBody ResendVerificationRequest body) {
+        authService.resendVerificationEmail(body.email());
+        return Map.of("status", "sent", "message", "Un nouvel email de vérification a été envoyé");
+    }
+
+    // ── Password Reset ─────────────────────────────────────────
+
+    @PostMapping("/forgot-password")
+    public Map<String, String> forgotPassword(@RequestBody ForgotPasswordRequest body) {
+        // Ne pas révéler si l'email existe ou non (protection anti-énumération)
+        try {
+            authService.sendPasswordResetEmail(body.email());
+        } catch (ResponseStatusException ignored) {
+            // Silencieux pour éviter l'énumération d'emails
+        }
+        return Map.of("status", "sent", "message", "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé.");
+    }
+
+    @PostMapping("/reset-password")
+    public Map<String, String> resetPassword(@Valid @RequestBody ResetPasswordRequest body) {
+        authService.resetPassword(body.token(), body.password());
+        return Map.of("status", "reset", "message", "Mot de passe réinitialisé avec succès");
+    }
+
+    // ── Helpers ────────────────────────────────────────────────
+
     private String generateToken(AppUser user) {
-        // Simple base64-like token (replace with JWT library in production)
         return java.util.Base64.getEncoder().encodeToString(
                 (user.getId() + ":" + user.getRole().name() + ":" + System.currentTimeMillis()).getBytes()
         );
     }
 
+    // ── DTOs ───────────────────────────────────────────────────
+
     public record LoginRequest(@NotBlank @Email String email, @NotBlank String password) {}
-    public record RegisterRequest(@NotBlank String fullName, @NotBlank @Email String email, @NotBlank String password, String phone) {}
+    public record RegisterRequest(@NotBlank String fullName, @NotBlank @Email String email, @NotBlank @Size(min = 6) String password, String phone) {}
+    public record VerifyEmailRequest(@NotBlank String token) {}
+    public record ResendVerificationRequest(@NotBlank @Email String email) {}
+    public record ForgotPasswordRequest(@NotBlank @Email String email) {}
+    public record ResetPasswordRequest(@NotBlank String token, @NotBlank @Size(min = 6) String password) {}
 }

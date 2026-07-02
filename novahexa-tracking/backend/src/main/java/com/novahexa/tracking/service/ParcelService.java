@@ -17,10 +17,15 @@ public class ParcelService {
 
     private final ParcelRepository parcels;
     private final TrackingNumberService trackingNumbers;
+    private final NotificationService notificationService;
+    private final PricingService pricingService;
 
-    public ParcelService(ParcelRepository parcels, TrackingNumberService trackingNumbers) {
+    public ParcelService(ParcelRepository parcels, TrackingNumberService trackingNumbers,
+                         NotificationService notificationService, PricingService pricingService) {
         this.parcels = parcels;
         this.trackingNumbers = trackingNumbers;
+        this.notificationService = notificationService;
+        this.pricingService = pricingService;
     }
 
     /** Cahier §5.2 : soumission client -> statut PENDING + n° de suivi auto. */
@@ -45,7 +50,13 @@ public class ParcelService {
         p.setTransportMode(req.mode());
         p.setDeliveryDelay(req.delay());
         p.setShippingDate(req.shippingDate());
-        p.setEstimatedCost(req.estimatedCost());
+        // Cahier §3.1 : recalcul côté serveur pour éviter la falsification
+        p.setEstimatedCost(pricingService.estimateCost(
+                req.mode(), req.delay(), req.material(),
+                req.weightKg(),
+                req.dimensions() != null ? req.dimensions().heightCm() : null,
+                req.dimensions() != null ? req.dimensions().widthCm() : null,
+                req.dimensions() != null ? req.dimensions().lengthCm() : null));
         p.setPhotoUrl(req.photoUrl());
         p.setStatus(ParcelStatus.PENDING);
 
@@ -53,6 +64,10 @@ public class ParcelService {
                 "Demande soumise par le client"));
 
         parcels.save(p);
+
+        // Cahier §9 : notification de confirmation de soumission
+        notificationService.onSubmission(p);
+
         return new ParcelSubmissionResponse(p.getTrackingNumber(), p.getStatus(), p.getEstimatedCost());
     }
 
@@ -84,7 +99,12 @@ public class ParcelService {
         p.setValidatedBy(admin);
         p.getEvents().add(new TrackingEvent(p, EventType.VALIDATED,
                 "Validée par l'administrateur"));
-        return parcels.save(p);
+        Parcel saved = parcels.save(p);
+
+        // Cahier §9 : notification de validation
+        notificationService.onValidation(saved);
+
+        return saved;
     }
 
     /** Cahier §6.2 : refus admin avec motif obligatoire. */
@@ -98,6 +118,11 @@ public class ParcelService {
         p.setRefusalReason(reason);
         p.getEvents().add(new TrackingEvent(p, EventType.REFUSED,
                 "Refusée par l'administrateur : " + reason));
-        return parcels.save(p);
+        Parcel saved = parcels.save(p);
+
+        // Cahier §9 : notification de refus avec motif
+        notificationService.onRefusal(saved, reason);
+
+        return saved;
     }
 }

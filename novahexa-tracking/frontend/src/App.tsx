@@ -17,6 +17,9 @@ import { Legal, PrivacyPolicy, CookiePolicy } from './pages/Legal';
 // Auth pages
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { VerifyEmail } from './pages/VerifyEmail';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 
 // Client pages
 import { ClientDashboard } from './pages/client/ClientDashboard';
@@ -29,6 +32,7 @@ import { AdminPackages } from './pages/admin/AdminPackages';
 import { AdminMessages } from './pages/admin/AdminMessages';
 import { AdminContactMessages } from './pages/admin/AdminContactMessages';
 import { AdminMap } from './pages/admin/AdminMap';
+import { AdminAnalytics } from './pages/admin/AdminAnalytics';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -58,6 +62,9 @@ export function App() {
             {/* ── Auth pages (no public layout) ── */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* ── Client pages (protected) ── */}
             <Route
@@ -107,6 +114,14 @@ export function App() {
               element={
                 <ProtectedRoute roles={['ADMIN']}>
                   <AdminMap />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/analytics"
+              element={
+                <ProtectedRoute roles={['ADMIN']}>
+                  <AdminAnalytics />
                 </ProtectedRoute>
               }
             />

@@ -11,7 +11,65 @@
   }
 }
 
-/* Hide scrollbar utility */
+/* ── Scroll-reveal animation classes ─────────────────────────── */
+
+/* Shared base: elements start invisible */
+.reveal {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 700ms;
+}
+
+/* When visible */
+.reveal.visible {
+  opacity: 1;
+}
+
+/* Directions */
+.reveal-up {
+  transform: translateY(32px);
+}
+.reveal-up.visible {
+  transform: translateY(0);
+}
+
+.reveal-down {
+  transform: translateY(-32px);
+}
+.reveal-down.visible {
+  transform: translateY(0);
+}
+
+.reveal-left {
+  transform: translateX(-40px);
+}
+.reveal-left.visible {
+  transform: translateX(0);
+}
+
+.reveal-right {
+  transform: translateX(40px);
+}
+.reveal-right.visible {
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  transform: scale(0.92);
+}
+.reveal-scale.visible {
+  transform: scale(1);
+}
+
+/* ── Shimmer underline utility ────────────────────────────────── */
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ── Hide scrollbar utility ──────────────────────────────────── */
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

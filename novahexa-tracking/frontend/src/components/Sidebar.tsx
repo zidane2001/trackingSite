@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -7,6 +7,7 @@ import {
   Map,
   MessageSquare,
   Inbox,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -26,6 +27,7 @@ const adminNav: NavItem[] = [
   { icon: ClipboardCheck, label: 'Soumissions', path: '/admin/submissions' },
   { icon: Package, label: 'Colis', path: '/admin/packages' },
   { icon: Map, label: 'Carte globale', path: '/admin/map' },
+  { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
   { icon: MessageSquare, label: 'Messagerie', path: '/admin/messages' },
   { icon: Inbox, label: 'Messages contact', path: '/admin/contact-messages' },
 ];

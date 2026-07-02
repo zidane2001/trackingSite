@@ -32,6 +32,13 @@ cloudinary:
   api-key: ${CLOUDINARY_API_KEY:}
   api-secret: ${CLOUDINARY_API_SECRET:}
 
+# Resend : à renseigner pour activer l'envoi d'emails transactionnels
+# Créer un compte sur https://resend.com et obtenir une clé API
+resend:
+  api-key: ${RESEND_API_KEY:}
+  from-email: ${RESEND_FROM_EMAIL:noreply@youmslogistics.com}
+  from-name: ${RESEND_FROM_NAME:Youms Logistics}
+
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

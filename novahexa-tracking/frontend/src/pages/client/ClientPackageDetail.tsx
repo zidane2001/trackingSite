@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Package, MapPin, Clock, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Package, Clock, MessageSquare, FileText, Download, Tag } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
-import { packagesApi } from '../../lib/api';
+import { ParcelMap } from '../../components/ParcelMap';
+import { TrackingQR } from '../../components/TrackingQR';
+import { packagesApi, pdfApi } from '../../lib/api';
 import type { PackageItem } from '../../types';
 
 export function ClientPackageDetail() {
@@ -66,24 +68,50 @@ export function ClientPackageDetail() {
         </div>
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-6">
-          {/* Map placeholder */}
+          {/* Real Leaflet map */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="h-[400px] bg-slate-100 flex items-center justify-center relative">
-              <div className="absolute inset-0 opacity-30" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394a3b8' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-              }} />
-              <div className="text-center z-10">
-                <MapPin className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-400 text-sm">Carte interactive</p>
-                <p className="text-xs text-slate-300 mt-1">
-                  {pkg.originAddress} → {pkg.destinationAddress}
-                </p>
-              </div>
-            </div>
+            <ParcelMap pkg={pkg} height="400px" showPosition={true} />
           </div>
 
           {/* Details sidebar */}
           <div className="space-y-4">
+            {/* QR Code */}
+            <TrackingQR
+              trackingNumber={pkg.trackingNumber}
+              name={pkg.name}
+              origin={pkg.originAddress}
+              destination={pkg.destinationAddress}
+              size={160}
+              showLabel={true}
+            />
+            {/* PDF Downloads */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+              <h3 className="font-bold text-slate-900 text-sm mb-4">Documents</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => pdfApi.downloadQuote(pkg.trackingNumber)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-50 rounded-lg text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors font-medium"
+                >
+                  <FileText className="w-4 h-4" />
+                  Télécharger le devis
+                </button>
+                <button
+                  onClick={() => pdfApi.downloadInvoice(pkg.trackingNumber)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-50 rounded-lg text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors font-medium"
+                >
+                  <Download className="w-4 h-4" />
+                  Télécharger la facture
+                </button>
+                <button
+                  onClick={() => pdfApi.downloadLabel(pkg.trackingNumber)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-50 rounded-lg text-sm text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition-colors font-medium"
+                >
+                  <Tag className="w-4 h-4" />
+                  Étiquette d'expédition
+                </button>
+              </div>
+            </div>
+
             {/* Route info */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
               <h3 className="font-bold text-slate-900 text-sm mb-4">Détails du trajet</h3>

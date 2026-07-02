@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Package, Plus, Pencil, Trash2, Search, Filter, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Package, Trash2, Search, X, FileText, Tag } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
-import { packagesApi } from '../../lib/api';
+import { TrackingQR } from '../../components/TrackingQR';
+import { packagesApi, pdfApi } from '../../lib/api';
 import type { PackageItem, PackageStatus } from '../../types';
 import { STATUS_LABELS } from '../../types';
 
@@ -13,7 +14,7 @@ export function AdminPackages() {
   const [statusFilter, setStatusFilter] = useState<PackageStatus | ''>('');
 
   const loadPackages = () => {
-    packagesApi.list().catch(() => []).finally(() => setLoading(false));
+    packagesApi.list().then(setPackages).catch(() => []).finally(() => setLoading(false));
   };
 
   useEffect(() => { loadPackages(); }, []);
@@ -87,8 +88,8 @@ export function AdminPackages() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50">
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Nom</th>
-                    <th className="text-left px-6 py-3 font-semibold text-slate-500">N° suivi</th>
+                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Colis</th>
+                    <th className="text-left px-6 py-3 font-semibold text-slate-500">QR</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Client</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Trajet</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Statut</th>
@@ -99,20 +100,41 @@ export function AdminPackages() {
                 <tbody className="divide-y divide-slate-100">
                   {filtered.map((pkg) => (
                     <tr key={pkg.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-3 font-medium text-slate-900">{pkg.name}</td>
-                      <td className="px-6 py-3 font-mono text-slate-500 text-xs">{pkg.trackingNumber}</td>
+                      <td className="px-6 py-3">
+                        <div className="font-medium text-slate-900">{pkg.name}</div>
+                        <div className="text-[11px] text-slate-400 font-mono mt-0.5">{pkg.trackingNumber}</div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <TrackingQR trackingNumber={pkg.trackingNumber} size={48} showActions={false} />
+                      </td>
                       <td className="px-6 py-3 text-slate-600">{pkg.ownerName || pkg.ownerEmail || '—'}</td>
                       <td className="px-6 py-3 text-slate-600">{pkg.originAddress} → {pkg.destinationAddress}</td>
                       <td className="px-6 py-3"><StatusBadge status={pkg.status} size="sm" /></td>
                       <td className="px-6 py-3 text-slate-400 text-xs">{new Date(pkg.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-6 py-3 text-right">
-                        <button
-                          onClick={() => handleDelete(pkg)}
-                          className="text-slate-400 hover:text-red-500 transition-colors p-1"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => pdfApi.downloadQuote(pkg.trackingNumber)}
+                            className="text-slate-400 hover:text-blue-500 transition-colors p-1"
+                            title="Devis PDF"
+                          >
+                            <FileText className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => pdfApi.downloadLabel(pkg.trackingNumber)}
+                            className="text-slate-400 hover:text-yellow-500 transition-colors p-1"
+                            title="Étiquette PDF"
+                          >
+                            <Tag className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(pkg)}
+                            className="text-slate-400 hover:text-red-500 transition-colors p-1"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
