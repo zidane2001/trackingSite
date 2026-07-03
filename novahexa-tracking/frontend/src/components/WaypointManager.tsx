@@ -35,7 +35,7 @@ export function WaypointManager({ pkg, onUpdate }: WaypointManagerProps) {
         orderIndex: waypoints.length,
       });
       // Reload package to get updated waypoints
-      const updated = await packagesApi.get(pkg.id);
+      const updated = await packagesApi.getAdmin(pkg.id);
       setWaypoints(updated.waypoints ?? []);
       onUpdate(updated);
       setSelectedCoords(null);
@@ -51,7 +51,7 @@ export function WaypointManager({ pkg, onUpdate }: WaypointManagerProps) {
     if (!confirm(`Supprimer l'arrêt "${wp.label}" ?`)) return;
     try {
       await packagesApi.deleteWaypoint(pkg.id, String(wp.id));
-      const updated = await packagesApi.get(pkg.id);
+      const updated = await packagesApi.getAdmin(pkg.id);
       setWaypoints(updated.waypoints ?? []);
       onUpdate(updated);
     } catch {

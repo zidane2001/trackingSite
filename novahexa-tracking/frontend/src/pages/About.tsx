@@ -21,14 +21,14 @@ export function About() {
   return (
     <div className="bg-[#eef2f6]">
       {/* Hero */}
-      <section className="relative bg-[#060f24] text-white py-24 overflow-hidden">
+      <section className="relative bg-[#060f24] text-white py-14 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: `url(${IMAGES.warehouse})` }} />
-        <div className="relative max-w-[1400px] mx-auto px-6 lg:px-8 text-center">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">À propos</span>
-          <h1 className="text-4xl lg:text-5xl font-bold mt-3 mb-5">
-            Nous connectons le monde,<br />un colis à la fois
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mt-3 mb-5">
+            Nous connectons le monde,<br className="hidden sm:block" />un colis à la fois
           </h1>
-          <p className="text-slate-300 max-w-2xl mx-auto text-lg">
+          <p className="text-slate-300 max-w-2xl mx-auto text-sm sm:text-lg">
             Depuis 2018, Youms Logistics accompagne particuliers et entreprises dans leurs
             expéditions nationales et internationales avec rigueur et innovation.
           </p>
@@ -36,11 +36,11 @@ export function About() {
       </section>
 
       {/* Mission */}
-      <section className="max-w-[1400px] mx-auto px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
           <div>
             <span className="text-gold text-xs font-bold uppercase tracking-wider">Notre mission</span>
-            <h2 className="text-3xl font-bold text-slate-900 mt-3 mb-5">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mt-3 mb-5">
               Rendre le transport international accessible à tous
             </h2>
             <p className="text-slate-500 leading-relaxed mb-4">
@@ -67,26 +67,26 @@ export function About() {
       </section>
 
       {/* Timeline */}
-      <section className="bg-[#060f24] py-20">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
+      <section className="bg-[#060f24] py-10 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">Notre histoire</span>
-            <h2 className="text-3xl font-bold text-white mt-3">Les étapes clés</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mt-3">Les étapes clés</h2>
           </div>
           <div className="relative">
-            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/10 -translate-x-1/2" />
-            <div className="space-y-12">
+            <div className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 sm:-translate-x-1/2" />
+            <div className="space-y-8 sm:space-y-12">
               {MILESTONES.map((m, i) => (
-                <div key={m.year} className={`relative flex items-center ${i % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                  <div className="w-1/2 px-8">
+                <div key={m.year} className={`relative flex items-center ${i % 2 === 0 ? 'sm:flex-row' : 'sm:flex-row-reverse'}`}>
+                  <div className="w-full sm:w-1/2 pl-10 sm:pl-8">
                     <div className={`bg-white/5 border border-white/10 rounded-xl p-6 ${i % 2 === 0 ? 'text-right' : 'text-left'}`}>
                       <span className="text-gold font-bold text-lg">{m.year}</span>
                       <h3 className="text-white font-bold mt-1">{m.title}</h3>
                       <p className="text-slate-400 text-sm mt-1">{m.text}</p>
                     </div>
                   </div>
-                  <div className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-gold rounded-full border-4 border-[#060f24] z-10" />
-                  <div className="w-1/2" />
+                  <div className="absolute left-4 sm:left-1/2 -translate-x-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-gold rounded-full border-3 sm:border-4 border-[#060f24] z-10" />
+                  <div className="hidden sm:block w-1/2" />
                 </div>
               ))}
             </div>

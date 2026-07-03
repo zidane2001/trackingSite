@@ -55,15 +55,15 @@ export function Services() {
   return (
     <div className="bg-[#eef2f6]">
       {/* Hero */}
-      <section className="bg-[#060f24] text-white py-20">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8 text-center">
+      <section className="bg-[#060f24] text-white py-12 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
             Nos solutions
           </span>
-          <h1 className="text-4xl lg:text-5xl font-bold mt-3 mb-5">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mt-3 mb-5">
             Des moyens de transport adaptés à chaque besoin
           </h1>
-          <p className="text-slate-300 max-w-2xl mx-auto text-lg">
+          <p className="text-slate-300 max-w-2xl mx-auto text-sm sm:text-lg">
             Qu'il s'agisse d'un envoi national urgent ou d'un transport maritime de gros
             volumes, Youms Logistics offre la solution qu'il vous faut.
           </p>
@@ -71,7 +71,7 @@ export function Services() {
       </section>
 
       {/* Service cards */}
-      <section className="max-w-[1400px] mx-auto px-6 lg:px-8 -mt-10 relative z-10 space-y-10 pb-20">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 relative z-10 space-y-6 sm:space-y-10 pb-10 sm:pb-20">
         {SERVICES.map((s, i) => (
           <div
             key={s.title}
@@ -91,7 +91,7 @@ export function Services() {
                   </div>
                 </div>
               </div>
-              <div className="p-8 lg:p-10">
+              <div className="p-5 sm:p-8 lg:p-10">
                 <span className="text-xs font-bold text-gold uppercase tracking-wider">
                   {s.subtitle}
                 </span>

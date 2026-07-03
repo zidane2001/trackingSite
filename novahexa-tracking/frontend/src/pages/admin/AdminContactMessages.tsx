@@ -46,7 +46,7 @@ export function AdminContactMessages() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_400px] gap-6 min-h-[500px]">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-4 sm:gap-6 min-h-[400px] sm:min-h-[500px]">
           {/* Message list */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             {loading ? (

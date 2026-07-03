@@ -57,8 +57,9 @@ export const authApi = {
 // ── Packages ─────────────────────────────────────────────────
 export const packagesApi = {
   list: () => api.get<PackageItem[]>('/api/admin/packages?status=ALL'),
+  listByOwner: () => api.get<PackageItem[]>('/api/client/packages'),
   listPending: () => api.get<PackageItem[]>('/api/admin/packages'),
-  get: (id: string) => api.get<PackageItem>(`/api/admin/packages/${id}`),
+  get: (id: string) => api.get<PackageItem>(`/api/client/packages/${id}`),
   getByTracking: (trackingNumber: string) =>
     api.get<PackageItem>(`/api/track/${trackingNumber}`),
   submit: (data: Record<string, unknown>) =>
@@ -66,6 +67,7 @@ export const packagesApi = {
       '/api/packages',
       data,
     ),
+  getAdmin: (id: string) => api.get<PackageItem>(`/api/admin/packages/${id}`),
   update: (id: string, data: Record<string, unknown>) =>
     api.put(`/api/admin/packages/${id}`, data),
   delete: (id: string) => api.delete(`/api/admin/packages/${id}`),

@@ -67,9 +67,9 @@ export function AdminAnalytics() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 sm:gap-3">
             <BarChart3 className="w-6 h-6 text-yellow-500" />
             Analytics & Rapports
           </h1>
@@ -77,7 +77,7 @@ export function AdminAnalytics() {
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {statCards.map((s) => (
             <div key={s.label} className={cn('rounded-xl p-4 border border-slate-100', s.color)}>
               <s.icon className="w-5 h-5 mb-2 opacity-70" />
@@ -195,7 +195,7 @@ export function AdminAnalytics() {
         {/* Revenue Summary */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
           <h3 className="font-bold text-slate-900 text-sm mb-4">Résumé des revenus</h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div className="text-center p-4 bg-slate-50 rounded-lg">
               <div className="text-2xl font-bold text-slate-900">
                 {revenue.total.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €

@@ -77,7 +77,7 @@ public class AdminParcelController {
 
     /** Supprimer un waypoint. */
     @DeleteMapping("/{parcelId}/waypoints/{waypointId}")
-    public ParcelView deleteWaypoint(@PathVariable String parcelId, @PathVariable Long waypointId) {
+    public ParcelView deleteWaypoint(@PathVariable String parcelId, @PathVariable UUID waypointId) {
         parcels.deleteWaypoint(parcelId, waypointId);
         return ParcelView.of(parcels.getById(UUID.fromString(parcelId)));
     }

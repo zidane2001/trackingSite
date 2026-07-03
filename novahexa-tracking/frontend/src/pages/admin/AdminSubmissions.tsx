@@ -45,9 +45,9 @@ export function AdminSubmissions() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 sm:gap-3">
             <ClipboardCheck className="w-6 h-6 text-yellow-500" />
             File de validation
           </h1>
@@ -76,9 +76,8 @@ export function AdminSubmissions() {
                 )}
                 onClick={() => setSelected(selected?.id === pkg.id ? null : pkg)}
               >
-                <div className="flex items-start justify-between cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between cursor-pointer gap-2">                    <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
                       <ClipboardCheck className="w-6 h-6 text-amber-500" />
                     </div>
                     <div>

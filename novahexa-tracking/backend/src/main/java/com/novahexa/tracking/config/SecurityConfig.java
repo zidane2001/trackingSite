@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/pdf/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/notifications").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/notifications/**").permitAll()
+                .requestMatchers("/api/client/**").authenticated()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/contact").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/contact/**").hasRole("ADMIN")

@@ -109,6 +109,11 @@ public class ParcelService {
         return parcels.findAllByOrderByCreatedAtDesc();
     }
 
+    @Transactional(readOnly = true)
+    public List<Parcel> listByOwner(UUID ownerId) {
+        return parcels.findByOwner_IdOrderByCreatedAtDesc(ownerId);
+    }
+
     /** Cahier §6.2 : validation admin -> statut VALIDATED. */
     @Transactional
     public Parcel validate(String trackingNumber, AppUser admin) {
@@ -195,7 +200,7 @@ public class ParcelService {
 
     /** Supprimer un waypoint. */
     @Transactional
-    public void deleteWaypoint(String parcelId, Long waypointId) {
+    public void deleteWaypoint(String parcelId, UUID waypointId) {
         Parcel p = getById(UUID.fromString(parcelId));
         p.getWaypoints().removeIf(wp -> wp.getId().equals(waypointId));
         parcels.save(p);

@@ -29,20 +29,20 @@ export function Contact() {
 
   return (
     <div className="bg-[#eef2f6]">
-      <section className="bg-[#060f24] text-white py-20">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8 text-center">
+      <section className="bg-[#060f24] text-white py-12 sm:py-20">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">Contact</span>
-          <h1 className="text-4xl font-bold mt-3 mb-5">Nous contacter</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-3 mb-5">Nous contacter</h1>
           <p className="text-slate-300 max-w-2xl mx-auto">
             Une question, une demande de devis ou un besoin d'assistance ? Notre équipe vous répond sous 24h.
           </p>
         </div>
       </section>
 
-      <section className="max-w-[1400px] mx-auto px-6 lg:px-8 py-16">
-        <div className="grid lg:grid-cols-[1fr_400px] gap-12">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-12">
           {/* Form */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8">
             {sent ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">

@@ -27,10 +27,10 @@ export function FAQ() {
 
   return (
     <div className="bg-[#eef2f6]">
-      <section className="bg-[#060f24] text-white py-20">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
+      <section className="bg-[#060f24] text-white py-12 sm:py-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-yellow-400 text-xs font-bold uppercase tracking-[0.2em]">FAQ</span>
-          <h1 className="text-4xl font-bold mt-3 mb-5">Questions fréquentes</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-3 mb-5">Questions fréquentes</h1>
           <p className="text-slate-300 mb-8">
             Trouvez rapidement les réponses à vos questions sur nos services de transport et de suivi.
           </p>
@@ -47,7 +47,7 @@ export function FAQ() {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-6 lg:px-8 py-16">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         <div className="space-y-3">
           {filtered.map((item, i) => (
             <div

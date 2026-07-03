@@ -19,7 +19,7 @@ export function AdminMessages() {
 
   useEffect(() => {
     if (selectedPkg) {
-      packagesApi.get(selectedPkg.id).then(setSelectedPkg).catch(() => {});
+      packagesApi.getAdmin(selectedPkg.id).then(setSelectedPkg).catch(() => {});
     }
   }, [selectedPkg?.id]);
 
@@ -31,23 +31,23 @@ export function AdminMessages() {
       setSubject('');
       setBody('');
       // Reload the package to get updated messages
-      const updated = await packagesApi.get(selectedPkg.id);
+      const updated = await packagesApi.getAdmin(selectedPkg.id);
       setSelectedPkg(updated);
     } catch { /* ignore */ } finally { setSending(false); }
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 sm:gap-3">
             <MessageSquare className="w-6 h-6 text-yellow-500" />
             Messagerie
           </h1>
           <p className="text-sm text-slate-500 mt-1">Envoyez des messages personnalisés aux clients</p>
         </div>
 
-        <div className="grid lg:grid-cols-[350px_1fr] gap-6 min-h-[600px]">
+        <div className="grid lg:grid-cols-[350px_1fr] gap-4 sm:gap-6 min-h-[400px] sm:min-h-[600px]">
           {/* Package list */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-100">

@@ -2,7 +2,7 @@
 export type UserRole = 'CLIENT' | 'ADMIN';
 
 export interface User {
-  id: number;
+  id: string;
   fullName: string;
   email: string;
   phone?: string;
@@ -43,7 +43,7 @@ export const STATUS_COLORS: Record<PackageStatus, string> = {
 export type TransportMode = 'ROUTIER' | 'AERIEN' | 'MARITIME';
 
 export interface Waypoint {
-  id: number;
+  id: string;
   label: string;
   orderIndex: number;
   lat: number;
@@ -53,15 +53,15 @@ export interface Waypoint {
 }
 
 export interface TrackingEvent {
-  id: number;
+  id: string;
   eventType: string;
   description: string;
   createdAt: string;
 }
 
 export interface PackageMessage {
-  id: number;
-  senderId: number;
+  id: string;
+  senderId: string;
   senderName: string;
   subject: string;
   body: string;
@@ -73,7 +73,10 @@ export interface PackageItem {
   trackingNumber: string;
   name: string;
   description?: string;
-  ownerId: number;
+  senderName?: string;
+  senderEmail?: string;
+  senderPhone?: string;
+  ownerId?: string;
   ownerName?: string;
   ownerEmail?: string;
   status: PackageStatus;
@@ -85,6 +88,8 @@ export interface PackageItem {
   destinationLat?: number;
   destinationLng?: number;
   transportMode?: TransportMode;
+  deliveryDelay?: string;
+  material?: string;
   weightKg?: number;
   heightCm?: number;
   widthCm?: number;
@@ -94,9 +99,9 @@ export interface PackageItem {
   shippingDate?: string;
   photoUrl?: string;
   validatedAt?: string;
-  validatedBy?: number;
+  validatedBy?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   waypoints?: Waypoint[];
   trackingEvents?: TrackingEvent[];
   messages?: PackageMessage[];

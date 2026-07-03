@@ -12,4 +12,5 @@ public interface ParcelRepository extends JpaRepository<Parcel, UUID> {
     boolean existsByTrackingNumber(String trackingNumber);
     List<Parcel> findByStatusOrderByCreatedAtDesc(ParcelStatus status);
     List<Parcel> findAllByOrderByCreatedAtDesc();
+    List<Parcel> findByOwner_IdOrderByCreatedAtDesc(UUID ownerId);
 }

@@ -45,7 +45,7 @@ export function ClientPackageDetail() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Back */}
         <Link to="/client" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Retour au tableau de bord
@@ -67,7 +67,7 @@ export function ClientPackageDetail() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_400px] gap-6">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-4 sm:gap-6">
           {/* Real Leaflet map */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <ParcelMap pkg={pkg} height="400px" showPosition={true} />

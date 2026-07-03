@@ -29,7 +29,7 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) {
         if (!users.existsByEmail(adminEmail)) {
             AppUser admin = new AppUser();
-            admin.setFullName("Administrateur Novahexa");
+            admin.setFullName("Administrateur Youms Logistics");
             admin.setEmail(adminEmail);
             admin.setPasswordHash(encoder.encode(adminPassword));
             admin.setRole(Role.ADMIN);

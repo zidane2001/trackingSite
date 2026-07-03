@@ -37,19 +37,19 @@ export function Tracking() {
   return (
     <div className="bg-[#eef2f6] min-h-screen">
       {/* Search section */}
-      <section className="bg-[#060f24] py-16">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
+      <section className="bg-[#060f24] py-10 sm:py-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-yellow-400 text-xs font-bold uppercase tracking-[0.2em]">
             Suivi public
           </span>
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mt-3 mb-5">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mt-3 mb-5">
             Suivre votre envoi
           </h1>
           <p className="text-slate-300 mb-8">
             Entrez votre numéro de suivi pour connaître la position de votre colis en temps réel.
           </p>
 
-          <form onSubmit={handleSearch} className="flex h-14 max-w-xl mx-auto">
+          <form onSubmit={handleSearch} className="flex h-12 sm:h-14 max-w-xl mx-auto">
             <input
               type="text"
               placeholder="Ex : NHX-A3B7K9"
@@ -71,7 +71,7 @@ export function Tracking() {
       </section>
 
       {/* Results */}
-      <section className="max-w-3xl mx-auto px-6 lg:px-8 py-12">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
         {error && (
           <div className="bg-white rounded-xl border border-red-200 p-6 text-center">
             <p className="text-red-600 font-medium">{error}</p>

@@ -366,16 +366,16 @@ public class PdfService {
 
     private String formatEnum(String name) {
         return switch (name) {
-            case "ROUTIER" -> "Routier";
-            case "AERIEN" -> "Aérien";
-            case "MARITIME" -> "Maritime";
+            case "ROUTE" -> "Routier";
+            case "AIR" -> "Aérien";
+            case "MER" -> "Maritime";
             case "EXPRESS" -> "Express";
             case "STANDARD" -> "Standard";
-            case "ECONOMIQUE" -> "Économique";
+            case "JOUR_MEME" -> "Jour même";
             case "GENERAL" -> "Général";
             case "AUTO_PARTS" -> "Pièces auto";
             case "FRAGILE" -> "Fragile";
-            case "FOOD" -> "Alimentaire";
+            case "ELECTRONIQUE" -> "Électronique";
             case "DOCUMENTS" -> "Documents";
             default -> name;
         };

@@ -36,21 +36,19 @@ export function AdminMap() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 sm:gap-3">
             <MapIcon className="w-6 h-6 text-yellow-500" />
             Carte globale
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             Vue d'ensemble de tous les colis actifs
           </p>
-        </div>
-
-        <div className="grid lg:grid-cols-[1fr_400px] gap-6">
+        </div>            <div className="grid lg:grid-cols-[1fr_400px] gap-4 sm:gap-6">
           {/* Map */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="h-[600px] relative">
+            <div className="h-[300px] sm:h-[400px] lg:h-[600px] relative">
               {loading ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
                   <div className="text-center">

@@ -68,10 +68,10 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={handleOpen}
-        className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
+        className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5 text-slate-300" />
+        <Bell className="w-5 h-5 text-slate-500" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -82,7 +82,7 @@ export function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-[28rem] overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] max-w-[384px] bg-white rounded-xl shadow-2xl border border-slate-200 z-50 max-h-[28rem] overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-sm text-slate-900">Notifications</h3>
