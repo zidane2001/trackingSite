@@ -74,6 +74,44 @@ public class MessageService {
     }
 
     /**
+     * Envoie un message client → admin concernant un colis.
+     */
+    @Transactional
+    public Message sendClientMessage(UUID parcelId, String subject, String body, AppUser client) {
+        Parcel parcel = parcels.findById(parcelId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colis introuvable"));
+
+        // Vérifier que le client est bien le propriétaire du colis
+        if (parcel.getOwner() == null || !parcel.getOwner().getId().equals(client.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Vous ne pouvez envoyer des messages que pour vos propres colis");
+        }
+
+        Message msg = new Message();
+        msg.setParcel(parcel);
+        msg.setSender(client);
+        msg.setSubject(subject);
+        msg.setBody(body);
+        Message saved = messages.save(msg);
+
+        // Notification interne + email
+        notificationService.onClientMessage(parcel, subject, body);
+
+        // WebSocket push vers les admins
+        wsTemplate.convertAndSend(
+                "/topic/admin/messages",
+                Map.of(
+                        "type", "CLIENT_MESSAGE",
+                        "content", "Nouveau message client : " + subject,
+                        "parcelId", parcelId.toString(),
+                        "trackingNumber", parcel.getTrackingNumber(),
+                        "clientName", client.getFullName()
+                )
+        );
+
+        return saved;
+    }
+
+    /**
      * Récupère les messages d'un colis.
      */
     @Transactional(readOnly = true)

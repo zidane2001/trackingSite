@@ -1,0 +1,1 @@
+{"user":{"id":"16dc5f60-706e-4ac9-aad4-eb90eb8534d0","verified":false,"createdAt":"2026-07-03T16:48:33.224588Z","fullName":"Test User","role":"CLIENT","email":"test@novahexa.local"},"token":"MTZkYzVmNjAtNzA2ZS00YWM5LWFhZDQtZWI5MGViODUzNGQwOkNMSUVOVDoxNzgzMTAxMzk3Nzc2"}

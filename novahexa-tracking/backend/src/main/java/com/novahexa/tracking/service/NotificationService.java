@@ -3,12 +3,15 @@ package com.novahexa.tracking.service;
 import com.novahexa.tracking.domain.AppUser;
 import com.novahexa.tracking.domain.Notification;
 import com.novahexa.tracking.domain.Parcel;
+import com.novahexa.tracking.domain.Role;
 import com.novahexa.tracking.repository.AppUserRepository;
 import com.novahexa.tracking.repository.NotificationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Service centralisé de notifications : crée la notification interne ET envoie l'email.
@@ -140,6 +143,28 @@ public class NotificationService {
                 subject,
                 messageBody
         );
+    }
+
+    // ── Message client → admin ─────────────────────────────────
+
+    @Transactional
+    public void onClientMessage(Parcel parcel, String subject, String messageBody) {
+        // Notifier tous les admins
+        List<AppUser> admins = users.findByRole(Role.ADMIN);
+        for (AppUser admin : admins) {
+            createInternal(admin, "CLIENT_MESSAGE",
+                    "Nouveau message de " + parcel.getOwner().getFullName()
+                    + " concernant le colis " + parcel.getTrackingNumber() + " : " + subject);
+
+            // Email à chaque admin
+            emailService.sendClientMessageEmail(
+                    admin.getEmail(),
+                    parcel.getTrackingNumber(),
+                    parcel.getOwner().getFullName(),
+                    subject,
+                    messageBody
+            );
+        }
     }
 
     // ── Création notification interne ───────────────────────────

@@ -40,7 +40,7 @@ public class GeocodingService {
                     + "&format=json&limit=1&addressdetails=0";
 
             HttpHeaders headers = new HttpHeaders();
-            headers.set("User-Agent", "Novahexa-Tracking/1.0 (contact@novahexa.local)");
+            headers.set("User-Agent", "YoumsLogistics-Tracking/1.0 (youmslogistics@gmail.com)");
             HttpEntity<?> entity = new HttpEntity<>(headers);
 
             ResponseEntity<GeocodingResult[]> response = http.exchange(

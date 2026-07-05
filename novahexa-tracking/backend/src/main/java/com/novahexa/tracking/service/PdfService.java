@@ -3,258 +3,118 @@ package com.novahexa.tracking.service;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.novahexa.tracking.domain.Parcel;
-import com.novahexa.tracking.domain.TrackingEvent;
-import com.novahexa.tracking.domain.Waypoint;
-import com.novahexa.tracking.domain.MaterialType;
-import com.novahexa.tracking.domain.TransportMode;
-import com.novahexa.tracking.domain.DeliveryDelay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
-/**
- * Génération de PDF : devis, factures, étiquettes d'expédition.
- * Cahier §3.1 (devis), §11 (facturation), §5.4 (étiquette).
- */
 @Service
 public class PdfService {
 
-    private static final Font TITLE_FONT = new Font(Font.HELVETICA, 18, Font.BOLD, new Color(6, 15, 36));
-    private static final Font HEADER_FONT = new Font(Font.HELVETICA, 12, Font.BOLD, new Color(200, 169, 81));
-    private static final Font BODY_FONT = new Font(Font.HELVETICA, 10, Font.NORMAL, new Color(51, 51, 51));
-    private static final Font SMALL_FONT = new Font(Font.HELVETICA, 8, Font.NORMAL, new Color(148, 163, 184));
-    private static final Font BOLD_BODY = new Font(Font.HELVETICA, 10, Font.BOLD, new Color(51, 51, 51));
+    private static final Logger log = LoggerFactory.getLogger(PdfService.class);
 
-    private static final Color GOLD = new Color(200, 169, 81);
-    private static final Color DARK = new Color(6, 15, 36);
-    private static final Color LIGHT_BG = new Color(249, 250, 251);
+    // ── Palette Youms Logistics (bleu nuit #060f24 + or #C8A951) ──
+    private static final Color BRAND_BLUE = new Color(6, 15, 36);     // #060f24
+    private static final Color BRAND_GOLD = new Color(200, 169, 81);  // #C8A951
+    private static final Color GRAY       = new Color(120, 120, 120);
+    private static final Color LTGRAY     = new Color(220, 220, 220);
+    private static final Color HEADER_BG  = new Color(245, 245, 245);
 
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private static final Font SECTION_FONT = new Font(Font.HELVETICA, 10, Font.BOLD, BRAND_BLUE);
+    private static final Font LABEL_FONT   = new Font(Font.HELVETICA, 8, Font.NORMAL, GRAY);
+    private static final Font VALUE_FONT   = new Font(Font.HELVETICA, 9, Font.NORMAL, BRAND_BLUE);
+    private static final Font BOLD_FONT    = new Font(Font.HELVETICA, 9, Font.BOLD, BRAND_BLUE);
+    private static final Font SMALL_FONT   = new Font(Font.HELVETICA, 7, Font.NORMAL, GRAY);
+    private static final Font TITLE_FONT   = new Font(Font.HELVETICA, 20, Font.BOLD, Color.WHITE);
+    private static final Font TOTAL_FONT   = new Font(Font.HELVETICA, 9, Font.BOLD, BRAND_BLUE);
+    private static final Font BARCODE_FONT = new Font(Font.HELVETICA, 12, Font.BOLD, BRAND_BLUE);
 
-    /**
-     * Génère un devis PDF pour un colis soumis.
-     */
-    public byte[] generateQuote(Parcel parcel) {
+    private static final String DATE_FMT = "dd/MM/yyyy HH:mm";
+
+    // ════════════════════════════════════════════════════════════
+    //  DEVIS (Quote)
+    // ════════════════════════════════════════════════════════════
+    public byte[] generateQuote(Parcel p) {
+        return buildDocument("DEVIS", p, "Erreur génération devis PDF");
+    }
+
+    public byte[] generateInvoice(Parcel p) {
+        return buildDocument("FACTURE", p, "Erreur génération facture PDF");
+    }
+
+    private byte[] buildDocument(String title, Parcel p, String errorMsg) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
+        Document doc = new Document(PageSize.A4, 36, 36, 36, 36);
         try {
             PdfWriter.getInstance(doc, out);
             doc.open();
-
-            // Header band
-            PdfPTable headerTable = new PdfPTable(1);
-            headerTable.setWidthPercentage(100);
-            PdfPCell headerCell = new PdfPCell();
-            headerCell.setBackgroundColor(DARK);
-            headerCell.setPadding(20);
-            Paragraph title = new Paragraph("DEVIS", new Font(Font.HELVETICA, 24, Font.BOLD, Color.WHITE));
-            title.setAlignment(Element.ALIGN_CENTER);
-            headerCell.addElement(title);
-            Paragraph subtitle = new Paragraph("Youms Logistics — Transport & logistique international",
-                    new Font(Font.HELVETICA, 10, Font.NORMAL, GOLD));
-            subtitle.setAlignment(Element.ALIGN_CENTER);
-            subtitle.setSpacingBefore(8);
-            headerCell.addElement(subtitle);
-            headerTable.addCell(headerCell);
-            doc.add(headerTable);
-            doc.add(new Paragraph(" "));
-
-            // Quote info
-            Paragraph ref = new Paragraph("Référence : " + parcel.getTrackingNumber(), HEADER_FONT);
-            ref.setSpacingAfter(4);
-            doc.add(ref);
-            Paragraph date = new Paragraph("Date : " + java.time.LocalDate.now()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT)), BODY_FONT);
-            date.setSpacingAfter(12);
-            doc.add(date);
-
-            // Sender info
-            addSectionTitle(doc, "Expéditeur");
-            addInfoLine(doc, "Nom", parcel.getSenderName() != null ? parcel.getSenderName() : "—");
-            addInfoLine(doc, "Email", parcel.getSenderEmail() != null ? parcel.getSenderEmail() : "—");
-            addInfoLine(doc, "Téléphone", parcel.getSenderPhone() != null ? parcel.getSenderPhone() : "—");
-            doc.add(new Paragraph(" "));
-
-            // Parcel info
-            addSectionTitle(doc, "Détails du colis");
-            addInfoLine(doc, "Désignation", parcel.getName());
-            addInfoLine(doc, "Poids", parcel.getWeightKg() != null ? parcel.getWeightKg() + " kg" : "—");
-            if (parcel.getHeightCm() != null) {
-                addInfoLine(doc, "Dimensions", parcel.getHeightCm() + " × " + parcel.getWidthCm() + " × " + parcel.getLengthCm() + " cm");
-            }
-            addInfoLine(doc, "Matériau", parcel.getMaterial() != null ? formatEnum(parcel.getMaterial().name()) : "—");
-            doc.add(new Paragraph(" "));
-
-            // Route
-            addSectionTitle(doc, "Trajet");
-            addInfoLine(doc, "Départ", parcel.getOriginAddress());
-            addInfoLine(doc, "Arrivée", parcel.getDestinationAddress());
-            addInfoLine(doc, "Transport", parcel.getTransportMode() != null ? formatEnum(parcel.getTransportMode().name()) : "—");
-            addInfoLine(doc, "Délai", parcel.getDeliveryDelay() != null ? formatEnum(parcel.getDeliveryDelay().name()) : "—");
-            doc.add(new Paragraph(" "));
-
-            // Pricing
-            addSectionTitle(doc, "Tarification");
-            PdfPTable priceTable = new PdfPTable(2);
-            priceTable.setWidthPercentage(100);
-            priceTable.setWidths(new float[]{70, 30});
-            addPriceRow(priceTable, "Mode de transport", parcel.getTransportMode() != null ? formatEnum(parcel.getTransportMode().name()) : "—");
-            addPriceRow(priceTable, "Délai de livraison", parcel.getDeliveryDelay() != null ? formatEnum(parcel.getDeliveryDelay().name()) : "—");
-            if (parcel.getWeightKg() != null) {
-                addPriceRow(priceTable, "Poids facturable", parcel.getWeightKg() + " kg");
-            }
-            doc.add(priceTable);
-            doc.add(new Paragraph(" "));
-
-            // Total
-            PdfPTable totalTable = buildTotalTable(parcel.getEstimatedCost());
-            doc.add(totalTable);
-
-            // Footer
-            doc.add(new Paragraph(" "));
-            addFooter(doc);
-
+            addDocumentHeader(doc, title, p);
+            addSenderReceiverBlock(doc, p);
+            addParcelDetailsTable(doc, p);
+            addTotalsRow(doc, p);
+            addDocumentFooter(doc);
             doc.close();
         } catch (Exception e) {
-            throw new PdfGenerationException("Erreur génération devis PDF", e);
+            throw new PdfException(errorMsg, e);
         }
         return out.toByteArray();
     }
 
-    /**
-     * Génère une facture PDF pour un colis validé/en transit/livré.
-     */
-    public byte[] generateInvoice(Parcel parcel) {
+    // ════════════════════════════════════════════════════════════
+    //  ÉTIQUETTE SHIPPING (barcode label)
+    // ════════════════════════════════════════════════════════════
+    public byte[] generateShippingLabel(Parcel p) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
-        try {
-            PdfWriter.getInstance(doc, out);
-            doc.open();
-
-            // Header
-            PdfPTable headerTable = new PdfPTable(1);
-            headerTable.setWidthPercentage(100);
-            PdfPCell headerCell = new PdfPCell();
-            headerCell.setBackgroundColor(DARK);
-            headerCell.setPadding(20);
-            Paragraph title = new Paragraph("FACTURE", new Font(Font.HELVETICA, 24, Font.BOLD, Color.WHITE));
-            title.setAlignment(Element.ALIGN_CENTER);
-            headerCell.addElement(title);
-            Paragraph subtitle = new Paragraph("Youms Logistics — Transport & logistique international",
-                    new Font(Font.HELVETICA, 10, Font.NORMAL, GOLD));
-            subtitle.setAlignment(Element.ALIGN_CENTER);
-            subtitle.setSpacingBefore(8);
-            headerCell.addElement(subtitle);
-            headerTable.addCell(headerCell);
-            doc.add(headerTable);
-            doc.add(new Paragraph(" "));
-
-            // Invoice info
-            Paragraph ref = new Paragraph("Facture N° : INV-" + parcel.getTrackingNumber(), HEADER_FONT);
-            ref.setSpacingAfter(4);
-            doc.add(ref);
-            Paragraph date = new Paragraph("Date : " + java.time.LocalDate.now()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT)), BODY_FONT);
-            date.setSpacingAfter(4);
-            doc.add(date);
-            if (parcel.getValidatedAt() != null) {
-                Paragraph validated = new Paragraph("Date de validation : " + java.time.LocalDateTime.ofInstant(parcel.getValidatedAt(), java.time.ZoneId.systemDefault())
-                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT)), BODY_FONT);
-                validated.setSpacingAfter(12);
-                doc.add(validated);
-            } else {
-                doc.add(new Paragraph(" "));
-            }
-
-            // Client
-            addSectionTitle(doc, "Client");
-            addInfoLine(doc, "Nom", parcel.getSenderName() != null ? parcel.getSenderName() : "—");
-            addInfoLine(doc, "Email", parcel.getSenderEmail() != null ? parcel.getSenderEmail() : "—");
-            doc.add(new Paragraph(" "));
-
-            // Route
-            addSectionTitle(doc, "Trajet");
-            addInfoLine(doc, "Départ", parcel.getOriginAddress());
-            addInfoLine(doc, "Arrivée", parcel.getDestinationAddress());
-            addInfoLine(doc, "Transport", parcel.getTransportMode() != null ? formatEnum(parcel.getTransportMode().name()) : "—");
-            addInfoLine(doc, "Délai", parcel.getDeliveryDelay() != null ? formatEnum(parcel.getDeliveryDelay().name()) : "—");
-            doc.add(new Paragraph(" "));
-
-            // Line items
-            addSectionTitle(doc, "Détail des prestations");
-            PdfPTable itemsTable = new PdfPTable(2);
-            itemsTable.setWidthPercentage(100);
-            itemsTable.setWidths(new float[]{70, 30});
-            addPriceRow(itemsTable, "Transport " + (parcel.getTransportMode() != null ? formatEnum(parcel.getTransportMode().name()) : ""), "—");
-            if (parcel.getWeightKg() != null) {
-                addPriceRow(itemsTable, "Poids facturable (" + parcel.getWeightKg() + " kg)", "—");
-            }
-            if (parcel.getMaterial() != null) {
-                addPriceRow(itemsTable, "Majoration matériau (" + formatEnum(parcel.getMaterial().name()) + ")", "—");
-            }
-            if (parcel.getDeliveryDelay() != null) {
-                addPriceRow(itemsTable, "Majoration délai (" + formatEnum(parcel.getDeliveryDelay().name()) + ")", "—");
-            }
-            doc.add(itemsTable);
-            doc.add(new Paragraph(" "));
-
-            // Total
-            PdfPTable totalTable = buildTotalTable(parcel.getEstimatedCost());
-            doc.add(totalTable);
-
-            doc.add(new Paragraph(" "));
-            addFooter(doc);
-
-            doc.close();
-        } catch (Exception e) {
-            throw new PdfGenerationException("Erreur génération facture PDF", e);
-        }
-        return out.toByteArray();
-    }
-
-    /**
-     * Génère une étiquette d'expédition PDF avec code-barres.
-     */
-    public byte[] generateShippingLabel(Parcel parcel) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Document doc = new Document(new Rectangle(226, 340), 15, 15, 15, 15); // ~8cm x 12cm label
+        Document doc = new Document(new Rectangle(226, 340), 15, 15, 15, 15);
         try {
             PdfWriter writer = PdfWriter.getInstance(doc, out);
             doc.open();
 
-            // Gold top bar
+            // White logo section + blue brand bar
             PdfPTable topBar = new PdfPTable(1);
             topBar.setWidthPercentage(100);
+            Image labelLogo = loadLogo();
+            if (labelLogo != null) {
+                PdfPCell logoCell = new PdfPCell();
+                logoCell.setBackgroundColor(Color.WHITE);
+                logoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                logoCell.setPadding(6);
+                labelLogo.scaleToFit(40, 40);
+                labelLogo.setAlignment(Element.ALIGN_CENTER);
+                logoCell.addElement(labelLogo);
+                topBar.addCell(logoCell);
+            }
             PdfPCell barCell = new PdfPCell();
-            barCell.setBackgroundColor(GOLD);
-            barCell.setPadding(6);
-            Paragraph brand = new Paragraph("YOUMS LOGISTICS", new Font(Font.HELVETICA, 10, Font.BOLD, Color.WHITE));
+            barCell.setBackgroundColor(BRAND_BLUE);
+            barCell.setPadding(4);
+            Paragraph brand = new Paragraph("YOUMS LOGISTICS", new Font(Font.HELVETICA, 9, Font.BOLD, Color.WHITE));
             brand.setAlignment(Element.ALIGN_CENTER);
             barCell.addElement(brand);
             topBar.addCell(barCell);
             doc.add(topBar);
 
             // Tracking number with barcode
-            Paragraph tnTitle = new Paragraph("N° de suivi", new Font(Font.HELVETICA, 7, Font.NORMAL, new Color(148, 163, 184)));
+            Paragraph tnTitle = new Paragraph("N° de suivi", new Font(Font.HELVETICA, 7, Font.NORMAL, GRAY));
             tnTitle.setAlignment(Element.ALIGN_CENTER);
             tnTitle.setSpacingBefore(8);
             doc.add(tnTitle);
-            Paragraph tn = new Paragraph(parcel.getTrackingNumber(),
-                    new Font(Font.HELVETICA, 16, Font.BOLD, DARK));
+            Paragraph tn = new Paragraph(p.getTrackingNumber(), BARCODE_FONT);
             tn.setAlignment(Element.ALIGN_CENTER);
             tn.setSpacingAfter(4);
             doc.add(tn);
 
             // Barcode
             Barcode128 barcode = new Barcode128();
-            barcode.setCode(parcel.getTrackingNumber());
+            barcode.setCode(p.getTrackingNumber());
             barcode.setCodeType(Barcode.CODE128);
             barcode.setBarHeight(30);
             barcode.setX(0.8f);
-            Image barcodeImg = barcode.createImageWithBarcode(writer.getDirectContent(), Color.BLACK, Color.WHITE);
+            Image barcodeImg = barcode.createImageWithBarcode(writer.getDirectContent(), BRAND_BLUE, Color.WHITE);
             Paragraph barcodePara = new Paragraph();
             barcodePara.setAlignment(Element.ALIGN_CENTER);
             barcodeImg.scaleToFit(180, 35);
@@ -262,107 +122,307 @@ public class PdfService {
             doc.add(barcodePara);
             doc.add(new Paragraph(" "));
 
-            // Name
-            addLabelField(doc, "COLIS", parcel.getName());
+            addLabelField(doc, "COLIS", p.getName());
 
-            // Route
-            Paragraph routeTitle = new Paragraph("TRAJET", new Font(Font.HELVETICA, 7, Font.NORMAL, new Color(148, 163, 184)));
+            Paragraph routeTitle = new Paragraph("TRAJET", new Font(Font.HELVETICA, 7, Font.NORMAL, GRAY));
             routeTitle.setSpacingBefore(6);
             doc.add(routeTitle);
             Paragraph route = new Paragraph(
-                    parcel.getOriginAddress() + "  →  " + parcel.getDestinationAddress(),
-                    new Font(Font.HELVETICA, 9, Font.BOLD, DARK));
+                    p.getOriginAddress() + "  →  " + p.getDestinationAddress(),
+                    new Font(Font.HELVETICA, 9, Font.BOLD, BRAND_BLUE));
             route.setSpacingAfter(4);
             doc.add(route);
 
-            // Info grid
-            addLabelField(doc, "TRANSPORT", parcel.getTransportMode() != null ? formatEnum(parcel.getTransportMode().name()) : "—");
-            addLabelField(doc, "POIDS", parcel.getWeightKg() != null ? parcel.getWeightKg() + " kg" : "—");
+            addLabelField(doc, "TRANSPORT", p.getTransportMode() != null ? formatEnum(p.getTransportMode().name()) : "—");
+            addLabelField(doc, "POIDS", p.getWeightKg() != null ? p.getWeightKg() + " kg" : "—");
             addLabelField(doc, "STATUT", "En cours");
 
             doc.add(new Paragraph(" "));
             doc.add(new Paragraph(" "));
 
-            // Footer
-            Paragraph footer = new Paragraph("youmslogistics.com  |  +33 3 21 00 00 00",
-                    new Font(Font.HELVETICA, 6, Font.NORMAL, new Color(148, 163, 184)));
+            Paragraph footer = new Paragraph("youmslogistics.com  |  youmslogistics@gmail.com",
+                    new Font(Font.HELVETICA, 6, Font.NORMAL, GRAY));
             footer.setAlignment(Element.ALIGN_CENTER);
             doc.add(footer);
 
             doc.close();
         } catch (Exception e) {
-            throw new PdfGenerationException("Erreur génération étiquette PDF", e);
+            throw new PdfException("Erreur génération étiquette PDF", e);
         }
         return out.toByteArray();
     }
 
-    // ── Helpers ────────────────────────────────────────────────
-
-    private void addSectionTitle(Document doc, String text) throws DocumentException {
-        Paragraph p = new Paragraph(text, HEADER_FONT);
-        p.setSpacingAfter(6);
-        doc.add(p);
+    // ════════════════════════════════════════════════════════════
+    //  LOGO HELPER
+    // ════════════════════════════════════════════════════════════
+    /** Loads logo from classpath, returns Image or null. */
+    private Image loadLogo() {
+        try {
+            ClassPathResource logoRes = new ClassPathResource("images/youms-logo-avec-arrière-plan.png");
+            if (logoRes.exists()) {
+                try (InputStream is = logoRes.getInputStream()) {
+                    return Image.getInstance(is.readAllBytes());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("[PdfService] Logo non chargé: {}", e.getMessage());
+        }
+        return null;
     }
 
-    private void addInfoLine(Document doc, String label, String value) throws DocumentException {
-        PdfPTable table = new PdfPTable(2);
+    // ════════════════════════════════════════════════════════════
+    //  SHARED BLOCKS
+    // ════════════════════════════════════════════════════════════
+
+    /** Header: centered logo with white bg + blue band with company name + doc type. */
+    private void addDocumentHeader(Document doc, String docType, Parcel p) throws DocumentException {
+        // ── Logo section with white background (displays the full circular logo) ──
+        PdfPTable logoTable = new PdfPTable(1);
+        logoTable.setWidthPercentage(100);
+        PdfPCell logoCell = new PdfPCell();
+        logoCell.setBackgroundColor(Color.WHITE);
+        logoCell.setPadding(14);
+        logoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        Image headerLogo = loadLogo();
+        if (headerLogo != null) {
+            headerLogo.scaleToFit(100, 100);
+            headerLogo.setAlignment(Element.ALIGN_CENTER);
+            logoCell.addElement(headerLogo);
+        }
+        logoTable.addCell(logoCell);
+        doc.add(logoTable);
+
+        // ── Blue band: company name + doc type ──
+        PdfPTable headerTable = new PdfPTable(1);
+        headerTable.setWidthPercentage(100);
+        PdfPCell cell = new PdfPCell();
+        cell.setBackgroundColor(BRAND_BLUE);
+        cell.setPadding(14);
+
+        Paragraph company = new Paragraph("Youms Logistics", new Font(Font.HELVETICA, 14, Font.BOLD, Color.WHITE));
+        company.setAlignment(Element.ALIGN_CENTER);
+        cell.addElement(company);
+
+        Paragraph sub = new Paragraph("Entreprise de transport et de logistique",
+                new Font(Font.HELVETICA, 8, Font.NORMAL, new Color(180, 180, 180)));
+        sub.setAlignment(Element.ALIGN_CENTER);
+        sub.setSpacingBefore(2);
+        cell.addElement(sub);
+
+        Paragraph title = new Paragraph(docType, new Font(Font.HELVETICA, 18, Font.BOLD, BRAND_GOLD));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingBefore(6);
+        cell.addElement(title);
+
+        headerTable.addCell(cell);
+        doc.add(headerTable);
+
+        // Date + tracking number row
+        PdfPTable infoRow = new PdfPTable(2);
+        infoRow.setWidthPercentage(100);
+        infoRow.setWidths(new float[]{50, 50});
+
+        PdfPCell dateCell = new PdfPCell();
+        dateCell.setBorder(Rectangle.NO_BORDER);
+        dateCell.setPadding(8);
+        String now = java.time.LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern(DATE_FMT));
+        dateCell.addElement(new Paragraph(now, SMALL_FONT));
+
+        PdfPCell refCell = new PdfPCell();
+        refCell.setBorder(Rectangle.NO_BORDER);
+        refCell.setPadding(8);
+        refCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        refCell.addElement(new Paragraph("N° de suivi : " + p.getTrackingNumber(), BOLD_FONT));
+
+        infoRow.addCell(dateCell);
+        infoRow.addCell(refCell);
+        doc.add(infoRow);
+
+        addSeparator(doc);
+    }
+
+    /** Sender and receiver details side by side. */
+    private void addSenderReceiverBlock(Document doc, Parcel p) throws DocumentException {
+        PdfPTable block = new PdfPTable(2);
+        block.setWidthPercentage(100);
+        block.setWidths(new float[]{50, 50});
+
+        PdfPCell senderCell = new PdfPCell();
+        senderCell.setBorder(Rectangle.NO_BORDER);
+        senderCell.setPadding(6);
+        senderCell.addElement(new Paragraph("DÉTAILS DE L'EXPÉDITEUR :", SECTION_FONT));
+        senderCell.addElement(new Paragraph(" ", SMALL_FONT));
+        addFieldInline(senderCell, "Nom de l'expéditeur :", safe(p.getSenderName()));
+        addFieldInline(senderCell, "Numéro de téléphone :", safe(p.getSenderPhone()));
+        addFieldInline(senderCell, "Adresse :", safe(p.getOriginAddress()));
+        addFieldInline(senderCell, "E-mail :", safe(p.getSenderEmail()));
+        block.addCell(senderCell);
+
+        PdfPCell receiverCell = new PdfPCell();
+        receiverCell.setBorder(Rectangle.NO_BORDER);
+        receiverCell.setPadding(6);
+        receiverCell.addElement(new Paragraph("DÉTAILS DU RÉCEPTEUR :", SECTION_FONT));
+        receiverCell.addElement(new Paragraph(" ", SMALL_FONT));
+        String destCity = p.getDestinationAddress() != null ? p.getDestinationAddress().split(",")[0].trim() : "—";
+        addFieldInline(receiverCell, "Nom du destinataire :", destCity);
+        addFieldInline(receiverCell, "Numéro de téléphone :", "—");
+        addFieldInline(receiverCell, "Adresse :", safe(p.getDestinationAddress()));
+        addFieldInline(receiverCell, "E-mail :", "—");
+        block.addCell(receiverCell);
+
+        doc.add(block);
+        addSeparator(doc);
+    }
+
+    /** Détails du forfait table. */
+    private void addParcelDetailsTable(Document doc, Parcel p) throws DocumentException {
+        Paragraph title = new Paragraph("DÉTAILS DU FORFAIT :", SECTION_FONT);
+        title.setSpacingBefore(4);
+        title.setSpacingAfter(4);
+        doc.add(title);
+
+        PdfPTable table = new PdfPTable(7);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{30, 70});
-        PdfPCell labelCell = new PdfPCell(new Paragraph(label, new Font(Font.HELVETICA, 9, Font.NORMAL, new Color(148, 163, 184))));
-        labelCell.setBorder(Rectangle.NO_BORDER);
-        labelCell.setPadding(3);
-        table.addCell(labelCell);
-        PdfPCell valueCell = new PdfPCell(new Paragraph(value, BOLD_BODY));
-        valueCell.setBorder(Rectangle.NO_BORDER);
-        valueCell.setPadding(3);
-        table.addCell(valueCell);
+        table.setWidths(new float[]{6, 12, 30, 13, 13, 13, 13});
+
+        String[] headers = {"Qté", "Type de pièce", "Description", "Longueur(cm)", "Largeur(cm)", "Hauteur(cm)", "Tétimac(kg)"};
+        for (String h : headers) {
+            PdfPCell hc = new PdfPCell(new Paragraph(h, new Font(Font.HELVETICA, 7, Font.BOLD, BRAND_BLUE)));
+            hc.setBackgroundColor(HEADER_BG);
+            hc.setBorderColor(LTGRAY);
+            hc.setBorderWidth(0.5f);
+            hc.setPadding(5);
+            hc.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(hc);
+        }
+
+        PdfPCell qtyCell = new PdfPCell(new Paragraph("1", VALUE_FONT));
+        qtyCell.setBorderColor(LTGRAY); qtyCell.setBorderWidth(0.5f); qtyCell.setPadding(5); qtyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(qtyCell);
+
+        String typeName = p.getMaterial() != null ? formatEnum(p.getMaterial().name()) : "Général";
+        PdfPCell typeCell = new PdfPCell(new Paragraph(typeName, VALUE_FONT));
+        typeCell.setBorderColor(LTGRAY); typeCell.setBorderWidth(0.5f); typeCell.setPadding(5);
+        table.addCell(typeCell);
+
+        String desc = p.getName() != null ? p.getName() : "—";
+        if (p.getMaterial() != null) {
+            desc += ", " + formatEnum(p.getMaterial().name());
+        }
+        PdfPCell descCell = new PdfPCell(new Paragraph(desc, VALUE_FONT));
+        descCell.setBorderColor(LTGRAY); descCell.setBorderWidth(0.5f); descCell.setPadding(5);
+        table.addCell(descCell);
+
+        addDimensionCell(table, p.getLengthCm());
+        addDimensionCell(table, p.getWidthCm());
+        addDimensionCell(table, p.getHeightCm());
+
+        String weight = p.getWeightKg() != null ? p.getWeightKg().toString() : "0.00";
+        PdfPCell wCell = new PdfPCell(new Paragraph(weight, VALUE_FONT));
+        wCell.setBorderColor(LTGRAY); wCell.setBorderWidth(0.5f); wCell.setPadding(5); wCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(wCell);
+
         doc.add(table);
     }
 
-    private void addLabelField(Document doc, String label, String value) throws DocumentException {
-        Paragraph p = new Paragraph(label + " : ", new Font(Font.HELVETICA, 7, Font.NORMAL, new Color(148, 163, 184)));
-        p.add(new Chunk(value, new Font(Font.HELVETICA, 9, Font.BOLD, DARK)));
+    /** Totals row: Poids volumétrique, Volume, Poids total réel. */
+    private void addTotalsRow(Document doc, Parcel p) throws DocumentException {
+        PdfPTable totals = new PdfPTable(3);
+        totals.setWidthPercentage(100);
+        totals.setWidths(new float[]{34, 33, 33});
+
+        double volWeight = 0;
+        double volume = 0;
+        if (p.getLengthCm() != null && p.getWidthCm() != null && p.getHeightCm() != null) {
+            volume = (p.getLengthCm() * p.getWidthCm() * p.getHeightCm()) / 1_000_000.0;
+            volWeight = (p.getLengthCm() * p.getWidthCm() * p.getHeightCm()) / 5000.0;
+        }
+        double realWeight = p.getWeightKg() != null ? p.getWeightKg().doubleValue() : 0;
+
+        PdfPCell c1 = new PdfPCell();
+        c1.setBorder(Rectangle.NO_BORDER);
+        c1.setPadding(8);
+        c1.addElement(new Paragraph("Poids volumétrique total :", LABEL_FONT));
+        c1.addElement(new Paragraph(String.format("%.2fkg.", volWeight), TOTAL_FONT));
+        totals.addCell(c1);
+
+        PdfPCell c2 = new PdfPCell();
+        c2.setBorder(Rectangle.NO_BORDER);
+        c2.setPadding(8);
+        c2.addElement(new Paragraph("Volume total :", LABEL_FONT));
+        c2.addElement(new Paragraph(String.format("%.2fcu.m.", volume), TOTAL_FONT));
+        totals.addCell(c2);
+
+        PdfPCell c3 = new PdfPCell();
+        c3.setBorder(Rectangle.NO_BORDER);
+        c3.setPadding(8);
+        c3.addElement(new Paragraph("Poids total réel :", LABEL_FONT));
+        c3.addElement(new Paragraph(String.format("%.2fkg.", realWeight), TOTAL_FONT));
+        totals.addCell(c3);
+
+        doc.add(totals);
+    }
+
+    /** Footer with logo + company info. */
+    private void addDocumentFooter(Document doc) throws DocumentException {
+        addSeparator(doc);
+
+        // Add logo in footer
+        Image footerLogo = loadLogo();
+        if (footerLogo != null) {
+            footerLogo.scaleToFit(45, 45);
+            footerLogo.setAlignment(Element.ALIGN_CENTER);
+            doc.add(footerLogo);
+        }
+
+        Paragraph footer = new Paragraph(
+                "Youms Logistics — youmslogistics@gmail.com\n" +
+                "https://youmslogistics.com",
+                SMALL_FONT);
+        footer.setAlignment(Element.ALIGN_CENTER);
+        footer.setSpacingBefore(4);
+        doc.add(footer);
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  HELPERS
+    // ════════════════════════════════════════════════════════════
+
+    private void addSeparator(Document doc) throws DocumentException {
+        PdfPTable sep = new PdfPTable(1);
+        sep.setWidthPercentage(100);
+        PdfPCell sepCell = new PdfPCell();
+        sepCell.setBorder(Rectangle.BOTTOM);
+        sepCell.setBorderColor(LTGRAY);
+        sepCell.setBorderWidth(0.5f);
+        sepCell.setFixedHeight(1);
+        sep.addCell(sepCell);
+        doc.add(sep);
+    }
+
+    private void addFieldInline(PdfPCell cell, String label, String value) {
+        Paragraph p = new Paragraph(label + " ", LABEL_FONT);
+        p.add(new Chunk(value, VALUE_FONT));
+        p.setSpacingAfter(2);
+        cell.addElement(p);
+    }
+
+    private void addDimensionCell(PdfPTable table, Integer cm) {
+        String val = cm != null ? cm.toString() : "—";
+        PdfPCell c = new PdfPCell(new Paragraph(val, VALUE_FONT));
+        c.setBorderColor(LTGRAY); c.setBorderWidth(0.5f); c.setPadding(5); c.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c);
+    }
+
+    private void addLabelField(Document doc, String label, String value) {
+        Paragraph p = new Paragraph(label + " : ", new Font(Font.HELVETICA, 7, Font.NORMAL, GRAY));
+        p.add(new Chunk(value, new Font(Font.HELVETICA, 9, Font.BOLD, BRAND_BLUE)));
         p.setSpacingAfter(2);
         doc.add(p);
     }
 
-    private void addPriceRow(PdfPTable table, String label, String value) {
-        PdfPCell labelCell = new PdfPCell(new Paragraph(label, BODY_FONT));
-        labelCell.setBorder(Rectangle.NO_BORDER);
-        labelCell.setPadding(5);
-        table.addCell(labelCell);
-        PdfPCell valueCell = new PdfPCell(new Paragraph(value, BOLD_BODY));
-        valueCell.setBorder(Rectangle.NO_BORDER);
-        valueCell.setPadding(5);
-        valueCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        table.addCell(valueCell);
-    }
-
-    private void addFooter(Document doc) throws DocumentException {
-        Paragraph footer = new Paragraph("Youms Logistics — 5 Rue du Beau Marais, 62100 Calais\n" +
-                "contact@youmslogistics.com  |  +33 3 21 00 00 00", SMALL_FONT);
-        footer.setAlignment(Element.ALIGN_CENTER);
-        doc.add(footer);
-    }
-
-    private PdfPTable buildTotalTable(java.math.BigDecimal cost) throws DocumentException {
-        PdfPTable totalTable = new PdfPTable(2);
-        totalTable.setWidthPercentage(100);
-        totalTable.setWidths(new float[]{70, 30});
-        PdfPCell totalLabel = new PdfPCell(new Paragraph("TOTAL À PAYER", new Font(Font.HELVETICA, 14, Font.BOLD, DARK)));
-        totalLabel.setBorder(Rectangle.NO_BORDER);
-        totalLabel.setPadding(12);
-        totalLabel.setBackgroundColor(LIGHT_BG);
-        totalTable.addCell(totalLabel);
-        String costStr = cost != null ? String.format("%.2f €", cost) : "—";
-        PdfPCell totalValue = new PdfPCell(new Paragraph(costStr, new Font(Font.HELVETICA, 14, Font.BOLD, GOLD)));
-        totalValue.setBorder(Rectangle.NO_BORDER);
-        totalValue.setPadding(12);
-        totalValue.setBackgroundColor(LIGHT_BG);
-        totalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        totalTable.addCell(totalValue);
-        return totalTable;
-    }
+    private String safe(String s) { return s != null ? s : "—"; }
 
     private String formatEnum(String name) {
         return switch (name) {
@@ -381,10 +441,7 @@ public class PdfService {
         };
     }
 
-    /** Custom exception for PDF generation errors. */
-    public static class PdfGenerationException extends RuntimeException {
-        public PdfGenerationException(String message, Throwable cause) {
-            super(message, cause);
-        }
+    public static class PdfException extends RuntimeException {
+        public PdfException(String msg, Throwable cause) { super(msg, cause); }
     }
 }

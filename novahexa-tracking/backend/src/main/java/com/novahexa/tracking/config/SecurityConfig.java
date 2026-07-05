@@ -24,14 +24,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
 @Configuration
-public class SecurityConfig {
-
-    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+public class SecurityConfig {    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:5174}")
     private String allowedOrigins;
+
+    private final JwtService jwtService;
+
+    public SecurityConfig(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,13 +45,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/packages").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/packages/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/track/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/uploads").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/uploads").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/faq").permitAll()
                 .requestMatchers("/api/pricing/**").permitAll()
                 .requestMatchers("/api/pdf/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/notifications").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/api/notifications/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/notifications").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/notifications/**").authenticated()
                 .requestMatchers("/api/client/**").authenticated()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/contact").hasRole("ADMIN")
@@ -76,7 +80,7 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-    /** Simple Bearer token filter that decodes Base64 token from AuthController. */
+    /** JWT Bearer token filter — validates signature and expiry. */
     @Bean
     public OncePerRequestFilter bearerAuthFilter() {
         return new OncePerRequestFilter() {
@@ -87,13 +91,11 @@ public class SecurityConfig {
                 if (header != null && header.startsWith("Bearer ")) {
                     try {
                         String token = header.substring(7);
-                        String decoded = new String(Base64.getDecoder().decode(token));
-                        // Format: uuid:ROLE:timestamp
-                        String[] parts = decoded.split(":");
-                        if (parts.length >= 2) {
-                            String role = parts[1];
+                        if (jwtService.isValid(token)) {
+                            String userId = jwtService.getUserId(token);
+                            String role = jwtService.getRole(token);
                             var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                                    parts[0], null,
+                                    userId, null,
                                     List.of(new SimpleGrantedAuthority("ROLE_" + role)));
                             org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
                         }

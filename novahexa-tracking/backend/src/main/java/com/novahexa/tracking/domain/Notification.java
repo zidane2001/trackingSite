@@ -1,5 +1,6 @@
 package com.novahexa.tracking.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -11,6 +12,7 @@ public class Notification {
     @Id @GeneratedValue
     private UUID id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private AppUser user;

@@ -1,7 +1,7 @@
 package com.novahexa.tracking.web;
 
 import com.novahexa.tracking.domain.AppUser;
-import com.novahexa.tracking.domain.Message;
+import com.novahexa.tracking.dto.ParcelView;
 import com.novahexa.tracking.repository.AppUserRepository;
 import com.novahexa.tracking.service.MessageService;
 import org.springframework.http.HttpStatus;
@@ -33,14 +33,13 @@ public class MessageController {
     /** Envoie un message admin concernant un colis. */
     @PostMapping("/admin/packages/{parcelId}/messages")
     @ResponseStatus(HttpStatus.CREATED)
-    public Message send(@PathVariable UUID parcelId,
+    public ParcelView.MessageView send(@PathVariable UUID parcelId,
                         @RequestBody Map<String, String> body,
                         Authentication auth) {
         if (auth == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentification requise");
         }
-        AppUser admin = users.findByEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Admin introuvable"));
+        AppUser admin = resolveUser(auth);
 
         String subject = body.getOrDefault("subject", "Message");
         String msgBody = body.getOrDefault("body", "");
@@ -48,12 +47,25 @@ public class MessageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le message ne peut pas être vide");
         }
 
-        return messageService.sendAdminMessage(parcelId, subject, msgBody, admin);
+        return ParcelView.MessageView.of(messageService.sendAdminMessage(parcelId, subject, msgBody, admin));
     }
 
     /** Historique des messages d'un colis. */
     @GetMapping("/admin/packages/{parcelId}/messages")
-    public List<Message> list(@PathVariable UUID parcelId) {
-        return messageService.getMessages(parcelId);
+    public List<ParcelView.MessageView> list(@PathVariable UUID parcelId) {
+        return messageService.getMessages(parcelId)
+                .stream().map(ParcelView.MessageView::of).toList();
+    }
+
+    private AppUser resolveUser(Authentication auth) {
+        String name = auth.getName();
+        try {
+            UUID id = UUID.fromString(name);
+            return users.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Utilisateur introuvable"));
+        } catch (IllegalArgumentException e) {
+            return users.findByEmail(name)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Utilisateur introuvable"));
+        }
     }
 }

@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,14 +22,19 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     private final AppUserRepository users;
     private final PasswordEncoder encoder;
     private final AuthService authService;
+    private final com.novahexa.tracking.config.JwtService jwtService;
 
-    public AuthController(AppUserRepository users, PasswordEncoder encoder, AuthService authService) {
+    public AuthController(AppUserRepository users, PasswordEncoder encoder, AuthService authService,
+                          com.novahexa.tracking.config.JwtService jwtService) {
         this.users = users;
         this.encoder = encoder;
         this.authService = authService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
@@ -68,14 +75,18 @@ public class AuthController {
         user.setPhone(body.phone());
         user.setRole(Role.CLIENT);
         user.setVerified(false);
-        users.save(user);
+        users.saveAndFlush(user); // flush pour garantir l'ID avant sendVerificationEmail
 
-        // Envoyer l'email de vérification
-        authService.sendVerificationEmail(user);
+        // Envoyer l'email de vérification (non bloquant si ça échoue)
+        try {
+            authService.sendVerificationEmail(user);
+        } catch (Exception e) {
+            log.warn("Email de vérification échoué pour {}: {}", body.email(), e.getMessage());
+        }
 
         return Map.of(
                 "status", "registered",
-                "message", "Un email de vérification a été envoyé à " + body.email()
+                "message", "Inscription réussie. Vérifiez votre email pour activer votre compte."
         );
     }
 
@@ -115,9 +126,7 @@ public class AuthController {
     // ── Helpers ────────────────────────────────────────────────
 
     private String generateToken(AppUser user) {
-        return java.util.Base64.getEncoder().encodeToString(
-                (user.getId() + ":" + user.getRole().name() + ":" + System.currentTimeMillis()).getBytes()
-        );
+        return jwtService.generateToken(user.getId().toString(), user.getRole().name());
     }
 
     // ── DTOs ───────────────────────────────────────────────────

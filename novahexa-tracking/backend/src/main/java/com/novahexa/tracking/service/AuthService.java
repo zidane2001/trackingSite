@@ -55,7 +55,7 @@ public class AuthService {
         Instant expiresAt = Instant.now().plus(24, ChronoUnit.HOURS);
         verificationTokens.save(new VerificationToken(token, user, expiresAt));
 
-        String verifyUrl = "http://localhost:5173/verify-email?token=" + token;
+        String verifyUrl = "http://localhost:5174/verify-email?token=" + token;
         emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verifyUrl);
     }
 
@@ -110,7 +110,7 @@ public class AuthService {
         Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
         resetTokens.save(new PasswordResetToken(token, user, expiresAt));
 
-        String resetUrl = "http://localhost:5173/reset-password?token=" + token;
+        String resetUrl = "http://localhost:5174/reset-password?token=" + token;
         emailService.sendPasswordResetEmail(user.getEmail(), user.getFullName(), resetUrl);
     }
 

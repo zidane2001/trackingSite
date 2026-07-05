@@ -146,6 +146,18 @@ public class EmailService {
         send(to, subject + " — " + trackingNumber, html);
     }
 
+    public void sendClientMessageEmail(String to, String trackingNumber, String clientName, String subject, String messageBody) {
+        String html = buildTemplate(
+                "Message client",
+                "Bonjour,",
+                "<strong>" + clientName + "</strong> a envoyé un message concernant le colis <strong>" + trackingNumber + "</strong> :",
+                "<blockquote style=\"border-left:3px solid #3b82f6;padding-left:12px;margin:16px 0;color:#555;\">" + messageBody + "</blockquote>",
+                "Connectez-vous à l'interface admin pour répondre.",
+                "#3b82f6"
+        );
+        send(to, subject + " — " + trackingNumber, html);
+    }
+
     // ── Auth templates ──────────────────────────────────────────
 
     public void sendVerificationEmail(String to, String clientName, String verifyUrl) {
@@ -175,37 +187,30 @@ public class EmailService {
     // ── Template builder ────────────────────────────────────────
 
     private String buildTemplate(String title, String greeting, String mainText, String detailText, String footer, String accentColor) {
-        return """
-                <!DOCTYPE html>
-                <html>
-                <head><meta charset="utf-8"></head>
-                <body style="margin:0;padding:0;background:#f4f6f8;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-                  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:40px 20px;">
-                    <tr><td align="center">
-                      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                        <!-- Header -->
-                        <tr><td style="background:%s;padding:24px 32px;">
-                          <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;">%s</h1>
-                        </td></tr>
-                        <!-- Body -->
-                        <tr><td style="padding:32px;">
-                          <p style="margin:0 0 16px;color:#333;font-size:15px;">%s</p>
-                          <p style="margin:0 0 16px;color:#555;font-size:14px;line-height:1.6;">%s</p>
-                          <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.6;">%s</p>
-                          <!-- Divider -->
-                          <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
-                          <p style="margin:0;color:#999;font-size:12px;line-height:1.5;">%s</p>
-                        </td></tr>
-                        <!-- Footer -->
-                        <tr><td style="background:#f9fafb;padding:20px 32px;text-align:center;">
-                          <p style="margin:0;color:#aaa;font-size:11px;">Youms Logistics — 5 Rue du Beau Marais, 62100 Calais</p>
-                          <p style="margin:4px 0 0;color:#aaa;font-size:11px;">contact@youmslogistics.com | +33 3 21 00 00 00</p>
-                        </td></tr>
-                      </table>
-                    </td></tr>
-                  </table>
-                </body>
-                </html>
-                """.formatted(accentColor, title, greeting, mainText, detailText, footer);
+        String tpl = "<!DOCTYPE html><html><head><meta charset='utf-8'></head>"
+            + "<body style='margin:0;padding:0;background:#f4f6f8;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;'>"
+            + "<table width='100%' cellpadding='0' cellspacing='0' style='background:#f4f6f8;padding:40px 20px;'>"
+            + "<tr><td align='center'>"
+            + "<table width='600' cellpadding='0' cellspacing='0' style='background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);'>"
+            + "<tr><td style='background:{{accent}};padding:24px 32px;'>"
+            + "<h1 style='margin:0;color:#ffffff;font-size:20px;font-weight:700;'>{{title}}</h1></td></tr>"
+            + "<tr><td style='padding:32px;'>"
+            + "<p style='margin:0 0 16px;color:#333;font-size:15px;'>{{greeting}}</p>"
+            + "<p style='margin:0 0 16px;color:#555;font-size:14px;line-height:1.6;'>{{main}}</p>"
+            + "<p style='margin:0 0 24px;color:#555;font-size:14px;line-height:1.6;'>{{detail}}</p>"
+            + "<hr style='border:none;border-top:1px solid #eee;margin:24px 0;'>"
+            + "<p style='margin:0;color:#999;font-size:12px;line-height:1.5;'>{{footer}}</p>"
+            + "</td></tr>"
+            + "<tr><td style='background:#f9fafb;padding:20px 32px;text-align:center;'>"
+            + "<p style='margin:0;color:#aaa;font-size:11px;'>Youms Logistics — 5 Rue du Beau Marais, 62100 Calais</p>"
+            + "<p style='margin:4px 0 0;color:#aaa;font-size:11px;'>contact@youmslogistics.com | +33 3 21 00 00 00</p>"
+            + "</td></tr></table></td></tr></table></body></html>";
+        return tpl
+            .replace("{{accent}}", accentColor)
+            .replace("{{title}}", title)
+            .replace("{{greeting}}", greeting)
+            .replace("{{main}}", mainText)
+            .replace("{{detail}}", detailText)
+            .replace("{{footer}}", footer);
     }
 }

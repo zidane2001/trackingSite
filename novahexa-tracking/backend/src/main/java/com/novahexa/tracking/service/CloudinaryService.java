@@ -39,7 +39,7 @@ public class CloudinaryService {
         }
         Map<String, Object> result = cloudinary.uploader().upload(
                 file.getBytes(),
-                ObjectUtils.asMap("folder", "novahexa/packages"));
+                ObjectUtils.asMap("folder", "youmslogistics/packages"));
         return (String) result.get("secure_url");
     }
 

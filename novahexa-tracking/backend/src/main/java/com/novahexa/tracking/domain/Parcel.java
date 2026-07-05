@@ -27,7 +27,7 @@ public class Parcel {
 
     // Déposant (le cahier prévoit owner_id -> users ; ici on stocke aussi
     // les coordonnées saisies au dépôt pour le pré-remplissage / notifications).
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private AppUser owner;
 
@@ -68,11 +68,19 @@ public class Parcel {
     private Integer estimatedDurationMinutes;
 
     private LocalDate shippingDate;
-    private String photoUrl;
+
+    @Column(name = "photo_url", columnDefinition = "text")
+    private String imageUrls;
 
     private Instant validatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    /** Instant où le colis est passé IN_TRANSIT (départ de l'animation). */
+    private Instant transitStartedAt;
+
+    /** Durée démo en minutes (compressée pour les tests). Null = durée réelle. */
+    private Integer demoDurationMinutes;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "validated_by")
     private AppUser validatedBy;
 
@@ -80,11 +88,11 @@ public class Parcel {
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 
-    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("orderIndex ASC")
     private List<Waypoint> waypoints = new ArrayList<>();
 
-    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")
     private List<TrackingEvent> events = new ArrayList<>();
 
@@ -143,10 +151,14 @@ public class Parcel {
     public void setEstimatedDurationMinutes(Integer v) { this.estimatedDurationMinutes = v; }
     public LocalDate getShippingDate() { return shippingDate; }
     public void setShippingDate(LocalDate v) { this.shippingDate = v; }
-    public String getPhotoUrl() { return photoUrl; }
-    public void setPhotoUrl(String v) { this.photoUrl = v; }
+    public String getImageUrls() { return imageUrls; }
+    public void setImageUrls(String v) { this.imageUrls = v; }
     public Instant getValidatedAt() { return validatedAt; }
     public void setValidatedAt(Instant v) { this.validatedAt = v; }
+    public Instant getTransitStartedAt() { return transitStartedAt; }
+    public void setTransitStartedAt(Instant v) { this.transitStartedAt = v; }
+    public Integer getDemoDurationMinutes() { return demoDurationMinutes; }
+    public void setDemoDurationMinutes(Integer v) { this.demoDurationMinutes = v; }
     public AppUser getValidatedBy() { return validatedBy; }
     public void setValidatedBy(AppUser v) { this.validatedBy = v; }
     public Instant getCreatedAt() { return createdAt; }

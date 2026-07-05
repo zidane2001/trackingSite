@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Token de réinitialisation mot de passe.
- * Valide pendant 1 heure.
- */
 @Entity
 @Table(name = "password_reset_tokens")
 public class PasswordResetToken {

@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /** Charge utile envoyée par le formulaire du hero (front). */
 public record ParcelSubmissionRequest(
@@ -25,5 +26,5 @@ public record ParcelSubmissionRequest(
         @NotNull DeliveryDelay delay,
         LocalDate shippingDate,
         BigDecimal estimatedCost,
-        String photoUrl
+        List<String> imageUrls
 ) {}

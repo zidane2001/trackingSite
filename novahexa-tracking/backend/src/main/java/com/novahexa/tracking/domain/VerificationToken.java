@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Token de vérification d'email envoyé lors de l'inscription.
- * Valide pendant 24 heures.
- */
 @Entity
 @Table(name = "verification_tokens")
 public class VerificationToken {

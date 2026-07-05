@@ -23,6 +23,9 @@ public class Waypoint {
     private Instant estimatedArrival;
     private Instant reachedAt;
 
+    /** Durée de l'arrêt en minutes (définie par l'admin). */
+    private Integer stopDurationMinutes;
+
     public UUID getId() { return id; }
     public Parcel getParcel() { return parcel; }
     public void setParcel(Parcel v) { this.parcel = v; }
@@ -38,4 +41,6 @@ public class Waypoint {
     public void setEstimatedArrival(Instant v) { this.estimatedArrival = v; }
     public Instant getReachedAt() { return reachedAt; }
     public void setReachedAt(Instant v) { this.reachedAt = v; }
+    public Integer getStopDurationMinutes() { return stopDurationMinutes; }
+    public void setStopDurationMinutes(Integer v) { this.stopDurationMinutes = v; }
 }

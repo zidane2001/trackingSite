@@ -26,23 +26,21 @@ public class NotificationController {
     /** Liste des notifications de l'utilisateur connecté (ou toutes si admin). */
     @GetMapping
     public List<Notification> list(Authentication auth) {
-        if (auth == null) {
+        AppUser user = resolveUser(auth);
+        if (user == null) {
             return repo.findAllByOrderByCreatedAtDesc();
         }
-        return users.findByEmail(auth.getName())
-                .map(repo::findByUserOrderByCreatedAtDesc)
-                .orElseGet(repo::findAllByOrderByCreatedAtDesc);
+        return repo.findByUserOrderByCreatedAtDesc(user);
     }
 
     /** Nombre de notifications non lues. */
     @GetMapping("/unread-count")
     public Map<String, Object> unreadCount(Authentication auth) {
-        if (auth == null) {
+        AppUser user = resolveUser(auth);
+        if (user == null) {
             return Map.of("count", 0L);
         }
-        long count = users.findByEmail(auth.getName())
-                .map(repo::countByUserAndReadFalse)
-                .orElse(0L);
+        long count = repo.countByUserAndReadFalse(user);
         return Map.of("count", count);
     }
 
@@ -57,13 +55,12 @@ public class NotificationController {
 
     @PutMapping("/read-all")
     public Map<String, String> markAllRead(Authentication auth) {
-        if (auth != null) {
-            users.findByEmail(auth.getName()).ifPresent(user ->
-                repo.findByUserOrderByCreatedAtDesc(user).forEach(n -> {
-                    n.setRead(true);
-                    repo.save(n);
-                })
-            );
+        AppUser user = resolveUser(auth);
+        if (user != null) {
+            repo.findByUserOrderByCreatedAtDesc(user).forEach(n -> {
+                n.setRead(true);
+                repo.save(n);
+            });
         } else {
             repo.findAll().forEach(n -> {
                 n.setRead(true);
@@ -71,5 +68,17 @@ public class NotificationController {
             });
         }
         return Map.of("status", "all_read");
+    }
+
+    /** Résout l'utilisateur depuis le token Bearer (UUID) ou HTTP Basic (email). */
+    private AppUser resolveUser(Authentication auth) {
+        if (auth == null) return null;
+        String name = auth.getName();
+        try {
+            UUID id = UUID.fromString(name);
+            return users.findById(id).orElse(null);
+        } catch (IllegalArgumentException e) {
+            return users.findByEmail(name).orElse(null);
+        }
     }
 }
