@@ -49,6 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       const res = await authApi.login(email, password);
+      // Stocker immédiatement dans localStorage AVANT de naviguer
+      // pour éviter le race condition (useEffect se déclenche après le render)
+      localStorage.setItem(TOKEN_KEY, res.token);
+      localStorage.setItem(USER_KEY, JSON.stringify(res.user));
       setToken(res.token);
       setUser(res.user);
       return res.user;

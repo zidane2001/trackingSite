@@ -60,8 +60,14 @@ public class SecurityConfig {    @Value("${app.cors.allowed-origins:http://local
                 .requestMatchers("/ws/**").permitAll()
                 .anyRequest().permitAll()
             )
-            .addFilterBefore(bearerAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-            .httpBasic(b -> {});
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\": \"Non autorisé\"}");
+                })
+            )
+            .addFilterBefore(bearerAuthFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

@@ -40,10 +40,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest body) {
         AppUser user = users.findByEmail(body.email())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identifiants incorrects"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Identifiants incorrects"));
 
         if (!encoder.matches(body.password(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identifiants incorrects");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Identifiants incorrects");
         }
 
         String token = generateToken(user);

@@ -16,15 +16,13 @@ spring:
     password: ${NEON_DB_PASSWORD:youmslogistics}
   jpa:
     hibernate:
-      ddl-auto: update          # crée/maj les tables automatiquement (dev)
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
         show_sql: true
         jdbc:
           time_zone: UTC
-        type:
-          preferred_uuid_jdbc_type: CHAR
     show-sql: ${SHOW_SQL:false}
     open-in-view: false
   jackson:
@@ -54,5 +52,5 @@ app:
   geocoding:
     enabled: ${GEOCODING_ENABLED:true}
   admin:
-    email: ${ADMIN_EMAIL:admin@youmslogistics.local}
+    email: ${ADMIN_EMAIL:admin@novahexa.local}
     password: ${ADMIN_PASSWORD:admin123}

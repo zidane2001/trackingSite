@@ -4,7 +4,7 @@
 import type { PackageItem, DashboardStats, Notification, ContactMessage, AuthResponse, FaqItem } from '../types';
 
 const BASE_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
+  (import.meta as any).env?.VITE_API_BASE_URL ?? '';
 
 function authHeaders(): Record<string, string> {
   const token = localStorage.getItem('youms_token');
@@ -174,7 +174,7 @@ export const pricingApi = {
 
 // ── PDF ────────────────────────────────────────────────
 const BASE_URL_PDF =
-  (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
+  (import.meta as any).env?.VITE_API_BASE_URL ?? '';
 
 export const pdfApi = {
   downloadQuote: (trackingNumber: string) =>

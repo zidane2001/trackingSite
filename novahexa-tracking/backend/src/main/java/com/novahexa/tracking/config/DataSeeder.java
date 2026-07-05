@@ -94,8 +94,10 @@ public class DataSeeder implements CommandLineRunner {
             }
         });
 
-        if (!users.existsByEmail(adminEmail)) {
-            AppUser admin = new AppUser();
+        // Toujours s'assurer que le compte admin existe et que le mot de passe est à jour
+        AppUser admin = users.findByEmail(adminEmail).orElse(null);
+        if (admin == null) {
+            admin = new AppUser();
             admin.setFullName("Administrateur Youms Logistics");
             admin.setEmail(adminEmail);
             admin.setPasswordHash(encoder.encode(adminPassword));
@@ -103,6 +105,13 @@ public class DataSeeder implements CommandLineRunner {
             admin.setVerified(true);
             users.save(admin);
             log.info(">>> Compte admin créé : {}", adminEmail);
+        } else if (!encoder.matches(adminPassword, admin.getPasswordHash())) {
+            // Mettre à jour le mot de passe si celui en DB ne correspond pas
+            admin.setPasswordHash(encoder.encode(adminPassword));
+            users.save(admin);
+            log.info(">>> Mot de passe admin mis à jour pour {}", adminEmail);
+        } else {
+            log.info(">>> Compte admin déjà existant et à jour : {}", adminEmail);
         }
     }
 }
