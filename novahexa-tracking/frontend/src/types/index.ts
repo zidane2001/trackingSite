@@ -40,7 +40,7 @@ export const STATUS_COLORS: Record<PackageStatus, string> = {
   DELIVERED: 'bg-emerald-100 text-emerald-700 border-emerald-200',
 };
 
-export type TransportMode = 'ROUTIER' | 'AERIEN' | 'MARITIME';
+export type TransportMode = 'ROUTE' | 'AIR' | 'MER';
 
 export interface Waypoint {
   id: string;
@@ -50,6 +50,7 @@ export interface Waypoint {
   lng: number;
   estimatedArrival?: string;
   reachedAt?: string;
+  stopDurationMinutes?: number;
 }
 
 export interface TrackingEvent {
@@ -98,8 +99,11 @@ export interface PackageItem {
   estimatedDuration?: string;
   shippingDate?: string;
   photoUrl?: string;
+  imageUrls?: string[];
   validatedAt?: string;
   validatedBy?: string;
+  transitStartedAt?: string;
+  demoDurationMinutes?: number;
   createdAt: string;
   updatedAt?: string;
   waypoints?: Waypoint[];
@@ -125,6 +129,16 @@ export interface ContactMessage {
   email: string;
   message: string;
   status: ContactStatus;
+  createdAt: string;
+}
+
+// ── FAQ ──────────────────────────────────────────────────────
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  sortOrder: number;
+  enabled: boolean;
   createdAt: string;
 }
 

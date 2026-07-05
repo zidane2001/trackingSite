@@ -12,6 +12,7 @@ const TYPE_ICONS: Record<string, string> = {
   WAYPOINT: '📍',
   DELIVERED: '🎉',
   MESSAGE: '💬',
+  CLIENT_MESSAGE: '📨',
 };
 
 /**

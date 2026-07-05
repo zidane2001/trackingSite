@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { User, AuthResponse, UserRole } from '../types';
+import type { User, UserRole } from '../types';
 import { authApi } from '../lib/api';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (data: {
     fullName: string;
     email: string;
@@ -51,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await authApi.login(email, password);
       setToken(res.token);
       setUser(res.user);
+      return res.user;
     } finally {
       setLoading(false);
     }

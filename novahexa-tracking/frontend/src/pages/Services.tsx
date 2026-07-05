@@ -1,4 +1,3 @@
-import React from 'react';
 import { Truck, Ship, Plane, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { IMAGES } from '../config/images';
@@ -82,6 +81,7 @@ export function Services() {
                 <img
                   src={s.img}
                   alt={s.title}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#060f24]/60 to-transparent" />

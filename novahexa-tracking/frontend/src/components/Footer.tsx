@@ -22,11 +22,11 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
           {/* Logo & description */}
           <FooterSection>
-            <Link to="/" className="flex items-center gap-2 mb-4 group">
+            <Link to="/" className="flex flex-col sm:flex-row items-center sm:items-start gap-3 mb-4 group">
               <img
-                src={IMAGES.LOGO}
+                src={IMAGES.LOGO_WITH_BG}
                 alt="Youms Logistics"
-                className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                className="h-28 w-28 sm:h-24 sm:w-24 rounded-2xl object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <span className="font-bold text-lg transition-colors duration-300 group-hover:text-gold">Youms Logistics</span>
             </Link>
@@ -90,7 +90,7 @@ export function Footer() {
 
         <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <img src={IMAGES.LOGO} alt="Youms Logistics" className="h-5 w-5 object-contain opacity-40" />
+            <img src={IMAGES.LOGO_WITH_BG} alt="Youms Logistics" className="h-8 w-8 rounded-lg object-contain opacity-60" />
             <span className="text-xs text-slate-500">© {new Date().getFullYear()} Youms Logistics. Tous droits réservés.</span>
           </div>
           <div className="flex items-center gap-4 hidden sm:flex">

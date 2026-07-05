@@ -1,41 +1,52 @@
-import { useState, useEffect } from 'react';
-import { MessageSquare, Send } from 'lucide-react';
-import { messagesApi } from '../lib/api';
+import { useState, useEffect, useCallback } from 'react';
+import { MessageSquare, Send, AlertCircle } from 'lucide-react';
+import { messagesApi, clientMessagesApi } from '../lib/api';
 import type { MessageItem } from '../lib/api';
 
 interface MessagingPanelProps {
   parcelId: string;
   packageName: string;
+  /** "admin" utilise l'API admin, "client" utilise l'API client. */
+  context?: 'admin' | 'client';
 }
 
-export function MessagingPanel({ parcelId, packageName }: MessagingPanelProps) {
+export function MessagingPanel({ parcelId, packageName, context = 'admin' }: MessagingPanelProps) {
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
-  useEffect(() => {
-    messagesApi.list(parcelId)
+  const api = context === 'client' ? clientMessagesApi : messagesApi;
+
+  const loadMessages = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    api.list(parcelId)
       .then(setMessages)
-      .catch(() => {})
+      .catch((err) => setError(err?.message || 'Erreur de chargement des messages'))
       .finally(() => setLoading(false));
-  }, [parcelId]);
+  }, [parcelId, api]);
+
+  useEffect(() => { loadMessages(); }, [loadMessages]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim() || !subject.trim()) return;
     setSending(true);
+    setSendError(null);
     try {
-      const msg = await messagesApi.send(parcelId, {
+      const msg = await api.send(parcelId, {
         subject: subject.trim(),
         body: body.trim(),
       });
       setMessages((prev) => [msg, ...prev]);
       setSubject('');
       setBody('');
-    } catch {
-      // Silently fail
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : "Erreur lors de l'envoi");
     } finally {
       setSending(false);
     }
@@ -66,6 +77,12 @@ export function MessagingPanel({ parcelId, packageName }: MessagingPanelProps) {
           className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 resize-none"
           required
         />
+        {sendError && (
+          <div className="flex items-center gap-2 bg-red-50 text-red-600 rounded-lg px-3 py-2 text-xs">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            {sendError}
+          </div>
+        )}
         <button
           type="submit"
           disabled={sending || !body.trim() || !subject.trim()}
@@ -80,6 +97,11 @@ export function MessagingPanel({ parcelId, packageName }: MessagingPanelProps) {
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {loading ? (
           <p className="text-xs text-slate-400 text-center py-4">Chargement...</p>
+        ) : error ? (
+          <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-3 text-xs text-center justify-center">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            <span>{error}</span>
+          </div>
         ) : messages.length === 0 ? (
           <p className="text-xs text-slate-400 text-center py-4">Aucun message pour ce colis</p>
         ) : (

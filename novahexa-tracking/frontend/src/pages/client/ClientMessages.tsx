@@ -4,15 +4,16 @@ import { DashboardLayout } from '../../components/DashboardLayout';
 import { MessagingPanel } from '../../components/MessagingPanel';
 import { packagesApi } from '../../lib/api';
 import type { PackageItem } from '../../types';
+import { StatusBadge } from '../../components/StatusBadge';
 import { cn } from '../../lib/utils';
 
-export function AdminMessages() {
+export function ClientMessages() {
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPkg, setSelectedPkg] = useState<PackageItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    packagesApi.list().then(setPackages).catch(() => {}).finally(() => setLoading(false));
+    packagesApi.listByOwner().then(setPackages).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   return (
@@ -23,7 +24,7 @@ export function AdminMessages() {
             <MessageSquare className="w-6 h-6 text-yellow-500" />
             Messagerie
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Envoyez des messages personnalisés aux clients</p>
+          <p className="text-sm text-slate-500 mt-1">Communiquez avec l'équipe concernant vos colis</p>
         </div>
 
         <div className="grid lg:grid-cols-[350px_1fr] gap-4 sm:gap-6 min-h-[400px] sm:min-h-[600px]">
@@ -35,6 +36,8 @@ export function AdminMessages() {
             <div className="overflow-y-auto max-h-[540px]">
               {loading ? (
                 <div className="p-6 text-center text-slate-400 text-sm">Chargement...</div>
+              ) : packages.length === 0 ? (
+                <div className="p-6 text-center text-slate-400 text-sm">Aucun colis</div>
               ) : (
                 packages.map((pkg) => (
                   <button
@@ -45,8 +48,13 @@ export function AdminMessages() {
                       selectedPkg?.id === pkg.id && 'bg-yellow-50 border-l-2 border-l-yellow-400',
                     )}
                   >
-                    <div className="text-sm font-bold text-slate-900">{pkg.name}</div>
-                    <div className="text-xs text-slate-400 font-mono">{pkg.trackingNumber}</div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-bold text-slate-900">{pkg.name}</div>
+                        <div className="text-xs text-slate-400 font-mono">{pkg.trackingNumber}</div>
+                      </div>
+                      <StatusBadge status={pkg.status} size="sm" />
+                    </div>
                   </button>
                 ))
               )}
@@ -59,14 +67,14 @@ export function AdminMessages() {
               <div className="flex-1 flex items-center justify-center text-slate-400 bg-white rounded-xl border border-slate-200 shadow-sm">
                 <div className="text-center">
                   <Package className="w-10 h-10 mx-auto mb-3 text-slate-300" />
-                  <p className="text-sm">Sélectionnez un colis pour envoyer un message</p>
+                  <p className="text-sm">Sélectionnez un colis pour accéder à la messagerie</p>
                 </div>
               </div>
             ) : (
               <MessagingPanel
                 parcelId={selectedPkg.id}
                 packageName={selectedPkg.name}
-                context="admin"
+                context="client"
               />
             )}
           </div>

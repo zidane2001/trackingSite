@@ -1,8 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { PackageItem } from '../types';
-import { buildRoutePoints, simulatePosition, parseDuration, haversineDistance } from '../lib/mapUtils';
+import {
+  buildRoutePoints,
+  simulatePosition,
+  getTraveledRatio,
+  getBearing,
+  getTransportIcon,
+  getTransportColor,
+  fetchOSRMRouteWithWaypoints,
+} from '../lib/mapUtils';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -14,7 +22,9 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-function createIcon(color: string, label?: string): L.DivIcon {
+/* ── Marker factories ──────────────────────────────── */
+
+function createDotIcon(color: string, label?: string): L.DivIcon {
   return L.divIcon({
     className: 'custom-marker',
     html: `
@@ -28,17 +38,22 @@ function createIcon(color: string, label?: string): L.DivIcon {
   });
 }
 
-function createPulseIcon(): L.DivIcon {
+/** Transport-mode icon: shows ✈️ 🚢 🚛 emoji with colored ring. */
+function createTransportIcon(mode?: string, bearing?: number): L.DivIcon {
+  const icon = mode === 'AIR' ? '✈️' : mode === 'MER' ? '🚢' : mode === 'ROUTE' ? '🚛' : '📦';
+  const color = getTransportColor(mode);
   return L.divIcon({
     className: 'custom-marker',
     html: `
-      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;width:32px;height:32px;background:rgba(200,169,81,0.3);border-radius:50%;animation:pulse-ring 2s infinite;"></div>
-        <div style="width:18px;height:18px;background:#C8A951;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(200,169,81,0.5);position:relative;z-index:2;"></div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(${bearing ?? 0}deg);">
+        <div style="position:absolute;width:40px;height:40px;background:${color}22;border:2px solid ${color}66;border-radius:50%;animation:pulse-ring 2s infinite;"></div>
+        <div style="width:32px;height:32px;background:#fff;border:3px solid ${color};border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;position:relative;z-index:2;transform:rotate(-${bearing ?? 0}deg);">
+          ${icon}
+        </div>
       </div>
     `,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
   });
 }
 
@@ -55,6 +70,8 @@ function createWaypointIcon(reached: boolean): L.DivIcon {
   });
 }
 
+/* ── Props ─────────────────────────────────────────── */
+
 interface ParcelMapProps {
   pkg: PackageItem;
   height?: string;
@@ -67,39 +84,7 @@ interface ParcelMapProps {
   onMapClick?: (lat: number, lng: number) => void;
 }
 
-/**
- * Interpolate position along a polyline at a given ratio (0→1).
- */
-function interpolateAlongRoute(
-  points: { lat: number; lng: number }[],
-  ratio: number,
-): { lat: number; lng: number } {
-  if (points.length === 0) return { lat: 0, lng: 0 };
-  if (points.length === 1 || ratio <= 0) return points[0];
-  if (ratio >= 1) return points[points.length - 1];
-
-  const cumDist: number[] = [0];
-  for (let i = 1; i < points.length; i++) {
-    cumDist.push(
-      cumDist[i - 1] + haversineDistance(points[i - 1].lat, points[i - 1].lng, points[i].lat, points[i].lng),
-    );
-  }
-  const totalDist = cumDist[cumDist.length - 1];
-  if (totalDist === 0) return points[0];
-
-  const targetDist = ratio * totalDist;
-  for (let i = 1; i < points.length; i++) {
-    if (cumDist[i] >= targetDist) {
-      const segLen = cumDist[i] - cumDist[i - 1];
-      const segProgress = segLen > 0 ? (targetDist - cumDist[i - 1]) / segLen : 0;
-      return {
-        lat: points[i - 1].lat + (points[i].lat - points[i - 1].lat) * segProgress,
-        lng: points[i - 1].lng + (points[i].lng - points[i - 1].lng) * segProgress,
-      };
-    }
-  }
-  return points[points.length - 1];
-}
+/* ── Component ─────────────────────────────────────── */
 
 export function ParcelMap({
   pkg,
@@ -115,6 +100,38 @@ export function ParcelMap({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const animFrameRef = useRef<number>(0);
+  const [osrmRoutes, setOsrmRoutes] = useState<Map<string, { lat: number; lng: number }[]>>(new Map());
+
+  // Fetch OSRM routes for packages that have coordinates
+  useEffect(() => {
+    const packagesToRoute = showAll ? allPackages : [pkg];
+    for (const p of packagesToRoute) {
+      if (p.originLat == null || p.originLng == null || p.destinationLat == null || p.destinationLng == null) continue;
+      // Fetch OSRM road routes for ALL transport modes so the line follows real roads
+      if (osrmRoutes.has(p.id)) continue;
+
+      const wpPoints = (p.waypoints || [])
+        .sort((a, b) => a.orderIndex - b.orderIndex)
+        .filter(w => w.lat != null && w.lng != null)
+        .map(w => ({ lat: w.lat, lng: w.lng }));
+
+      fetchOSRMRouteWithWaypoints(
+        { lat: p.originLat, lng: p.originLng },
+        wpPoints,
+        { lat: p.destinationLat, lng: p.destinationLng },
+      ).then(route => {
+        if (route.length > 2) {
+          setOsrmRoutes(prev => {
+            const next = new Map(prev);
+            next.set(p.id, route);
+            return next;
+          });
+        }
+      }).catch(() => {
+        // Silently fall back to straight-line route
+      });
+    }
+  }, [pkg, showAll, allPackages]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -130,6 +147,7 @@ export function ParcelMap({
       maxZoom: 18,
     }).addTo(map);
 
+    // Edit mode: click to place
     if (editMode && onMapClick) {
       map.on('click', (e: L.LeafletMouseEvent) => onMapClick(e.latlng.lat, e.latlng.lng));
       map.getContainer().style.cursor = 'crosshair';
@@ -139,19 +157,29 @@ export function ParcelMap({
     const allPoints: L.LatLngExpression[] = [];
 
     for (const p of packagesToShow) {
-      const routePoints = buildRoutePoints(p);
+      // Get route points: prefer OSRM road route over straight-line segments
+      const osrmRoute = osrmRoutes.get(p.id);
+      const routeForSim = osrmRoute && osrmRoute.length > 2 ? osrmRoute : undefined;
+      const routePoints = routeForSim ?? buildRoutePoints(p);
 
-      // Route polyline (gold solid)
+      const routeColor = getTransportColor(p.transportMode);
+
+      // Route polyline
       if (routePoints.length >= 2) {
         const latlngs: L.LatLngExpression[] = routePoints.map((pt) => [pt.lat, pt.lng]);
-        L.polyline(latlngs, { color: '#C8A951', weight: 4, opacity: 0.9 }).addTo(map);
+        L.polyline(latlngs, {
+          color: routeColor,
+          weight: 4,
+          opacity: 0.8,
+          dashArray: p.transportMode === 'AIR' ? '8 6' : p.transportMode === 'MER' ? '12 4' : undefined,
+        }).addTo(map);
         allPoints.push(...latlngs);
       }
 
       // Origin marker
       if (p.originLat != null && p.originLng != null) {
         L.marker([p.originLat, p.originLng], {
-          icon: createIcon('#3b82f6', showAll ? undefined : p.originAddress),
+          icon: createDotIcon('#3b82f6', showAll ? undefined : `🟢 ${p.originAddress}`),
         }).addTo(map).bindPopup(`<div style="font-size:12px;"><strong>Départ</strong><br/>${p.originAddress}</div>`);
         allPoints.push([p.originLat, p.originLng]);
       }
@@ -159,7 +187,7 @@ export function ParcelMap({
       // Destination marker
       if (p.destinationLat != null && p.destinationLng != null) {
         L.marker([p.destinationLat, p.destinationLng], {
-          icon: createIcon('#ef4444', showAll ? undefined : p.destinationAddress),
+          icon: createDotIcon('#ef4444', showAll ? undefined : `🔴 ${p.destinationAddress}`),
         }).addTo(map).bindPopup(`<div style="font-size:12px;"><strong>Arrivée</strong><br/>${p.destinationAddress}</div>`);
         allPoints.push([p.destinationLat, p.destinationLng]);
       }
@@ -177,63 +205,58 @@ export function ParcelMap({
                   : wp.estimatedArrival
                   ? `<br/>Arrivée estimée : ${new Date(wp.estimatedArrival).toLocaleString('fr-FR')}`
                   : ''
+              }${
+                wp.stopDurationMinutes && wp.stopDurationMinutes > 0
+                  ? `<br/>⏸ Arrêt : ${wp.stopDurationMinutes} min`
+                  : ''
               }</div>`);
           }
         }
       }
 
-      // Position marker — single parcel view only (not showAll)
+      // Animated position marker for single parcel view
       if (!showAll && showPosition && p.status !== 'PENDING' && p.status !== 'REFUSED') {
-        const initialPos = simulatePosition(p);
+        const initialPos = simulatePosition(p, routeForSim);
         if (initialPos) {
-          const animMarker = L.marker([initialPos.lat, initialPos.lng], { icon: createPulseIcon() }).addTo(map);
+          const bearing = getBearing(p, routeForSim) ?? 0;
+          const animMarker = L.marker([initialPos.lat, initialPos.lng], {
+            icon: createTransportIcon(p.transportMode, bearing),
+          }).addTo(map);
+
+          const iconLabel = p.transportMode === 'AIR' ? '✈️ Avion' : p.transportMode === 'MER' ? '🚢 Bateau' : p.transportMode === 'ROUTE' ? '🚛 Camion' : '📦 Colis';
           animMarker.bindPopup(
-            `<div style="font-size:12px;"><strong>📍 Position actuelle</strong><br/>${p.name} (${p.trackingNumber})</div>`,
+            `<div style="font-size:12px;"><strong>${iconLabel}</strong><br/>${p.name} (${p.trackingNumber})</div>`,
           );
           if (onParcelClick) animMarker.on('click', () => onParcelClick(p));
           allPoints.push([initialPos.lat, initialPos.lng]);
 
-          // Animated trail + marker for in-transit parcels
-          if (routePoints.length >= 2 && p.status !== 'DELIVERED') {
-            const traveledRatio = getTraveledRatio(p);
-            const totalDist = routePoints.reduce((sum, pt, i) =>
-              i === 0 ? 0 : sum + haversineDistance(routePoints[i - 1].lat, routePoints[i - 1].lng, pt.lat, pt.lng), 0);
+          // Animate marker along route
+          if (p.status === 'IN_TRANSIT') {
+            let progress = getTraveledRatio(p);
 
-            // Draw traveled trail (solid gold, from origin to current position)
-            const trailPoints = routePoints.slice(0, Math.max(2, Math.ceil(traveledRatio * routePoints.length)));
-            if (trailPoints.length >= 2) {
-              L.polyline(trailPoints.map((pt) => [pt.lat, pt.lng] as L.LatLngExpression), {
-                color: '#f59e0b',
-                weight: 5,
-                opacity: 0.8,
-              }).addTo(map);
-            }
-
-            // Animate marker along route (speed tied to distance)
-            let progress = traveledRatio;
-            let lastTime = performance.now();
-            const speedDeg = totalDist > 0 ? (totalDist * 0.015) / 60 : 0.001; // visual speed scaled to route length
-
-            function animate(now: number) {
-              const dt = (now - lastTime) / 1000;
-              lastTime = now;
-              progress = Math.min(1, progress + (speedDeg * dt));
-              const pos = interpolateAlongRoute(routePoints, progress);
-              animMarker.setLatLng([pos.lat, pos.lng]);
-              if (progress < 1) animFrameRef.current = requestAnimationFrame(animate);
+            function animate(_now: number) {
+              // Recalculate ratio from real time (demo or real duration)
+              progress = getTraveledRatio(p);
+              const pos = simulatePosition(p, routeForSim);
+              if (pos) {
+                animMarker.setLatLng([pos.lat, pos.lng]);
+              }
+              if (progress < 1) {
+                animFrameRef.current = requestAnimationFrame(animate);
+              }
             }
             animFrameRef.current = requestAnimationFrame(animate);
           }
         }
       }
 
-      // Static position for showAll mode (no animation to avoid chaos)
+      // Multi-package: static icons
       if (showAll && showPosition && p.status !== 'PENDING' && p.status !== 'REFUSED') {
-        const pos = simulatePosition(p);
+        const pos = simulatePosition(p, routeForSim);
         if (pos) {
-          L.marker([pos.lat, pos.lng], { icon: createPulseIcon() })
+          L.marker([pos.lat, pos.lng], { icon: createTransportIcon(p.transportMode, 0) })
             .addTo(map)
-            .bindPopup(`<div style="font-size:12px;"><strong>${p.name}</strong><br/>${p.trackingNumber}</div>`);
+            .bindPopup(`<div style="font-size:12px;"><strong>${getTransportIcon(p.transportMode)} ${p.name}</strong><br/>${p.trackingNumber}</div>`);
           allPoints.push([pos.lat, pos.lng]);
         }
       }
@@ -252,7 +275,7 @@ export function ParcelMap({
       map.remove();
       mapInstance.current = null;
     };
-  }, [pkg, showAll, allPackages, showPosition, readOnly, editMode, onMapClick]);
+  }, [pkg, showAll, allPackages, showPosition, readOnly, editMode, onMapClick, osrmRoutes]);
 
   return (
     <div
@@ -263,13 +286,3 @@ export function ParcelMap({
   );
 }
 
-function getTraveledRatio(pkg: PackageItem): number {
-  if (pkg.status === 'DELIVERED') return 1;
-  if (pkg.status === 'PENDING' || pkg.status === 'REFUSED') return 0;
-  const departureTime = pkg.validatedAt
-    ? new Date(pkg.validatedAt).getTime()
-    : new Date(pkg.createdAt).getTime();
-  const elapsed = Math.max(0, Date.now() - departureTime);
-  const dur = pkg.estimatedDuration ? parseDuration(pkg.estimatedDuration) : 7 * 24 * 3600 * 1000;
-  return Math.min(1, elapsed / dur);
-}

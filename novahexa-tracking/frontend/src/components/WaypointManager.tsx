@@ -32,7 +32,6 @@ export function WaypointManager({ pkg, onUpdate }: WaypointManagerProps) {
         label: label.trim(),
         lat: selectedCoords.lat,
         lng: selectedCoords.lng,
-        orderIndex: waypoints.length,
       });
       // Reload package to get updated waypoints
       const updated = await packagesApi.getAdmin(pkg.id);

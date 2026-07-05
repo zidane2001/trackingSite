@@ -24,9 +24,9 @@ const STATUS_CHART_COLORS: Record<string, string> = {
 };
 
 const TRANSPORT_COLORS: Record<string, string> = {
-  ROUTIER: '#6366f1',
-  AERIEN: '#3b82f6',
-  MARITIME: '#06b6d4',
+  ROUTE: '#6366f1',
+  AIR: '#3b82f6',
+  MER: '#06b6d4',
 };
 
 // ── Helper: group packages by month ─────────────────────────

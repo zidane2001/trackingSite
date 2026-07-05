@@ -168,6 +168,7 @@ export function Home() {
                   <img
                     src={s.img}
                     alt={s.title}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
@@ -218,12 +219,12 @@ export function Home() {
       {/* ===================== ENTREPÔT À GRANDE ÉCHELLE ===================== */}
       <section className="relative">
         <Reveal direction="scale">
-          <div className="relative h-[250px] sm:h-[320px] lg:h-[420px] overflow-hidden group">
-            <img
-              src={IMAGES.warehouse}
-              alt="Entrepôt de stockage à grande échelle"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+          <div className="relative h-[250px] sm:h-[320px] lg:h-[420px] overflow-hidden group">              <img
+                src={IMAGES.warehouse}
+                alt="Entrepôt de stockage à grande échelle"
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
             <div className="absolute inset-0 bg-gradient-to-r from-[#060f24]/95 via-[#060f24]/70 to-transparent" />
             <div className="absolute inset-0 flex items-center">
               <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2, Plus, Pencil } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TrackingQR } from '../../components/TrackingQR';
@@ -8,11 +9,13 @@ import type { PackageItem, PackageStatus } from '../../types';
 import { STATUS_LABELS } from '../../types';
 
 export function AdminPackages() {
+  const navigate = useNavigate();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<PackageStatus | ''>('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const loadPackages = () => {
     packagesApi.list().then(setPackages).catch(() => []).finally(() => setLoading(false));
@@ -23,20 +26,41 @@ export function AdminPackages() {
   const handleDelete = async (pkg: PackageItem) => {
     if (!confirm(`Supprimer le colis "${pkg.name}" (${pkg.trackingNumber}) ?`)) return;
     setActionLoading(pkg.id);
-    await packagesApi.delete(pkg.id).catch(() => {});
-    loadPackages();
+    setActionError(null);
+    try {
+      await packagesApi.delete(pkg.id);
+      loadPackages();
+    } catch (err: any) {
+      setActionError(err?.message || 'Erreur lors de la suppression');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleSetInTransit = async (pkg: PackageItem) => {
     setActionLoading(pkg.id);
-    await packagesApi.setInTransit(pkg.trackingNumber).catch(() => {});
-    loadPackages();
+    setActionError(null);
+    try {
+      await packagesApi.setInTransit(pkg.trackingNumber);
+      loadPackages();
+    } catch (err: any) {
+      setActionError(err?.message || 'Erreur lors de la mise en transit');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleSetDelivered = async (pkg: PackageItem) => {
     setActionLoading(pkg.id);
-    await packagesApi.setDelivered(pkg.trackingNumber).catch(() => {});
-    loadPackages();
+    setActionError(null);
+    try {
+      await packagesApi.setDelivered(pkg.trackingNumber);
+      loadPackages();
+    } catch (err: any) {
+      setActionError(err?.message || 'Erreur lors de la marquer comme livré');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const filtered = packages.filter((p) => {
@@ -60,6 +84,13 @@ export function AdminPackages() {
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">{packages.length} colis au total</p>
           </div>
+          <button
+            onClick={() => navigate('/admin/map')}
+            className="flex items-center gap-2 px-4 py-2.5 bg-yellow-400 text-[#060f24] rounded-xl font-bold text-sm hover:bg-yellow-300 transition shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            Ajouter un colis
+          </button>
         </div>
 
         {/* Filters */}
@@ -93,6 +124,13 @@ export function AdminPackages() {
           </div>
         </div>
 
+        {actionError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center justify-between">
+            <p className="text-sm text-red-600">{actionError}</p>
+            <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
+          </div>
+        )}
+
         {/* Mobile: Card list */}
         <div className="block lg:hidden">
           {loading ? (
@@ -102,7 +140,7 @@ export function AdminPackages() {
           ) : (
             <div className="space-y-3">
               {filtered.map((pkg) => (
-                <div key={pkg.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                <div key={pkg.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-yellow-300 transition-colors" onClick={() => navigate('/admin/map', { state: { selectedId: pkg.id } })}>
                   <div className="flex items-start justify-between mb-2">
                     <div className="min-w-0">
                       <div className="font-medium text-slate-900 text-sm">{pkg.name}</div>
@@ -114,22 +152,25 @@ export function AdminPackages() {
                   <div className="text-xs text-slate-400 mb-3">{pkg.ownerName || pkg.ownerEmail || '—'}</div>
                   <div className="flex items-center gap-2 flex-wrap">
                     {pkg.status === 'VALIDATED' && (
-                      <button onClick={() => handleSetInTransit(pkg)} disabled={actionLoading === pkg.id} className="text-indigo-500 hover:text-indigo-700 p-1.5 rounded-lg hover:bg-indigo-50 transition" title="Mettre en transit">
+                      <button onClick={(e) => { e.stopPropagation(); handleSetInTransit(pkg); }} disabled={actionLoading === pkg.id} className="text-indigo-500 hover:text-indigo-700 p-1.5 rounded-lg hover:bg-indigo-50 transition" title="Mettre en transit">
                         {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
                       </button>
                     )}
                     {pkg.status === 'IN_TRANSIT' && (
-                      <button onClick={() => handleSetDelivered(pkg)} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition" title="Marquer livré">
+                      <button onClick={(e) => { e.stopPropagation(); handleSetDelivered(pkg); }} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition" title="Marquer livré">
                         {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                       </button>
                     )}
-                    <button onClick={() => pdfApi.downloadQuote(pkg.trackingNumber)} className="text-slate-400 hover:text-blue-500 p-1.5 rounded-lg hover:bg-blue-50 transition" title="Devis PDF">
+                    <button onClick={(e) => { e.stopPropagation(); pdfApi.downloadQuote(pkg.trackingNumber); }} className="text-slate-400 hover:text-blue-500 p-1.5 rounded-lg hover:bg-blue-50 transition" title="Devis PDF">
                       <FileText className="w-4 h-4" />
                     </button>
-                    <button onClick={() => pdfApi.downloadLabel(pkg.trackingNumber)} className="text-slate-400 hover:text-yellow-500 p-1.5 rounded-lg hover:bg-yellow-50 transition" title="Étiquette PDF">
+                    <button onClick={(e) => { e.stopPropagation(); pdfApi.downloadLabel(pkg.trackingNumber); }} className="text-slate-400 hover:text-yellow-500 p-1.5 rounded-lg hover:bg-yellow-50 transition" title="Étiquette PDF">
                       <Tag className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(pkg)} disabled={actionLoading === pkg.id} className="text-slate-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition ml-auto" title="Supprimer">
+                    <button onClick={(e) => { e.stopPropagation(); navigate('/admin/map', { state: { selectedId: pkg.id, edit: true } }); }} className="text-slate-400 hover:text-blue-600 p-1.5 rounded-lg hover:bg-blue-50 transition" title="Modifier">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(pkg); }} disabled={actionLoading === pkg.id} className="text-slate-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition ml-auto" title="Supprimer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -162,7 +203,7 @@ export function AdminPackages() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filtered.map((pkg) => (
-                    <tr key={pkg.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={pkg.id} className="hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => navigate('/admin/map', { state: { selectedId: pkg.id } })}>
                       <td className="px-6 py-3">
                         <div className="font-medium text-slate-900">{pkg.name}</div>
                         <div className="text-[11px] text-slate-400 font-mono mt-0.5">{pkg.trackingNumber}</div>
@@ -178,22 +219,25 @@ export function AdminPackages() {
                       <td className="px-6 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {pkg.status === 'VALIDATED' && (
-                            <button onClick={() => handleSetInTransit(pkg)} disabled={actionLoading === pkg.id} className="text-indigo-500 hover:text-indigo-700 transition-colors p-1" title="Mettre en transit">
+                            <button onClick={(e) => { e.stopPropagation(); handleSetInTransit(pkg); }} disabled={actionLoading === pkg.id} className="text-indigo-500 hover:text-indigo-700 transition-colors p-1" title="Mettre en transit">
                               {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
                             </button>
                           )}
                           {pkg.status === 'IN_TRANSIT' && (
-                            <button onClick={() => handleSetDelivered(pkg)} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 transition-colors p-1" title="Marquer livré">
+                            <button onClick={(e) => { e.stopPropagation(); handleSetDelivered(pkg); }} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 transition-colors p-1" title="Marquer livré">
                               {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                             </button>
                           )}
-                          <button onClick={() => pdfApi.downloadQuote(pkg.trackingNumber)} className="text-slate-400 hover:text-blue-500 transition-colors p-1" title="Devis PDF">
+                          <button onClick={(e) => { e.stopPropagation(); pdfApi.downloadQuote(pkg.trackingNumber); }} className="text-slate-400 hover:text-blue-500 transition-colors p-1" title="Devis PDF">
                             <FileText className="w-4 h-4" />
                           </button>
-                          <button onClick={() => pdfApi.downloadLabel(pkg.trackingNumber)} className="text-slate-400 hover:text-yellow-500 transition-colors p-1" title="Étiquette PDF">
+                          <button onClick={(e) => { e.stopPropagation(); pdfApi.downloadLabel(pkg.trackingNumber); }} className="text-slate-400 hover:text-yellow-500 transition-colors p-1" title="Étiquette PDF">
                             <Tag className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleDelete(pkg)} disabled={actionLoading === pkg.id} className="text-slate-400 hover:text-red-500 transition-colors p-1" title="Supprimer">
+                          <button onClick={(e) => { e.stopPropagation(); navigate('/admin/map', { state: { selectedId: pkg.id, edit: true } }); }} className="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Modifier">
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(pkg); }} disabled={actionLoading === pkg.id} className="text-slate-400 hover:text-red-500 transition-colors p-1" title="Supprimer">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>

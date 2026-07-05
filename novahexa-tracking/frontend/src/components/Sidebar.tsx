@@ -8,6 +8,8 @@ import {
   MessageSquare,
   Inbox,
   BarChart3,
+  HelpCircle,
+  User,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -31,10 +33,13 @@ const adminNav: NavItem[] = [
   { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
   { icon: MessageSquare, label: 'Messagerie', path: '/admin/messages' },
   { icon: Inbox, label: 'Messages contact', path: '/admin/contact-messages' },
+  { icon: HelpCircle, label: 'FAQ', path: '/admin/faq' },
 ];
 
 const clientNav: NavItem[] = [
   { icon: LayoutDashboard, label: 'Mon tableau de bord', path: '/client' },
+  { icon: MessageSquare, label: 'Messagerie', path: '/client/messages' },
+  { icon: User, label: 'Mon profil', path: '/client/profile' },
 ];
 
 interface Props {
@@ -67,8 +72,8 @@ export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const active =
-            item.path === '/admin'
-              ? location.pathname === '/admin'
+            item.path === '/admin' || item.path === '/client'
+              ? location.pathname === item.path
               : location.pathname.startsWith(item.path);
           return (
             <Link

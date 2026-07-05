@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Inbox, Check, Mail } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { contactApi } from '../../lib/api';
@@ -11,13 +11,13 @@ export function AdminContactMessages() {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
 
   const loadMessages = () => {
-    contactApi.list().catch(() => []).finally(() => setLoading(false));
+    contactApi.list().then(setMessages).catch(() => []).finally(() => setLoading(false));
   };
 
   useEffect(() => { loadMessages(); }, []);
 
   const handleMarkTreated = async (msg: ContactMessage) => {
-    await contactApi.markTreated(msg.id).catch(() => {});
+    await contactApi.markTreated(Number(msg.id)).catch(() => {});
     setMessages((prev) =>
       prev.map((m) => (m.id === msg.id ? { ...m, status: 'TRAITE' as const } : m))
     );

@@ -1,7 +1,7 @@
 /**
  * API client — wraps fetch with auth token injection.
  */
-import type { PackageItem, DashboardStats, Notification, ContactMessage, AuthResponse } from '../types';
+import type { PackageItem, DashboardStats, Notification, ContactMessage, AuthResponse, FaqItem } from '../types';
 
 const BASE_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:8080';
@@ -21,8 +21,22 @@ async function request<T>(path: string, opts: RequestInit = {}): Promise<T> {
     },
   });
   if (!res.ok) {
+    // Auto-logout on 401 — token is stale/invalid
+    if (res.status === 401 && localStorage.getItem('youms_token')) {
+      localStorage.removeItem('youms_token');
+      localStorage.removeItem('youms_user');
+      window.location.href = '/login';
+      throw new Error('Session expirée. Veuillez vous reconnecter.');
+    }
     const text = await res.text().catch(() => '');
-    throw new Error(text || `API ${res.status}`);
+    let message = `Erreur ${res.status}`;
+    try {
+      const json = JSON.parse(text);
+      message = json.message || json.error || message;
+    } catch {
+      if (text) message = text;
+    }
+    throw new Error(message);
   }
   return res.json();
 }
@@ -79,7 +93,7 @@ export const packagesApi = {
     api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/in-transit`, {}),
   setDelivered: (trackingNumber: string) =>
     api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/delivered`, {}),
-  addWaypoint: (id: string, data: { label: string; lat: number; lng: number }) =>
+  addWaypoint: (id: string, data: { label: string; lat: number; lng: number; stopDurationMinutes?: number }) =>
     api.post<PackageItem>(`/api/admin/packages/${id}/waypoints`, data),
   deleteWaypoint: (packageId: string, waypointId: string) =>
     api.delete<PackageItem>(`/api/admin/packages/${packageId}/waypoints/${waypointId}`),
@@ -87,6 +101,22 @@ export const packagesApi = {
     api.post(`/api/admin/packages/${id}/messages`, data),
   getMessages: (id: string) =>
     api.get(`/api/admin/packages/${id}/messages`),
+  createForClient: (data: Record<string, unknown>) =>
+    api.post<PackageItem>('/api/admin/packages/create', data),
+};
+
+// ── Admin Users ──────────────────────────────────────────
+export interface ClientSummary {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  role: string;
+  verified: boolean;
+}
+
+export const adminUsersApi = {
+  list: () => api.get<ClientSummary[]>('/api/admin/users'),
 };
 
 // ── Dashboard stats ──────────────────────────────────────────
@@ -195,6 +225,34 @@ export const messagesApi = {
     api.post<MessageItem>(`/api/admin/packages/${parcelId}/messages`, data),
   list: (parcelId: string) =>
     api.get<MessageItem[]>(`/api/admin/packages/${parcelId}/messages`),
+};
+
+// ── Client Messages ──────────────────────────────────────
+export const clientMessagesApi = {
+  send: (parcelId: string, data: { subject: string; body: string }) =>
+    api.post<MessageItem>(`/api/client/packages/${parcelId}/messages`, data),
+  list: (parcelId: string) =>
+    api.get<MessageItem[]>(`/api/client/packages/${parcelId}/messages`),
+};
+
+// ── Profile ──────────────────────────────────────────────
+export const profileApi = {
+  get: () => api.get<{ id: string; fullName: string; email: string; phone: string; role: string; verified: boolean; createdAt: string }>('/api/client/profile'),
+  update: (data: { fullName?: string; email?: string; phone?: string }) =>
+    api.put<{ id: string; fullName: string; email: string; phone: string; role: string; verified: boolean }>('/api/client/profile', data),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put<{ status: string; message: string }>('/api/client/profile/password', { currentPassword, newPassword }),
+};
+
+// ── FAQ ──────────────────────────────────────────────────────
+export const faqApi = {
+  list: () => api.get<FaqItem[]>('/api/faq'),
+  listAll: () => api.get<FaqItem[]>('/api/admin/faq'),
+  create: (data: { question: string; answer: string; sortOrder: number; enabled: boolean }) =>
+    api.post<FaqItem>('/api/admin/faq', data),
+  update: (id: string, data: { question: string; answer: string; sortOrder: number; enabled: boolean }) =>
+    api.put<FaqItem>(`/api/admin/faq/${id}`, data),
+  delete: (id: string) => api.delete(`/api/admin/faq/${id}`),
 };
 
 // ── Legacy submitPackage (used by PackageHeroForm) ──────

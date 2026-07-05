@@ -10,9 +10,9 @@ import { cn } from '../lib/utils';
 import type { PackageItem } from '../types';
 
 const TRANSPORT_ICONS: Record<string, React.FC<{ className?: string }>> = {
-  ROUTIER: Truck,
-  AERIEN: Plane,
-  MARITIME: Ship,
+  ROUTE: Truck,
+  AIR: Plane,
+  MER: Ship,
 };
 
 export function Dashboard() {
@@ -49,8 +49,8 @@ export function Dashboard() {
 
   const getTransportIcon = (mode?: string) => {
     if (mode && TRANSPORT_ICONS[mode]) return TRANSPORT_ICONS[mode];
-    if (mode === 'AERIEN') return Plane;
-    if (mode === 'MARITIME') return Ship;
+    if (mode === 'AIR') return Plane;
+    if (mode === 'MER') return Ship;
     return Truck;
   };
 

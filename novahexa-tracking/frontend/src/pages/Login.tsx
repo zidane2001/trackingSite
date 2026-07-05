@@ -16,18 +16,8 @@ export function Login() {
     e.preventDefault();
     setError('');
     try {
-      await login(email, password);
-      // Redirect based on role — user will be set in context
-      // Small delay to ensure state is updated
-      setTimeout(() => {
-        const userStr = localStorage.getItem('youms_user');
-        if (userStr) {
-          const user = JSON.parse(userStr);
-          navigate(user.role === 'ADMIN' ? '/admin' : '/client', { replace: true });
-        } else {
-          navigate('/', { replace: true });
-        }
-      }, 100);
+      const loggedUser = await login(email, password);
+      navigate(loggedUser.role === 'ADMIN' ? '/admin' : '/client', { replace: true });
     } catch (err: any) {
       setError(err?.message || 'Identifiants incorrects. Veuillez réessayer.');
     }

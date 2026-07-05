@@ -14,6 +14,8 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronUp,
+  X,
+  ImagePlus,
 } from 'lucide-react';
 import {
   estimatePrice,
@@ -27,6 +29,8 @@ import {
 } from '../lib/pricing';
 import { generateTrackingNumber } from '../lib/tracking';
 import { submitPackage, pricingApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
+import { useImageUpload } from '../hooks/useImageUpload';
 
 type FormState = {
   senderName: string;
@@ -114,6 +118,8 @@ export function PackageHeroForm() {
   const [result, setResult] = useState<{ trackingNumber: string; cost: number } | null>(null);
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const { images, previews, uploading, fileRef, handleUpload, remove, reset } = useImageUpload();
+  const { isAuthenticated } = useAuth();
 
   // Server-side cost estimate — zero re-render to avoid focus loss
   const [serverCost, setServerCost] = useState<number | null>(null);
@@ -207,6 +213,7 @@ export function PackageHeroForm() {
         delay: form.delay,
         shippingDate: form.shippingDate || undefined,
         estimatedCost,
+        imageUrls: images.length > 0 ? images : undefined,
       });
       setResult({ trackingNumber: res.trackingNumber, cost: res.estimatedCost });
     } catch {
@@ -256,7 +263,7 @@ export function PackageHeroForm() {
 
         <button
           type="button"
-          onClick={() => { setResult(null); setForm(initial); setServerCost(null); }}
+          onClick={() => { setResult(null); setForm(initial); setServerCost(null); reset(); }}
           className="text-sm font-semibold text-yellow-400 hover:text-yellow-300 inline-flex items-center gap-1.5"
         >
           Soumettre un autre colis <ArrowRight className="w-4 h-4" />
@@ -335,6 +342,54 @@ export function PackageHeroForm() {
         {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         {expanded ? 'Moins d\'options' : 'Poids, dimensions, date...'}
       </button>
+
+      {/* Image upload (only for authenticated users) */}
+      {isAuthenticated && (
+        <div className="mb-2">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-yellow-400 transition"
+          >
+            {uploading ? (
+              <><Loader2 className="w-3 h-3 animate-spin" /> Envoi des images…</>
+            ) : (
+              <><ImagePlus className="w-3 h-3" /> Photos du colis (optionnel)</>
+            )}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleUpload}
+          />
+          {previews.length > 0 && (
+            <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
+              {previews.map((src, i) => (
+                <div key={i} className="relative shrink-0 group">
+                  <img src={src} alt={`Photo ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-white/10" />
+                  <button
+                    type="button"
+                    onClick={() => remove(i)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {!isAuthenticated && (
+        <div className="mb-2 text-[10px] text-slate-500">
+          <ImagePlus className="inline w-3 h-3 -mt-0.5 mr-0.5" />
+          Connectez-vous pour ajouter des photos du colis
+        </div>
+      )}
 
       {/* Advanced fields (collapsible) */}
       {expanded && (

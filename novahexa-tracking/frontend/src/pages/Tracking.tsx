@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, Package, Clock, Truck, Plane, Ship } from 'lucide-react';
 import { packagesApi } from '../lib/api';
 import { ParcelMap } from '../components/ParcelMap';
@@ -28,10 +28,10 @@ export function Tracking() {
     }
   };
 
-  const getTransportIcon = (mode?: string) => {
-    if (mode === 'AERIEN') return Plane;
-    if (mode === 'MARITIME') return Ship;
-    return Truck;
+  const renderTransportIcon = (mode?: string) => {
+    if (mode === 'AIR') return <Plane className="w-5 h-5 text-yellow-500" />;
+    if (mode === 'MER') return <Ship className="w-5 h-5 text-yellow-500" />;
+    return <Truck className="w-5 h-5 text-yellow-500" />;
   };
 
   return (
@@ -52,7 +52,7 @@ export function Tracking() {
           <form onSubmit={handleSearch} className="flex h-12 sm:h-14 max-w-xl mx-auto">
             <input
               type="text"
-              placeholder="Ex : NHX-A3B7K9"
+              placeholder="Ex : YL-12345678-FR"
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
               className="flex-1 bg-[#0a1530] border border-white/10 rounded-l-xl px-5 text-white placeholder-slate-500 focus:outline-none focus:border-yellow-400/50 text-sm"
@@ -137,14 +137,14 @@ export function Tracking() {
 
               {result.transportMode && (
                 <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
-                  {React.createElement(getTransportIcon(result.transportMode), { className: 'w-5 h-5 text-yellow-500' })}
+                  {renderTransportIcon(result.transportMode)}
                   <span className="text-sm text-slate-600">Transport : <strong>{result.transportMode}</strong></span>
                 </div>
               )}
 
               <div className="flex items-center gap-2 text-xs text-slate-400 pt-2">
                 <Clock className="w-3.5 h-3.5" />
-                Dernière mise à jour : {new Date(result.updatedAt).toLocaleString('fr-FR')}
+                Dernière mise à jour : {result.updatedAt ? new Date(result.updatedAt).toLocaleString('fr-FR') : '—'}
               </div>
             </div>
 

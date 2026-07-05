@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Package, Clock, MessageSquare, FileText, Download, Tag } from 'lucide-react';
+import { ArrowLeft, Package, Clock, FileText, Download, Tag, ImageIcon } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { ParcelMap } from '../../components/ParcelMap';
 import { TrackingQR } from '../../components/TrackingQR';
+import { MessagingPanel } from '../../components/MessagingPanel';
 import { packagesApi, pdfApi } from '../../lib/api';
 import type { PackageItem } from '../../types';
 
@@ -112,6 +113,27 @@ export function ClientPackageDetail() {
               </div>
             </div>
 
+            {/* Package images */}
+            {pkg.imageUrls && pkg.imageUrls.length > 0 && (
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" /> Photos du colis
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {pkg.imageUrls.map((url, i) => (
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                      <img
+                        src={url}
+                        alt={`Photo ${i + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-slate-200 hover:border-yellow-400 transition cursor-pointer"
+                        loading="lazy"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Route info */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
               <h3 className="font-bold text-slate-900 text-sm mb-4">Détails du trajet</h3>
@@ -187,25 +209,12 @@ export function ClientPackageDetail() {
               </div>
             )}
 
-            {/* Messages */}
-            {pkg.messages && pkg.messages.length > 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" /> Messages
-                </h3>
-                <div className="space-y-3">
-                  {pkg.messages.map((msg) => (
-                    <div key={msg.id} className="bg-slate-50 rounded-lg p-3">
-                      <p className="text-xs font-semibold text-slate-700">{msg.subject}</p>
-                      <p className="text-sm text-slate-600 mt-1">{msg.body}</p>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        {new Date(msg.sentAt).toLocaleString('fr-FR')}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Messages — interactif, le client peut répondre */}
+            <MessagingPanel
+              parcelId={pkg.id}
+              packageName={pkg.name}
+              context="client"
+            />
           </div>
         </div>
       </div>
