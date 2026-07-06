@@ -16,6 +16,7 @@ import {
   Star,
   Quote,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { IMAGES } from '../config/images';
 import { PackageHeroForm } from '../components/PackageHeroForm';
 import { useScrollReveal } from '../hooks/useScrollReveal';
@@ -44,64 +45,35 @@ function Reveal({
   );
 }
 
-const STEPS = [
-  {
-    icon: FileText,
-    title: 'Frais de port',
-    text: "Réglez les frais d'expédition en ligne ou au guichet. Apposez l'étiquette fournie sur le colis.",
-  },
-  {
-    icon: PackageOpen,
-    title: 'Dépôt ou ramassage',
-    text: 'Déposez le colis dans un point de collecte, ou demandez un enlèvement à domicile.',
-  },
-  {
-    icon: Search,
-    title: 'Suivi des colis',
-    text: "Utilisez votre numéro de suivi pour suivre la progression du colis en temps réel.",
-  },
-  {
-    icon: CheckCircle2,
-    title: 'Livraison',
-    text: "Le colis est remis au destinataire. En cas d'absence, un avis de passage est laissé.",
-  },
-];
-
-const SERVICES = [
-  {
-    icon: Truck,
-    img: IMAGES.serviceRoad,
-    title: 'Transport routier',
-    text: 'Solutions terrestres fiables et flexibles au niveau national et continental.',
-  },
-  {
-    icon: Ship,
-    img: IMAGES.serviceSea,
-    title: 'Fret maritime',
-    text: 'Expédition économique de gros volumes avec suivi complet de conteneurs.',
-  },
-  {
-    icon: Plane,
-    img: IMAGES.serviceAir,
-    title: 'Fret aérien',
-    text: "La solution la plus rapide pour vos expéditions urgentes à l'international.",
-  },
-];
-
-const METRICS = [
-  { icon: Package, value: '1M+', label: 'Colis livrés' },
-  { icon: Globe2, value: '150+', label: 'Pays couverts' },
-  { icon: ShieldCheck, value: '99.9%', label: 'Sécurité' },
-  { icon: Clock, value: '24/7', label: 'Support' },
-];
-
-const TESTIMONIALS = [
-  { name: 'Amina K.', city: 'Paris', text: "Service impeccable ! Mon colis est arrivé à Dakar en 4 jours. Le suivi en temps réel m'a rassuré tout au long du trajet.", stars: 5 },
-  { name: 'Jean-Pierre M.', city: 'Perpignan', text: "Très professionnel. L'équipe a été réactive pour la validation de ma soumission. Je recommande vivement Youms Logistics.", stars: 5 },
-  { name: 'Fatou D.', city: 'Bruxelles', text: "J'ai envoyé des pièces auto au Cameroun. Le transport routier était la bonne solution et tout s'est bien passé. Merci !", stars: 5 },
-];
-
 export function Home() {
+  const { t } = useTranslation();
+
+  const STEPS = [
+    { icon: FileText, title: t('home.step1_title'), text: t('home.step1_text') },
+    { icon: PackageOpen, title: t('home.step2_title'), text: t('home.step2_text') },
+    { icon: Search, title: t('home.step3_title'), text: t('home.step3_text') },
+    { icon: CheckCircle2, title: t('home.step4_title'), text: t('home.step4_text') },
+  ];
+
+  const SERVICES = [
+    { icon: Truck, img: IMAGES.serviceRoad, title: t('home.service_road_title'), text: t('home.service_road_text') },
+    { icon: Ship, img: IMAGES.serviceSea, title: t('home.service_sea_title'), text: t('home.service_sea_text') },
+    { icon: Plane, img: IMAGES.serviceAir, title: t('home.service_air_title'), text: t('home.service_air_text') },
+  ];
+
+  const METRICS = [
+    { icon: Package, value: '1M+', label: t('home.metrics_packages') },
+    { icon: Globe2, value: '150+', label: t('home.metrics_countries') },
+    { icon: ShieldCheck, value: '99.9%', label: t('home.metrics_security') },
+    { icon: Clock, value: '24/7', label: t('home.metrics_support') },
+  ];
+
+  const TESTIMONIALS = [
+    { name: 'Amina K.', city: 'Paris', text: "Service impeccable ! Mon colis est arrivé à Dakar en 4 jours. Le suivi en temps réel m'a rassuré tout au long du trajet.", stars: 5 },
+    { name: 'Jean-Pierre M.', city: 'Perpignan', text: "Très professionnel. L'équipe a été réactive pour la validation de ma soumission. Je recommande vivement Youms Logistics.", stars: 5 },
+    { name: 'Fatou D.', city: 'Bruxelles', text: "J'ai envoyé des pièces auto au Cameroun. Le transport routier était la bonne solution et tout s'est bien passé. Merci !", stars: 5 },
+  ];
+
   return (
     <div className="flex flex-col bg-[#eef2f6]">
       {/* ===================== HERO ===================== */}
@@ -113,23 +85,22 @@ export function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#060f24] via-[#060f24]/95 to-[#060f24]/70" aria-hidden />
 
-        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-16 sm:pb-24 grid lg:grid-cols-[1.05fr_0.95fr] gap-6 sm:gap-10 items-center">
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-16 sm:pb-24 grid lg:grid-cols-[1.05fr_0.95fr] gap-6 sm:gap-10 items-center w-full overflow-x-hidden">
           <div>
             <span className="inline-flex items-center gap-2 text-gold text-xs font-bold uppercase tracking-[0.2em] mb-3 sm:mb-4 animate-hero-badge">
               <span className="h-px w-8 bg-gold" />
-              Transport &amp; logistique
+              {t('home.badge')}
             </span>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-[1.1] tracking-tight mb-3 sm:mb-4 animate-hero-title">
-              Déposez et suivez vos colis en{' '}
+              {t('home.hero_title_1')}{' '}
               <span className="text-gold relative inline-block">
-                temps réel
+                {t('home.hero_highlight')}
                 <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gold/40 animate-shimmer" />
               </span>
             </h1>
             <div className="animate-hero-desc">
               <p className="text-slate-300/90 mb-5 sm:mb-7 max-w-xl text-sm sm:text-base">
-                Remplissez votre demande, obtenez un devis instantané et un numéro de
-                suivi. Notre équipe valide chaque envoi avant sa mise en route.
+                {t('home.hero_desc')}
               </p>
               <PackageHeroForm />
             </div>
@@ -150,8 +121,8 @@ export function Home() {
                 <Truck className="w-5 h-5 text-gold" />
               </div>
               <div>
-                <div className="text-sm font-bold leading-none">Livraison express</div>
-                <div className="text-[11px] text-slate-400 mt-1">Air · Mer · Route</div>
+                <div className="text-sm font-bold leading-none">{t('home.express')}</div>
+                <div className="text-[11px] text-slate-400 mt-1">{t('home.express_modes')}</div>
               </div>
             </div>
           </div>
@@ -159,10 +130,10 @@ export function Home() {
       </section>
 
       {/* ===================== SERVICES ===================== */}
-      <section id="services" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-14 w-full relative z-20 mb-12 sm:mb-20">
+      <section id="services" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-14 w-full relative z-20 mb-12 sm:mb-20 overflow-x-hidden">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {SERVICES.map((s, i) => (
-            <Reveal key={s.title} direction="up" delay={i * 120}>
+            <Reveal key={i} direction="up" delay={i * 120}>
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:border-gold transition-all duration-300 group hover:shadow-lg hover:shadow-gold/10 hover:-translate-y-1">
                 <div className="h-28 sm:h-36 overflow-hidden">
                   <img
@@ -179,7 +150,7 @@ export function Home() {
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 group-hover:text-gold transition-colors duration-300">{s.title}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed mb-4 sm:mb-5">{s.text}</p>
                   <Link to="/services" className="text-[#060f24] font-bold text-sm flex items-center gap-2 group-hover:text-gold transition-colors duration-300">
-                    En savoir plus <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    {t('home.learn_more')} <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </div>
               </div>
@@ -190,19 +161,19 @@ export function Home() {
 
       {/* ===================== PROCESSUS 4 ÉTAPES ===================== */}
       <section className="bg-[#060f24] py-12 sm:py-20 mb-0">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full overflow-x-hidden">
           <Reveal direction="up">
             <div className="text-center mb-8 sm:mb-14">
               <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
-                Comment ça marche
+                {t('home.how_it_works')}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-3">Votre colis, en 4 étapes</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-3">{t('home.process_title')}</h2>
             </div>
           </Reveal>
           <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div className="hidden md:block absolute top-9 left-[12%] right-[12%] border-t-2 border-dashed border-gold/30" aria-hidden />
             {STEPS.map((step, i) => (
-              <Reveal key={step.title} direction="scale" delay={i * 150}>
+              <Reveal key={i} direction="scale" delay={i * 150}>
                 <div className="relative text-center group">
                   <div className="w-14 h-14 sm:w-[72px] sm:h-[72px] rounded-full bg-gold flex items-center justify-center mx-auto mb-3 sm:mb-5 relative z-10 shadow-lg shadow-gold/20 transition-all duration-300 group-hover:scale-110 group-hover:shadow-gold/40 group-hover:bg-gold-400">
                     <step.icon className="w-6 h-6 sm:w-8 sm:h-8 text-[#060f24]" />
@@ -219,29 +190,28 @@ export function Home() {
       {/* ===================== ENTREPÔT À GRANDE ÉCHELLE ===================== */}
       <section className="relative">
         <Reveal direction="scale">
-          <div className="relative h-[250px] sm:h-[320px] lg:h-[420px] overflow-hidden group">              <img
-                src={IMAGES.warehouse}
-                alt="Entrepôt de stockage à grande échelle"
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+          <div className="relative h-[250px] sm:h-[320px] lg:h-[420px] overflow-hidden group">
+            <img
+              src={IMAGES.warehouse}
+              alt="Entrepôt de stockage à grande échelle"
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-[#060f24]/95 via-[#060f24]/70 to-transparent" />
             <div className="absolute inset-0 flex items-center">
               <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="max-w-lg">
                   <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-2 sm:mb-4">
-                    Entrepôt de stockage à grande échelle
+                    {t('home.warehouse_title')}
                   </h2>
                   <p className="text-slate-300 mb-4 sm:mb-7 text-sm sm:text-base">
-                    Grâce à nos projets de logistique et de transport, nous relions les
-                    continents, rapprochons les entreprises et facilitons le commerce
-                    international.
+                    {t('home.warehouse_desc')}
                   </p>
                   <a
                     href="#services"
                     className="group inline-flex items-center gap-2 bg-gold text-[#060f24] px-5 sm:px-7 py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base hover:bg-gold-400 transition-all duration-300 hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-0.5"
                   >
-                    Découvrir <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    {t('home.discover')} <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </a>
                 </div>
               </div>
@@ -251,10 +221,10 @@ export function Home() {
       </section>
 
       {/* ===================== CHIFFRES CLÉS ===================== */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20 w-full">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20 w-full overflow-x-hidden">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
           {METRICS.map((m, i) => (
-            <Reveal key={m.label} direction="up" delay={i * 100}>
+            <Reveal key={i} direction="up" delay={i * 100}>
               <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 transition-all duration-300 hover:shadow-md hover:border-gold/30 hover:-translate-y-1 group">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gold-50 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-gold/20 group-hover:scale-110">
                   <m.icon className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
@@ -271,33 +241,33 @@ export function Home() {
 
       {/* ===================== TÉMOIGNAGES ===================== */}
       <section className="bg-white py-12 sm:py-20">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full overflow-x-hidden">
           <Reveal direction="up">
             <div className="text-center mb-8 sm:mb-14">
               <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
-                Témoignages
+                {t('home.testimonials_badge')}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-3">Ce que disent nos clients</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-3">{t('home.testimonials_title')}</h2>
             </div>
           </Reveal>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {TESTIMONIALS.map((t, i) => (
-              <Reveal key={t.name} direction="up" delay={i * 120}>
+            {TESTIMONIALS.map((testimonial, i) => (
+              <Reveal key={i} direction="up" delay={i * 120}>
                 <div className="bg-[#eef2f6] rounded-2xl p-5 sm:p-7 border border-slate-200 transition-all duration-300 hover:shadow-lg hover:border-gold/30 hover:-translate-y-1 h-full">
                   <div className="flex items-center gap-1 mb-3 sm:mb-4">
-                    {[...Array(t.stars)].map((_, j) => (
+                    {[...Array(testimonial.stars)].map((_, j) => (
                       <Star key={j} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-gold text-gold transition-transform duration-300 hover:scale-125" />
                     ))}
                   </div>
                   <Quote className="w-7 h-7 sm:w-8 sm:h-8 text-gold/30 mb-2 sm:mb-3" />
-                  <p className="text-slate-600 text-sm leading-relaxed mb-4 sm:mb-5">&ldquo;{t.text}&rdquo;</p>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4 sm:mb-5">&ldquo;{testimonial.text}&rdquo;</p>
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#060f24] flex items-center justify-center text-white font-bold text-sm transition-all duration-300 group-hover:bg-gold group-hover:scale-110">
-                      {t.name.charAt(0)}
+                      {testimonial.name.charAt(0)}
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-slate-900">{t.name}</div>
-                      <div className="text-xs text-slate-500">{t.city}</div>
+                      <div className="text-sm font-bold text-slate-900">{testimonial.name}</div>
+                      <div className="text-xs text-slate-500">{testimonial.city}</div>
                     </div>
                   </div>
                 </div>
@@ -312,10 +282,10 @@ export function Home() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Reveal direction="up">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
-              Prêt à expédier votre colis ?
+              {t('home.cta_title')}
             </h2>
             <p className="text-slate-300 mb-6 sm:mb-8 max-w-xl mx-auto text-sm sm:text-base">
-              Créez votre compte gratuitement et commencez à suivre vos envois en temps réel.
+              {t('home.cta_desc')}
             </p>
           </Reveal>
           <Reveal direction="up" delay={200}>
@@ -324,13 +294,13 @@ export function Home() {
                 to="/register"
                 className="w-full sm:w-auto bg-gold text-[#060f24] px-8 py-3.5 rounded-lg font-bold hover:bg-gold-400 transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-0.5"
               >
-                Créer un compte <ArrowRight className="w-4 h-4" />
+                {t('home.cta_create')} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/tracking"
                 className="w-full sm:w-auto border border-white/20 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-2 hover:border-white/40 hover:-translate-y-0.5"
               >
-                Suivre un envoi <Search className="w-4 h-4" />
+                {t('home.cta_track_shipment')} <Search className="w-4 h-4" />
               </Link>
             </div>
           </Reveal>

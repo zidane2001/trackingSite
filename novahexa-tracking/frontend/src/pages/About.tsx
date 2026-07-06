@@ -1,57 +1,54 @@
-import React from 'react';
 import { Shield, Heart, Globe2, Award } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { IMAGES } from '../config/images';
 
-const VALUES = [
-  { icon: Shield, title: 'Fiabilité', text: 'Chaque colis est traité avec le plus grand soin. Nous garantissons la sécurité de vos envois.' },
-  { icon: Heart, title: 'Engagement', text: "Votre satisfaction est notre priorité. Notre équipe est disponible 24/7 pour vous accompagner." },
-  { icon: Globe2, title: 'Ouverture', text: "Présents sur plus de 150 pays, nous connectons les continents et facilitons le commerce international." },
-  { icon: Award, title: 'Excellence', text: 'Standards de qualité élevés à chaque étape, du dépôt à la livraison finale.' },
-];
-
-const MILESTONES = [
-  { year: '2018', title: 'Création', text: "Fondation de Youms Logistics à Perpignan, spécialisée en transport routier européen." },
-  { year: '2020', title: 'Expansion maritime', text: 'Lancement des services de fret maritime vers l\'Afrique et l\'Asie.' },
-  { year: '2022', title: 'Fret aérien', text: 'Ajout du fret aérien express avec couverture mondiale.' },
-  { year: '2024', title: 'Plateforme digitale', text: 'Mise en ligne de la plateforme de suivi en temps réel.' },
-  { year: '2026', title: 'Innovation', text: 'Intégration de la simulation de trajet et des notifications intelligentes.' },
-];
-
 export function About() {
+  const { t } = useTranslation();
+
+  const VALUES = [
+    { icon: Shield, title: t('about.v1_title'), text: t('about.v1_text') },
+    { icon: Heart, title: t('about.v2_title'), text: t('about.v2_text') },
+    { icon: Globe2, title: t('about.v3_title'), text: t('about.v3_text') },
+    { icon: Award, title: t('about.v4_title'), text: t('about.v4_text') },
+  ];
+
+  const MILESTONES = [
+    { year: '2018', title: t('about.m1_title'), text: t('about.m1_text') },
+    { year: '2020', title: t('about.m2_title'), text: t('about.m2_text') },
+    { year: '2022', title: t('about.m3_title'), text: t('about.m3_text') },
+    { year: '2024', title: t('about.m4_title'), text: t('about.m4_text') },
+    { year: '2026', title: t('about.m5_title'), text: t('about.m5_text') },
+  ];
+
   return (
     <div className="bg-[#eef2f6]">
       {/* Hero */}
       <section className="relative bg-[#060f24] text-white py-14 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: `url(${IMAGES.warehouse})` }} />
-        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">À propos</span>
+        <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center w-full overflow-x-hidden">
+          <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">{t('about.badge')}</span>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mt-3 mb-5">
-            Nous connectons le monde,<br className="hidden sm:block" />un colis à la fois
+            {t('about.hero_title_1')}<br className="hidden sm:block" />{t('about.hero_title_2')}
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto text-sm sm:text-lg">
-            Depuis 2018, Youms Logistics accompagne particuliers et entreprises dans leurs
-            expéditions nationales et internationales avec rigueur et innovation.
+            {t('about.hero_desc')}
           </p>
         </div>
       </section>
 
       {/* Mission */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20 w-full overflow-x-hidden">
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
           <div>
-            <span className="text-gold text-xs font-bold uppercase tracking-wider">Notre mission</span>
+            <span className="text-gold text-xs font-bold uppercase tracking-wider">{t('about.mission_badge')}</span>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mt-3 mb-5">
-              Rendre le transport international accessible à tous
+              {t('about.mission_title')}
             </h2>
             <p className="text-slate-500 leading-relaxed mb-4">
-              Youms Logistics est née d'une conviction simple : le transport de colis
-              à l'international devrait être simple, transparent et abordable. Notre plateforme
-              permet à chacun de soumettre, suivre et gérer ses envois en toute confiance.
+              {t('about.mission_desc1')}
             </p>
             <p className="text-slate-500 leading-relaxed">
-              De Perpignan au monde entier, nous mettons à votre disposition notre expertise
-              logistique, nos partenariats avec les meilleurs transporteurs et une technologie
-              de pointe pour offrir une expérience de suivi sans pareil.
+              {t('about.mission_desc2')}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -70,8 +67,8 @@ export function About() {
       <section className="bg-[#060f24] py-10 sm:py-20">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">Notre histoire</span>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mt-3">Les étapes clés</h2>
+            <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">{t('about.history_badge')}</span>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mt-3">{t('about.history_title')}</h2>
           </div>
           <div className="relative">
             <div className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-0.5 bg-white/10 sm:-translate-x-1/2" />

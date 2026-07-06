@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2, Plus, Pencil, ImageIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TrackingQR } from '../../components/TrackingQR';
@@ -9,6 +10,7 @@ import type { PackageItem, PackageStatus } from '../../types';
 import { STATUS_LABELS } from '../../types';
 
 export function AdminPackages() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,7 +136,7 @@ export function AdminPackages() {
         {/* Mobile: Card list */}
         <div className="block lg:hidden">
           {loading ? (
-            <div className="p-8 text-center text-slate-400">Chargement...</div>
+            <div className="p-8 text-center text-slate-400">{t('common.loading')}</div>
           ) : filtered.length === 0 ? (
             <div className="p-8 text-center text-slate-400">Aucun colis trouvé</div>
           ) : (

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Package, Clock, Truck, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { packagesApi } from '../../lib/api';
@@ -8,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { PackageItem, DashboardStats } from '../../types';
 
 export function ClientDashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,32 +33,30 @@ export function ClientDashboard() {
   };
 
   const statCards = [
-    { label: 'Total', value: stats.total, icon: Package, color: 'bg-slate-100 text-slate-600' },
-    { label: 'En attente', value: stats.pending, icon: Clock, color: 'bg-amber-50 text-amber-600' },
-    { label: 'En transit', value: stats.inTransit, icon: Truck, color: 'bg-indigo-50 text-indigo-600' },
-    { label: 'Livrés', value: stats.delivered, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600' },
+    { label: t('client.dashboard_total'), value: stats.total, icon: Package, color: 'bg-slate-100 text-slate-600' },
+    { label: t('client.dashboard_pending'), value: stats.pending, icon: Clock, color: 'bg-amber-50 text-amber-600' },
+    { label: t('client.dashboard_in_transit'), value: stats.inTransit, icon: Truck, color: 'bg-indigo-50 text-indigo-600' },
+    { label: t('client.dashboard_delivered'), value: stats.delivered, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600' },
   ];
 
   return (
     <DashboardLayout>
       <div className="space-y-4 sm:space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-              Bonjour, {user?.fullName?.split(' ')[0]}
+              {t('client.dashboard_greeting')}, {user?.fullName?.split(' ')[0]}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">Voici le résumé de vos envois</p>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">{t('client.dashboard_summary')}</p>
           </div>
           <Link
             to="/"
             className="bg-yellow-400 text-[#060f24] px-4 sm:px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-yellow-300 transition flex items-center justify-center gap-2 shrink-0"
           >
-            <Plus className="w-4 h-4" /> Nouveau colis
+            <Plus className="w-4 h-4" /> {t('client.dashboard_new')}
           </Link>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {statCards.map((s) => (
             <div key={s.label} className="bg-white rounded-xl border border-slate-200 p-3 sm:p-5 shadow-sm">
@@ -71,22 +71,21 @@ export function ClientDashboard() {
           ))}
         </div>
 
-        {/* Packages list */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-bold text-slate-900 text-sm sm:text-base">Mes colis</h2>
+            <h2 className="font-bold text-slate-900 text-sm sm:text-base">{t('client.dashboard_my_packages')}</h2>
           </div>
           {loading ? (
-            <div className="p-8 sm:p-12 text-center text-slate-400">Chargement...</div>
+            <div className="p-8 sm:p-12 text-center text-slate-400">{t('client.dashboard_loading')}</div>
           ) : packages.length === 0 ? (
             <div className="p-8 sm:p-12 text-center">
               <Package className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-3 sm:mb-4" />
-              <p className="text-slate-500 mb-3 sm:mb-4 text-sm">Vous n'avez pas encore de colis.</p>
+              <p className="text-slate-500 mb-3 sm:mb-4 text-sm">{t('client.dashboard_empty')}</p>
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 bg-yellow-400 text-[#060f24] px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-yellow-300 transition"
               >
-                <Plus className="w-4 h-4" /> Soumettre un colis
+                <Plus className="w-4 h-4" /> {t('client.dashboard_submit')}
               </Link>
             </div>
           ) : (

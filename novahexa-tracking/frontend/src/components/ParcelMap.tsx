@@ -280,7 +280,7 @@ export function ParcelMap({
   return (
     <div
       ref={mapRef}
-      style={{ height, width: '100%', borderRadius: '12px', overflow: 'hidden' }}
+      style={{ height, width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}
       className="relative"
     />
   );

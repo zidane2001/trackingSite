@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Inbox, Check, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { contactApi } from '../../lib/api';
 import type { ContactMessage } from '../../types';
 import { cn } from '../../lib/utils';
 
 export function AdminContactMessages() {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<ContactMessage | null>(null);
@@ -50,7 +52,7 @@ export function AdminContactMessages() {
           {/* Message list */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             {loading ? (
-              <div className="p-12 text-center text-slate-400">Chargement...</div>
+              <div className="p-12 text-center text-slate-400">{t('common.loading')}</div>
             ) : messages.length === 0 ? (
               <div className="p-12 text-center text-slate-400">Aucun message</div>
             ) : (

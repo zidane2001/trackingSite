@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { IMAGES } from '../config/images';
 
 export function Login() {
+  const { t } = useTranslation();
   const { login, loading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -19,31 +21,29 @@ export function Login() {
       const loggedUser = await login(email, password);
       navigate(loggedUser.role === 'ADMIN' ? '/admin' : '/client', { replace: true });
     } catch (err: any) {
-      setError(err?.message || 'Identifiants incorrects. Veuillez réessayer.');
+      setError(err?.message || t('login.error'));
     }
   };
 
   return (
     <div className="min-h-screen bg-[#eef2f6] flex flex-col">
-      {/* Header */}
       <div className="bg-[#060f24] py-16">
         <div className="max-w-md mx-auto px-6 text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <img src={IMAGES.LOGO} alt="Youms Logistics" className="h-12 w-12 object-contain" />
             <span className="text-white font-bold text-xl">Youms Logistics</span>
           </Link>
-          <h1 className="text-3xl font-bold text-white">Connexion</h1>
-          <p className="text-slate-400 mt-2">Accédez à votre espace personnel</p>
+          <h1 className="text-3xl font-bold text-white">{t('login.title')}</h1>
+          <p className="text-slate-400 mt-2">{t('login.subtitle')}</p>
         </div>
       </div>
 
-      {/* Form */}
       <div className="flex-1 flex items-start justify-center -mt-8 px-6">
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 w-full max-w-md">
           <form onSubmit={handleSubmit}>
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('login.email')}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -57,7 +57,7 @@ export function Login() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Mot de passe</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('login.password')}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -91,20 +91,20 @@ export function Login() {
               className="w-full bg-gold text-[#060f24] py-3 rounded-lg font-bold text-sm hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Se connecter
+              {t('login.submit')}
             </button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-slate-500">
               <Link to="/forgot-password" className="text-gold hover:underline font-medium">
-                Mot de passe oublié ?
+                {t('login.forgot')}
               </Link>
             </p>
             <p className="text-sm text-slate-500">
-              Pas encore de compte ?{' '}
+              {t('login.no_account')}{' '}
               <Link to="/register" className="text-gold hover:underline font-medium">
-                Créer un compte
+                {t('login.create_account')}
               </Link>
             </p>
           </div>

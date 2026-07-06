@@ -1,5 +1,7 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './i18n';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Header } from './components/Header';
@@ -43,17 +45,18 @@ const AdminFaq = React.lazy(() => import('./pages/admin/AdminFaq').then(m => ({ 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
     <Header />
-    <main className="flex-1 flex flex-col">{children}</main>
+    <main className="flex-1 flex flex-col overflow-x-hidden">{children}</main>
     <Footer />
   </>
 );
 
 function PageLoader() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 flex items-center justify-center py-20">
       <div className="text-center">
         <div className="w-12 h-12 border-4 border-gold/30 border-t-gold rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-500 text-sm">Chargement…</p>
+        <p className="text-slate-500 text-sm">{t('common.loading')}</p>
       </div>
     </div>
   );
@@ -63,7 +66,7 @@ export function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen flex flex-col font-sans text-slate-900">
+        <div className="min-h-screen flex flex-col font-sans text-slate-900 overflow-x-hidden">
           <WhatsAppButton />
           <Suspense fallback={<PageLoader />}>
             <Routes>

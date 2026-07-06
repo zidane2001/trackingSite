@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ClipboardCheck, Check, X, Loader2, Pencil, Save, ImagePlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 
 import { packagesApi } from '../../lib/api';
@@ -8,6 +9,7 @@ import { cn } from '../../lib/utils';
 import { useImageUpload } from '../../hooks/useImageUpload';
 
 export function AdminSubmissions() {
+  const { t } = useTranslation();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<PackageItem | null>(null);
@@ -124,7 +126,7 @@ export function AdminSubmissions() {
 
         {loading ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">
-            Chargement...
+                        {t('common.loading')}
           </div>
         ) : packages.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">

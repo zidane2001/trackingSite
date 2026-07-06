@@ -1,75 +1,54 @@
 import { Truck, Ship, Plane, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { IMAGES } from '../config/images';
 
-const SERVICES = [
-  {
-    icon: Truck,
-    img: IMAGES.serviceRoad,
-    title: 'Transport routier',
-    subtitle: 'National & continental',
-    description:
-      'Solutions terrestres fiables et flexibles pour vos expéditions nationales et européennes. Flotte moderne, suivi GPS en temps réel et délais maîtrisés.',
-    features: [
-      'Livraison porte-à-porte',
-      'Suivi GPS en temps réel',
-      'Délais de 24 à 72h en Europe',
-      'Enlèvement à domicile possible',
-      'Assurance colis incluse',
-    ],
-  },
-  {
-    icon: Ship,
-    img: IMAGES.serviceSea,
-    title: 'Fret maritime',
-    subtitle: 'International',
-    description:
-      'Expédition économique de gros volumes par voie maritime. Idéal pour les envois internationaux non urgents avec un excellent rapport qualité-prix.',
-    features: [
-      "Conteneurs 20' et 40'",
-      'Couverture mondiale',
-      'Tarifs compétitifs',
-      'Dédouanement inclus',
-      'Suivi de conteneur en ligne',
-    ],
-  },
-  {
-    icon: Plane,
-    img: IMAGES.serviceAir,
-    title: 'Fret aérien',
-    subtitle: 'Express international',
-    description:
-      "La solution la plus rapide pour vos expéditions urgentes à l'international. Réseau aérien mondial avec des délais de livraison garantis.",
-    features: [
-      'Livraison en 24-48h mondial',
-      'Envois urgents et prioritaire',
-      'Température contrôlée possible',
-      'Dédouanement express',
-      'Assurance sur mesure',
-    ],
-  },
-];
-
 export function Services() {
+  const { t } = useTranslation();
+
+  const SERVICES = [
+    {
+      icon: Truck,
+      img: IMAGES.serviceRoad,
+      title: t('services.road_title'),
+      subtitle: t('services.road_subtitle'),
+      description: t('services.road_desc'),
+      features: [t('services.road_f1'), t('services.road_f2'), t('services.road_f3'), t('services.road_f4'), t('services.road_f5')],
+    },
+    {
+      icon: Ship,
+      img: IMAGES.serviceSea,
+      title: t('services.sea_title'),
+      subtitle: t('services.sea_subtitle'),
+      description: t('services.sea_desc'),
+      features: [t('services.sea_f1'), t('services.sea_f2'), t('services.sea_f3'), t('services.sea_f4'), t('services.sea_f5')],
+    },
+    {
+      icon: Plane,
+      img: IMAGES.serviceAir,
+      title: t('services.air_title'),
+      subtitle: t('services.air_subtitle'),
+      description: t('services.air_desc'),
+      features: [t('services.air_f1'), t('services.air_f2'), t('services.air_f3'), t('services.air_f4'), t('services.air_f5')],
+    },
+  ];
+
   return (
     <div className="bg-[#eef2f6]">
-      {/* Hero */}
       <section className="bg-[#060f24] text-white py-12 sm:py-20">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center w-full overflow-x-hidden">
           <span className="text-gold text-xs font-bold uppercase tracking-[0.2em]">
-            Nos solutions
+            {t('services.badge')}
           </span>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mt-3 mb-5">
-            Des moyens de transport adaptés à chaque besoin
+            {t('services.title')}
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto text-sm sm:text-lg">
-            Qu'il s'agisse d'un envoi national urgent ou d'un transport maritime de gros
-            volumes, Youms Logistics offre la solution qu'il vous faut.
+            {t('services.desc')}
           </p>
         </div>
       </section>
 
-      {/* Service cards */}
       <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 relative z-10 space-y-6 sm:space-y-10 pb-10 sm:pb-20">
         {SERVICES.map((s, i) => (
           <div
@@ -109,7 +88,7 @@ export function Services() {
                   to="/tracking"
                   className="inline-flex items-center gap-2 bg-[#060f24] text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-[#0a1530] transition-colors"
                 >
-                  Suivre un envoi <ArrowRight className="w-4 h-4" />
+                  {t('services.track_shipment')} <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>

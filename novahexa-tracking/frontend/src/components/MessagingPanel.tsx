@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare, Send, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { messagesApi, clientMessagesApi } from '../lib/api';
 import type { MessageItem } from '../lib/api';
 
@@ -11,6 +12,7 @@ interface MessagingPanelProps {
 }
 
 export function MessagingPanel({ parcelId, packageName, context = 'admin' }: MessagingPanelProps) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function MessagingPanel({ parcelId, packageName, context = 'admin' }: Mes
     setError(null);
     api.list(parcelId)
       .then(setMessages)
-      .catch((err) => setError(err?.message || 'Erreur de chargement des messages'))
+      .catch((err) => setError(err?.message || t('client.messages_loading')))
       .finally(() => setLoading(false));
   }, [parcelId, api]);
 
@@ -96,7 +98,7 @@ export function MessagingPanel({ parcelId, packageName, context = 'admin' }: Mes
       {/* Messages list */}
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {loading ? (
-          <p className="text-xs text-slate-400 text-center py-4">Chargement...</p>
+          <p className="text-xs text-slate-400 text-center py-4">{t('client.messages_loading')}</p>
         ) : error ? (
           <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-3 text-xs text-center justify-center">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />

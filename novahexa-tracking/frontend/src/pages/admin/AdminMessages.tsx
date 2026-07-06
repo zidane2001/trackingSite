@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MessageSquare, Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { MessagingPanel } from '../../components/MessagingPanel';
 import { packagesApi } from '../../lib/api';
@@ -7,6 +8,7 @@ import type { PackageItem } from '../../types';
 import { cn } from '../../lib/utils';
 
 export function AdminMessages() {
+  const { t } = useTranslation();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPkg, setSelectedPkg] = useState<PackageItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ export function AdminMessages() {
             </div>
             <div className="overflow-y-auto max-h-[540px]">
               {loading ? (
-                <div className="p-6 text-center text-slate-400 text-sm">Chargement...</div>
+                <div className="p-6 text-center text-slate-400 text-sm">{t('common.loading')}</div>
               ) : (
                 packages.map((pkg) => (
                   <button

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { HelpCircle, Plus, Save, Trash2, Pencil, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { faqApi } from '../../lib/api';
 import type { FaqItem } from '../../types';
 
 export function AdminFaq() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<FaqItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -67,7 +69,7 @@ export function AdminFaq() {
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">Chargement...</div>
+          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">{t('common.loading')}</div>
         ) : items.length === 0 && !isNew ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
             <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />

@@ -1,57 +1,115 @@
-import React, { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, FileText, LogIn, UserPlus, Menu, X } from 'lucide-react';
+import { MapPin, FileText, LogIn, UserPlus, Menu, X, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { IMAGES } from '../config/images';
 import { useAuth } from '../contexts/AuthContext';
+import type { TFunction } from 'i18next';
 
-const NAV_LINKS = [
-  { to: '/', label: 'Accueil' },
-  { to: '/about', label: 'À propos' },
-  { to: '/services', label: 'Services' },
-  { to: '/tracking', label: "Suivre l'envoi" },
-  { to: '/faq', label: 'FAQ' },
-  { to: '/contact', label: 'Contact' },
+const LANGUAGES = [
+  { code: 'fr', label: 'Fran\u00e7ais', short: 'FR' },
+  { code: 'en', label: 'English', short: 'EN' },
 ];
 
+function NAV_LINKS(t: TFunction) {
+  return [
+    { to: '/', label: t('header.home') },
+    { to: '/about', label: t('header.about') },
+    { to: '/services', label: t('header.services') },
+    { to: '/tracking', label: t('header.tracking') },
+    { to: '/faq', label: t('header.faq') },
+    { to: '/contact', label: t('header.contact') },
+  ];
+}
+
 export function Header() {
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+
+  // Close lang dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
 
   return (
-    <header className="w-full bg-[#000a2d] relative animate-header">
-      {/* ── Top bar: logo + hamburger ─────────────────────── */}
-      <div className="flex items-center h-16 px-4 lg:h-[100px]">
-        {/* Logo block */}
-        <div className="bg-[#C8A951] h-12 w-12 lg:h-[100px] lg:w-[250px] flex items-center justify-center shrink-0 rounded-lg lg:rounded-none z-10">
+    <header className="w-full bg-[#000a2d] relative z-50 overflow-x-hidden">
+      {/* ── Top bar ─────────────────────────────────── */}
+      <div className="flex items-center h-14 sm:h-16 px-3 sm:px-4 lg:h-[100px] min-w-0">
+        {/* Logo */}
+        <div className="bg-[#C8A951] h-10 w-10 lg:h-[100px] lg:w-[250px] flex items-center justify-center shrink-0 rounded-lg lg:rounded-none min-w-0">
           <Link to="/" className="flex items-center justify-center">
             <img
               src={IMAGES.LOGO}
               alt="Youms Logistics"
-              className="h-9 w-9 lg:h-14 lg:w-14 object-contain animate-logo drop-shadow-lg"
+              className="h-7 w-7 lg:h-14 lg:w-14 object-contain drop-shadow-lg"
             />
           </Link>
         </div>
 
-        {/* Center: address + nav (desktop) */}
-        <div className="hidden lg:flex flex-1 flex-col justify-center px-8 z-0 animate-nav">
+        {/* ── Desktop: address + nav ────────────────── */}
+        <div className="hidden lg:flex flex-1 flex-col justify-center px-8 z-0 min-w-0">
           <div className="flex items-center gap-8 text-white text-sm pb-3 border-b border-white/10">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-gold" />
-              <span>5 Rue du Beau Marais, 62100 Calais</span>
+              <span>{t('header.address')}</span>
             </div>
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-gold" />
-              <span>Demandez un devis !</span>
+              <span>{t('header.quote')}</span>
+            </div>
+            {/* Language switcher — desktop */}
+            <div className="relative ml-auto" ref={langRef}>
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm transition-colors"
+                aria-label="Change language"
+                aria-expanded={langOpen}
+                aria-haspopup="true"
+              >
+                <Globe className="w-4 h-4" />
+                <span className="font-medium">{currentLang.short}</span>
+                <svg className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {langOpen && (
+                <div role="menu" className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-slate-200 py-1 w-40 z-50" style={{ animation: 'slideDown 0.15s ease-out' }}>
+                  {LANGUAGES.map((lng) => (
+                    <button
+                      key={lng.code}
+                      role="menuitem"
+                      onClick={() => { i18n.changeLanguage(lng.code); setLangOpen(false); }}
+                      className={`w-full px-4 py-2.5 text-left text-sm flex items-center gap-2 transition-colors ${
+                        i18n.language === lng.code
+                          ? 'bg-gold/10 text-gold font-medium'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="text-xs font-bold w-5">{lng.short}</span>
+                      <span>{lng.label}</span>
+                      {i18n.language === lng.code && (
+                        <svg className="w-4 h-4 ml-auto text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <nav className="flex items-center gap-6 text-white text-sm font-medium pt-3">
-            {NAV_LINKS.map((link, i) => (
+            {NAV_LINKS(t).map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 className="relative hover:text-gold transition-colors duration-300 after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-gold after:transition-all after:duration-300 hover:after:w-full"
-                style={{ animationDelay: `${0.4 + i * 0.06}s` }}
               >
                 {link.label}
               </Link>
@@ -59,43 +117,43 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Spacer */}
+        {/* Spacer mobile */}
         <div className="flex-1 lg:hidden" />
 
-        {/* Desktop CTA block */}
-        <div className="hidden lg:block relative w-[300px] h-full shrink-0 z-10 animate-cta">
+        {/* ── Desktop CTA (skew block) ─────────────── */}
+        <div className="hidden lg:block relative w-[300px] h-full shrink-0 z-10">
           <div className="absolute inset-0 bg-[#C8A951] -skew-x-[20deg] origin-bottom-left translate-x-8" />
           <div className="relative h-full flex flex-col items-center justify-center gap-2 pr-8 pl-12">
             {isAuthenticated ? (
               <>
                 <Link
                   to={user?.role === 'ADMIN' ? '/admin' : '/client'}
-                  className="border border-white text-white px-5 py-2 text-sm font-medium hover:bg-white hover:text-[#060f24] transition-all duration-300 w-full text-center hover:shadow-lg hover:shadow-white/10"
+                  className="border border-white text-white px-5 py-2 text-sm font-medium hover:bg-white hover:text-[#060f24] transition-all duration-300 w-full text-center"
                 >
-                  Mon espace
+                  {t('header.dashboard')}
                 </Link>
                 <button
                   onClick={() => { logout(); navigate('/'); }}
                   className="text-white/70 text-xs hover:text-white transition-colors duration-300"
                 >
-                  Déconnexion
+                  {t('header.logout')}
                 </button>
               </>
             ) : (
               <>
                 <Link
                   to="/tracking"
-                  className="border border-white text-white px-5 py-2 text-sm font-medium hover:bg-white hover:text-[#060f24] transition-all duration-300 w-full text-center hover:shadow-lg hover:shadow-white/10"
+                  className="border border-white text-white px-5 py-2 text-sm font-medium hover:bg-white hover:text-[#060f24] transition-all duration-300 w-full text-center"
                 >
-                  Suivre l'envoi
+                  {t('header.tracking')}
                 </Link>
                 <div className="flex items-center gap-3 text-white/80 text-xs">
                   <Link to="/login" className="hover:text-white flex items-center gap-1 transition-colors duration-300">
-                    <LogIn className="w-3 h-3" /> Connexion
+                    <LogIn className="w-3 h-3" /> {t('header.login')}
                   </Link>
                   <span>|</span>
                   <Link to="/register" className="hover:text-white flex items-center gap-1 transition-colors duration-300">
-                    <UserPlus className="w-3 h-3" /> Inscription
+                    <UserPlus className="w-3 h-3" /> {t('header.register')}
                   </Link>
                 </div>
               </>
@@ -103,21 +161,32 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile CTA + hamburger */}
-        <div className="flex lg:hidden items-center gap-2 z-20">
+        {/* ── Mobile: CTA buttons + hamburger ──────── */}
+        <div className="flex lg:hidden items-center gap-1.5 z-20 shrink-0">
+          {/* Lang toggle mobile */}
+          <button
+            onClick={() => i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr')}
+            className="flex items-center gap-1 bg-white/10 text-white px-2 py-1.5 rounded-lg text-xs font-bold hover:bg-white/20 transition-colors"
+            aria-label="Change language"
+          >
+            <Globe className="w-3.5 h-3.5" />
+            {currentLang.short}
+          </button>
+
           {isAuthenticated ? (
             <Link
               to={user?.role === 'ADMIN' ? '/admin' : '/client'}
-              className="bg-[#C8A951] text-[#060f24] px-3 py-1.5 rounded-lg text-xs font-bold"
+              className="bg-[#C8A951] text-[#060f24] px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap flex items-center justify-center"
             >
-              Espace
+              {t('header.dashboard')}
             </Link>
           ) : (
             <Link
               to="/login"
-              className="text-white text-xs font-medium"
+              className="bg-[#C8A951] text-[#060f24] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 whitespace-nowrap"
             >
-              Connexion
+              <LogIn className="w-3 h-3" />
+              <span>{t('header.login')}</span>
             </Link>
           )}
           <button
@@ -125,22 +194,22 @@ export function Header() {
             className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             aria-label="Menu"
           >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* ── Mobile dropdown menu ──────────────────────────── */}
+      {/* ── Mobile dropdown menu ──────────────────── */}
       {mobileOpen && (
         <div className="lg:hidden bg-[#0a1530] border-t border-white/10" style={{ animation: 'slideDown 0.2s ease-out' }}>
           <div className="px-4 py-3 border-b border-white/5">
             <div className="flex items-center gap-2 text-white/60 text-xs">
               <MapPin className="w-3 h-3 text-gold" />
-              <span>5 Rue du Beau Marais, 62100 Calais</span>
+              <span>{t('header.address')}</span>
             </div>
           </div>
-          <nav className="px-4 py-3 space-y-1">
-            {NAV_LINKS.map((link) => (
+          <nav className="px-3 py-2 space-y-0.5">
+            {NAV_LINKS(t).map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -159,22 +228,22 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                   className="block w-full text-center border border-white text-white px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-white hover:text-[#060f24] transition-all"
                 >
-                  Suivre l'envoi
+                  {t('header.tracking')}
                 </Link>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex-1 text-center text-gold text-sm font-medium py-2 hover:underline"
+                    className="flex-1 text-center border border-gold text-gold text-sm font-medium py-2.5 rounded-lg hover:bg-gold/10 transition"
                   >
-                    Connexion
+                    {t('header.login')}
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileOpen(false)}
-                    className="flex-1 text-center bg-gold text-[#060f24] text-sm font-bold py-2 rounded-lg hover:bg-gold-400 transition"
+                    className="flex-1 text-center bg-gold text-[#060f24] text-sm font-bold py-2.5 rounded-lg hover:bg-gold-400 transition"
                   >
-                    Inscription
+                    {t('header.register')}
                   </Link>
                 </div>
               </>
@@ -184,7 +253,7 @@ export function Header() {
                 onClick={() => { logout(); navigate('/'); setMobileOpen(false); }}
                 className="w-full text-center text-white/60 text-sm py-2 hover:text-white transition-colors"
               >
-                Déconnexion
+                {t('header.logout')}
               </button>
             )}
           </div>

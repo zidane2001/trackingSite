@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BarChart3, TrendingUp, Package, Truck, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
@@ -20,6 +21,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function AdminAnalytics() {
+  const { t } = useTranslation();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -27,7 +29,7 @@ export function AdminAnalytics() {
   useEffect(() => {
     analyticsApi.get()
       .then(setData)
-      .catch(() => setError('Erreur lors du chargement des analytics'))
+      .catch(() => setError(t('common.loading')))
       .finally(() => setLoading(false));
   }, []);
 
@@ -37,7 +39,7 @@ export function AdminAnalytics() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full mx-auto mb-3" />
-            <p className="text-sm text-slate-400">Chargement des analytics…</p>
+            <p className="text-sm text-slate-400">{t('common.loading')}</p>
           </div>
         </div>
       </DashboardLayout>

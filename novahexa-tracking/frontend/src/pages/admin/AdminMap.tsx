@@ -11,6 +11,7 @@ import { PhotoGallery } from '../../components/PhotoGallery';
 import type { ClientSummary } from '../../lib/api';
 import type { PackageItem, TransportMode } from '../../types';
 import { reverseGeocode } from '../../lib/mapUtils';
+import { useTranslation } from 'react-i18next';
 
 type Mode = 'view' | 'create' | 'edit';
 type PlacingType = 'origin' | 'destination' | 'waypoint' | null;
@@ -307,10 +308,10 @@ export function AdminMap() {
           )}
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_400px] gap-4 sm:gap-6">
+        <div className="grid lg:grid-cols-[1fr_350px] gap-4 sm:gap-6">
           {/* Map */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="h-[300px] sm:h-[400px] lg:h-[600px] relative">
+            <div className="h-[400px] sm:h-[500px] lg:h-[600px] relative">
               {loading ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
                   <div className="text-center">
@@ -332,45 +333,15 @@ export function AdminMap() {
                   />
 
                   {/* Placing point indicator */}
-                  {placingPoint && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#060f24] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg z-[1000] animate-pulse">
-                      📍 Cliquez sur la carte pour placer : {
-                        placingPoint === 'origin' ? 'point de départ' :
-                        placingPoint === 'destination' ? 'point d\'arrivée' :
-                        'l\'arrêt intermédiaire'
-                      }
-                    </div>
-                  )}
-
-                  {/* Package list overlay (view mode) */}
-                  {mode === 'view' && (
-                    <div className="absolute bottom-4 left-4 bg-white rounded-xl shadow-lg border border-slate-200 p-4 max-w-xs max-h-64 overflow-y-auto z-[1000]">
-                      <h4 className="font-bold text-slate-900 text-sm mb-3">Colis actifs</h4>
-                      {activePkgs.length === 0 ? (
-                        <p className="text-xs text-slate-400">Aucun colis actif</p>
-                      ) : (
-                        <div className="space-y-2">
-                          {activePkgs.map((pkg) => (
-                            <button
-                              key={pkg.id}
-                              onClick={() => setSelectedPkg(pkg)}
-                              className={`w-full flex items-center justify-between text-xs p-2 rounded-lg transition-colors ${
-                                selectedPkg?.id === pkg.id
-                                  ? 'bg-yellow-50 border border-yellow-200'
-                                  : 'hover:bg-slate-50 border border-transparent'
-                              }`}
-                            >
-                              <div className="text-left">
-                                <div className="font-medium text-slate-900">{pkg.name}</div>
-                                <div className="text-slate-400 font-mono">{pkg.trackingNumber}</div>
-                              </div>
-                              <StatusBadge status={pkg.status} size="sm" />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                   {placingPoint && (
+                     <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[#060f24] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg z-50 animate-pulse">
+                       📍 Cliquez sur la carte pour placer : {
+                         placingPoint === 'origin' ? 'point de départ' :
+                         placingPoint === 'destination' ? 'point d\'arrivée' :
+                         'l\'arrêt intermédiaire'
+                       }
+                     </div>
+                   )}
                 </>
               )}
             </div>
@@ -378,6 +349,39 @@ export function AdminMap() {
 
           {/* Sidebar */}
           <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
+            {/* Active packages list (view mode) */}
+            {mode === 'view' && (
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                <h3 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-yellow-500" />
+                  Colis actifs ({activePkgs.length})
+                </h3>
+                {activePkgs.length === 0 ? (
+                  <p className="text-xs text-slate-400">Aucun colis actif</p>
+                ) : (
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                    {activePkgs.map((pkg) => (
+                      <button
+                        key={pkg.id}
+                        onClick={() => setSelectedPkg(pkg)}
+                        className={`w-full flex items-center justify-between text-xs p-3 rounded-lg transition-colors ${
+                          selectedPkg?.id === pkg.id
+                            ? 'bg-yellow-50 border border-yellow-200'
+                            : 'hover:bg-slate-50 border border-transparent'
+                        }`}
+                      >
+                        <div className="text-left">
+                          <div className="font-medium text-slate-900">{pkg.name}</div>
+                          <div className="text-slate-400 font-mono">{pkg.trackingNumber}</div>
+                        </div>
+                        <StatusBadge status={pkg.status} size="sm" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {(mode === 'create' || mode === 'edit') ? (
               /* ── Create / Edit form ── */
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">

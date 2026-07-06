@@ -3,6 +3,7 @@ import {
   Search, Package, Truck, Plane, Ship, MapPin, Clock,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { packagesApi } from '../lib/api';
 import { ParcelMap } from '../components/ParcelMap';
 import { StatusBadge } from '../components/StatusBadge';
@@ -16,6 +17,7 @@ const TRANSPORT_ICONS: Record<string, React.FC<{ className?: string }>> = {
 };
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPkg, setSelectedPkg] = useState<PackageItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -115,7 +117,7 @@ export function Dashboard() {
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
               <div className="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-sm text-slate-400">Chargement…</p>
+              <p className="text-sm text-slate-400">{t('common.loading')}</p>
             </div>
           </div>
         ) : packages.length === 0 ? (

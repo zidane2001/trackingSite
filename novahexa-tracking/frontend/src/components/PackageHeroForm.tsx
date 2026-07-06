@@ -31,6 +31,7 @@ import { generateTrackingNumber } from '../lib/tracking';
 import { submitPackage, pricingApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useImageUpload } from '../hooks/useImageUpload';
+import { useTranslation } from 'react-i18next';
 
 type FormState = {
   senderName: string;
@@ -120,6 +121,7 @@ export function PackageHeroForm() {
   const [expanded, setExpanded] = useState(false);
   const { images, previews, uploading, fileRef, handleUpload, remove, reset } = useImageUpload();
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   // Server-side cost estimate — zero re-render to avoid focus loss
   const [serverCost, setServerCost] = useState<number | null>(null);
@@ -237,9 +239,11 @@ export function PackageHeroForm() {
         <div className="w-12 h-12 rounded-full bg-yellow-400/15 flex items-center justify-center mx-auto mb-4">
           <CheckCircle2 className="w-6 h-6 text-yellow-400" />
         </div>
-        <h3 className="text-lg font-bold text-white mb-1">Demande envoyée</h3>
+        <h3 className="text-lg font-bold text-white mb-1">{t('packageHero.request_sent')}</h3>
         <p className="text-xs text-slate-400 mb-5 max-w-xs mx-auto">
-          Votre colis est <span className="text-yellow-400 font-semibold">en cours de traitement</span>. Conservez votre numéro :
+          {t('packageHero.processing')}{' '}
+          <span className="text-yellow-400 font-semibold">{t('packageHero.processing_status')}</span>.{' '}
+          {t('packageHero.keep_number')}
         </p>
 
         <div className="flex items-center justify-center gap-2 mb-4">
@@ -250,15 +254,16 @@ export function PackageHeroForm() {
             type="button"
             onClick={copy}
             className="p-2 rounded-lg border border-white/10 text-slate-300 hover:text-yellow-400 hover:border-yellow-400/50 transition"
-            aria-label="Copier le numéro de suivi"
+            aria-label={t('packageHero.copy_tracking')}
           >
             <Copy className="w-4 h-4" />
           </button>
         </div>
-        {copied && <p className="text-xs text-yellow-400 mb-3">Numéro copié ✓</p>}
+        {copied && <p className="text-xs text-yellow-400 mb-3">{t('packageHero.copied')}</p>}
 
         <div className="text-xs text-slate-400 mb-4">
-          Coût estimé : <span className="text-white font-semibold">{formatEUR(result.cost)}</span>
+          {t('packageHero.estimated_cost')}{' '}
+          <span className="text-white font-semibold">{formatEUR(result.cost)}</span>
         </div>
 
         <button
@@ -266,167 +271,170 @@ export function PackageHeroForm() {
           onClick={() => { setResult(null); setForm(initial); setServerCost(null); reset(); }}
           className="text-sm font-semibold text-yellow-400 hover:text-yellow-300 inline-flex items-center gap-1.5"
         >
-          Soumettre un autre colis <ArrowRight className="w-4 h-4" />
+          {t('packageHero.submit_another')} <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     );
   }
 
   // --- Ultra-Compact Form ---
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-[#0a1530]/90 backdrop-blur border border-white/10 rounded-xl p-4 shadow-2xl"
-    >
-      {/* Row 1: Name + Email + Phone */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
-        <Labeled text="Nom" icon={User}>
-          <input className={field} value={form.senderName} onChange={setField('senderName')} placeholder="Ulrich Tenkeu" required />
-        </Labeled>
-        <Labeled text="Email" icon={Mail}>
-          <input type="email" className={field} value={form.senderEmail} onChange={setField('senderEmail')} placeholder="vous@email.com" required />
-        </Labeled>
-        <Labeled text="Tél" icon={Phone}>
-          <input className={field} value={form.senderPhone} onChange={setField('senderPhone')} placeholder="+237 6XX XX XX XX" />
-        </Labeled>
-      </div>
+   return (
+     <form
+       onSubmit={handleSubmit}
+       className="bg-[#0a1530]/90 backdrop-blur border border-white/10 rounded-xl p-4 shadow-2xl"
+     >
+       {/* Row 1: Name + Email + Phone */}
+       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+         <Labeled text={t('packageHero.name')} icon={User}>
+           <input className={field} value={form.senderName} onChange={setField('senderName')} placeholder={t('packageHero.name_placeholder')} required />
+         </Labeled>
+         <Labeled text={t('packageHero.email')} icon={Mail}>
+           <input type="email" className={field} value={form.senderEmail} onChange={setField('senderEmail')} placeholder={t('packageHero.email_placeholder')} required />
+         </Labeled>
+         <Labeled text={t('packageHero.phone')} icon={Phone}>
+           <input className={field} value={form.senderPhone} onChange={setField('senderPhone')} placeholder={t('packageHero.phone_placeholder')} />
+         </Labeled>
+       </div>
 
-      {/* Row 2: Colis name + Material */}
-      <div className="grid grid-cols-2 gap-2 mb-2">
-        <Labeled text="Colis" icon={Package}>
-          <input className={field} value={form.name} onChange={setField('name')} placeholder="Pièces moteur" required />
-        </Labeled>
-        <Labeled text="Matériel" icon={Package}>
-          <select className={field} value={form.material} onChange={setField('material')}>
-            {Object.entries(MATERIAL_LABELS).map(([v, l]) => (
-              <option key={v} value={v} className="bg-[#060f24]">{l}</option>
-            ))}
-          </select>
-        </Labeled>
-      </div>
+       {/* Row 2: Colis name + Material */}
+       <div className="grid grid-cols-2 gap-2 mb-2">
+         <Labeled text={t('packageHero.package_name')} icon={Package}>
+           <input className={field} value={form.name} onChange={setField('name')} placeholder={t('packageHero.package_placeholder')} required />
+         </Labeled>
+         <Labeled text={t('packageHero.material')} icon={Package}>
+           <select className={field} value={form.material} onChange={setField('material')}>
+             {Object.entries(MATERIAL_LABELS).map((entry) => {
+               const [v, l] = entry;
+               return <option key={v} value={v} className="bg-[#060f24]">{l}</option>;
+             })}
+           </select>
+         </Labeled>
+       </div>
 
-      {/* Row 3: Origin + Destination */}
-      <div className="grid grid-cols-2 gap-2 mb-2">
-        <Labeled text="Départ" icon={MapPin}>
-          <input className={field} value={form.originAddress} onChange={setField('originAddress')} placeholder="Ville, pays" required />
-        </Labeled>
-        <Labeled text="Arrivée" icon={MapPin}>
-          <input className={field} value={form.destinationAddress} onChange={setField('destinationAddress')} placeholder="Ville, pays" required />
-        </Labeled>
-      </div>
+       {/* Row 3: Origin + Destination */}
+       <div className="grid grid-cols-2 gap-2 mb-2">
+         <Labeled text={t('packageHero.origin')} icon={MapPin}>
+           <input className={field} value={form.originAddress} onChange={setField('originAddress')} placeholder={t('packageHero.origin_placeholder')} required />
+         </Labeled>
+         <Labeled text={t('packageHero.destination')} icon={MapPin}>
+           <input className={field} value={form.destinationAddress} onChange={setField('destinationAddress')} placeholder={t('packageHero.destination_placeholder')} required />
+         </Labeled>
+       </div>
 
-      {/* Row 4: Mode + Delay */}
-      <div className="grid grid-cols-2 gap-2 mb-2">
-        <Labeled text="Mode" icon={Package}>
-          <select className={field} value={form.mode} onChange={setField('mode')}>
-            {Object.entries(MODE_LABELS).map(([v, l]) => (
-              <option key={v} value={v} className="bg-[#060f24]">{l}</option>
-            ))}
-          </select>
-        </Labeled>
-        <Labeled text="Délai" icon={CalendarDays}>
-          <select className={field} value={form.delay} onChange={setField('delay')}>
-            {Object.entries(DELAY_LABELS).map(([v, l]) => (
-              <option key={v} value={v} className="bg-[#060f24]">{l}</option>
-            ))}
-          </select>
-        </Labeled>
-      </div>
+       {/* Row 4: Mode + Delay */}
+       <div className="grid grid-cols-2 gap-2 mb-2">
+         <Labeled text={t('packageHero.mode')} icon={Package}>
+           <select className={field} value={form.mode} onChange={setField('mode')}>
+             {Object.entries(MODE_LABELS).map((entry) => {
+               const [v, l] = entry;
+               return <option key={v} value={v} className="bg-[#060f24]">{l}</option>;
+             })}
+           </select>
+         </Labeled>
+         <Labeled text={t('packageHero.delay')} icon={CalendarDays}>
+           <select className={field} value={form.delay} onChange={setField('delay')}>
+             {Object.entries(DELAY_LABELS).map((entry) => {
+               const [v, l] = entry;
+               return <option key={v} value={v} className="bg-[#060f24]">{l}</option>;
+             })}
+           </select>
+         </Labeled>
+       </div>
 
-      {/* Advanced toggle */}
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-300 transition mb-2"
-      >
-        {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        {expanded ? 'Moins d\'options' : 'Poids, dimensions, date...'}
-      </button>
+       {/* Advanced toggle */}
+       <button
+         type="button"
+         onClick={() => setExpanded(!expanded)}
+         className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-300 transition mb-2"
+       >
+         {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+         {expanded ? t('packageHero.less_options') : t('packageHero.more_options')}
+       </button>
 
-      {/* Image upload (only for authenticated users) */}
-      {isAuthenticated && (
-        <div className="mb-2">
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-yellow-400 transition"
-          >
-            {uploading ? (
-              <><Loader2 className="w-3 h-3 animate-spin" /> Envoi des images…</>
-            ) : (
-              <><ImagePlus className="w-3 h-3" /> Photos du colis (optionnel)</>
-            )}
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleUpload}
-          />
-          {previews.length > 0 && (
-            <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
-              {previews.map((src, i) => (
-                <div key={i} className="relative shrink-0 group">
-                  <img src={src} alt={`Photo ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-white/10" />
-                  <button
-                    type="button"
-                    onClick={() => remove(i)}
-                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                  >
-                    <X className="w-3 h-3 text-white" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {!isAuthenticated && (
-        <div className="mb-2 text-[10px] text-slate-500">
-          <ImagePlus className="inline w-3 h-3 -mt-0.5 mr-0.5" />
-          Connectez-vous pour ajouter des photos du colis
-        </div>
-      )}
+       {/* Image upload (only for authenticated users) */}
+       {isAuthenticated && (
+         <div className="mb-2">
+           <button
+             type="button"
+             onClick={() => fileRef.current?.click()}
+             disabled={uploading}
+             className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-yellow-400 transition"
+           >
+             {uploading ? (
+               <><Loader2 className="w-3 h-3 animate-spin" /> {t('packageHero.uploading')}</>
+             ) : (
+               <><ImagePlus className="w-3 h-3" /> {t('packageHero.photos')}</>
+             )}
+           </button>
+           <input
+             ref={fileRef}
+             type="file"
+             accept="image/*"
+             multiple
+             className="hidden"
+             onChange={handleUpload}
+           />
+           {previews.length > 0 && (
+             <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
+               {previews.map((src, i) => (
+                 <div key={i} className="relative shrink-0 group">
+                   <img src={src} alt={t('packageHero.photo_alt', { index: i + 1 })} className="w-16 h-16 object-cover rounded-lg border border-white/10" />
+                   <button
+                     type="button"
+                     onClick={() => remove(i)}
+                     className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                   >
+                     <X className="w-3 h-3 text-white" />
+                   </button>
+                 </div>
+               ))}
+             </div>
+           )}
+         </div>
+       )}
+       {!isAuthenticated && (
+         <div className="mb-2 text-[10px] text-slate-500">
+           <ImagePlus className="inline w-3 h-3 -mt-0.5 mr-0.5" />
+           {t('packageHero.login_for_photos')}
+         </div>
+       )}
 
-      {/* Advanced fields (collapsible) */}
-      {expanded && (
-        <div className="grid grid-cols-4 gap-2 mb-2">
-          <Labeled text="Poids" icon={Weight}>
-            <input type="number" min="0" step="0.1" className={field} value={form.weightKg} onChange={setField('weightKg')} placeholder="kg" />
-          </Labeled>
-          <Labeled text="H" icon={Ruler}>
-            <input type="number" min="0" className={field} value={form.heightCm} onChange={setField('heightCm')} placeholder="cm" />
-          </Labeled>
-          <Labeled text="L" icon={Ruler}>
-            <input type="number" min="0" className={field} value={form.widthCm} onChange={setField('widthCm')} placeholder="cm" />
-          </Labeled>
-          <Labeled text="P" icon={Ruler}>
-            <input type="number" min="0" className={field} value={form.lengthCm} onChange={setField('lengthCm')} placeholder="cm" />
-          </Labeled>
-        </div>
-      )}
+       {/* Advanced fields (collapsible) */}
+       {expanded && (
+         <div className="grid grid-cols-4 gap-2 mb-2">
+           <Labeled text={t('packageHero.weight')} icon={Weight}>
+             <input type="number" min="0" step="0.1" className={field} value={form.weightKg} onChange={setField('weightKg')} placeholder={t('packageHero.weight_placeholder')} />
+           </Labeled>
+           <Labeled text={t('packageHero.height')} icon={Ruler}>
+             <input type="number" min="0" className={field} value={form.heightCm} onChange={setField('heightCm')} placeholder={t('packageHero.height_placeholder')} />
+           </Labeled>
+           <Labeled text={t('packageHero.width')} icon={Ruler}>
+             <input type="number" min="0" className={field} value={form.widthCm} onChange={setField('widthCm')} placeholder={t('packageHero.width_placeholder')} />
+           </Labeled>
+           <Labeled text={t('packageHero.length')} icon={Ruler}>
+             <input type="number" min="0" className={field} value={form.lengthCm} onChange={setField('lengthCm')} placeholder={t('packageHero.length_placeholder')} />
+           </Labeled>
+         </div>
+       )}
 
-      {/* Live estimate + CTA */}
-      <div className="flex items-center gap-2 mt-1">
-        <div className="flex-1 bg-[#060f24] border border-yellow-400/20 rounded-md px-3 py-1.5 flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Devis</span>
-          <span className="text-lg font-bold text-yellow-400 leading-none">{formatEUR(estimatedCost)}</span>
-        </div>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="bg-yellow-400 text-[#060f24] px-5 py-2 rounded-md font-bold text-sm hover:bg-yellow-300 transition disabled:opacity-60 flex items-center justify-center gap-1.5 whitespace-nowrap"
-        >
-          {submitting ? (
-            <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Envoi…</>
-          ) : (
-            <>Soumettre <ArrowRight className="w-3.5 h-3.5" /></>
-          )}
-        </button>
-      </div>
-    </form>
-  );
-}
+       {/* Live estimate + CTA */}
+       <div className="flex items-center gap-2 mt-1">
+         <div className="flex-1 bg-[#060f24] border border-yellow-400/20 rounded-md px-3 py-1.5 flex items-center justify-between">
+           <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('packageHero.quote')}</span>
+           <span className="text-lg font-bold text-yellow-400 leading-none">{formatEUR(estimatedCost)}</span>
+         </div>
+         <button
+           type="submit"
+           disabled={submitting}
+           className="bg-yellow-400 text-[#060f24] px-5 py-2 rounded-md font-bold text-sm hover:bg-yellow-300 transition disabled:opacity-60 flex items-center justify-center gap-1.5 whitespace-nowrap"
+         >
+           {submitting ? (
+             <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('packageHero.submitting')}</>
+           ) : (
+             <>{t('packageHero.submit')} <ArrowRight className="w-3.5 h-3.5" /></>
+           )}
+         </button>
+       </div>
+     </form>
+   );
+ }

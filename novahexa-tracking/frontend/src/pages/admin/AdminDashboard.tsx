@@ -4,6 +4,7 @@ import {
   RefreshCw, TrendingUp, AlertCircle,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
@@ -61,6 +62,7 @@ function groupByTransport(packages: PackageItem[]): { mode: string; count: numbe
 
 // ── AdminDashboard ──────────────────────────────────────────
 export function AdminDashboard() {
+  const { t } = useTranslation();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +80,7 @@ export function AdminDashboard() {
       setPackages(pkgs);
       setMessages(msgs);
     } catch {
-      setError('Erreur lors du chargement des données.');
+      setError(t('common.loading'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -257,7 +259,7 @@ export function AdminDashboard() {
               <Link to="/admin/submissions" className="text-xs text-yellow-500 hover:underline font-medium">Voir tout</Link>
             </div>
             {loading ? (
-              <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">Chargement...</div>
+              <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">{t('common.loading')}</div>
             ) : stats.pending.length === 0 ? (
               <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">Aucune soumission en attente</div>
             ) : (
@@ -281,7 +283,7 @@ export function AdminDashboard() {
               <Link to="/admin/contact-messages" className="text-xs text-yellow-500 hover:underline font-medium">Voir tout</Link>
             </div>
             {loading ? (
-              <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">Chargement...</div>
+              <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">{t('common.loading')}</div>
             ) : recentMessages.length === 0 ? (
               <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">Aucun message</div>
             ) : (
@@ -307,7 +309,7 @@ export function AdminDashboard() {
               <h2 className="font-bold text-slate-900 text-sm">Activité récente</h2>
             </div>
             {loading ? (
-              <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">Chargement...</div>
+              <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">{t('common.loading')}</div>
             ) : recentPkgs.length === 0 ? (
               <div className="p-6 sm:p-8 text-center text-slate-400 text-sm">Aucune activité</div>
             ) : (

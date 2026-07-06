@@ -12,11 +12,13 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "clsx": "latest",
+    "i18next": "^26.3.4",
     "leaflet": "^1.9.4",
     "lucide-react": "0.522.0",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.8",
     "react-router-dom": "^6.26.2",
     "recharts": "^2.12.7",
     "tailwind-merge": "latest"
