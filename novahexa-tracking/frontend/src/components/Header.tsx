@@ -28,6 +28,7 @@ export function Header() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [langPosition, setLangPosition] = useState<{ top: number; right: number } | null>(null);
   const langRef = useRef<HTMLDivElement>(null);
 
   // Close lang dropdown on outside click
@@ -39,10 +40,20 @@ export function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  // Calculate dropdown position when opened
+  useEffect(() => {
+    if (langOpen && langRef.current) {
+      const rect = langRef.current.getBoundingClientRect();
+      setLangPosition({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    } else {
+      setLangPosition(null);
+    }
+  }, [langOpen]);
+
   const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0];
 
   return (
-    <header className="w-full bg-[#000a2d] relative z-50 overflow-x-hidden">
+    <header className="w-full bg-[#000a2d] relative z-[1000] overflow-visible">
       {/* ── Top bar ─────────────────────────────────── */}
       <div className="flex items-center h-14 sm:h-16 px-3 sm:px-4 lg:h-[100px] min-w-0">
         {/* Logo */}
@@ -80,8 +91,12 @@ export function Header() {
                 <span className="font-medium">{currentLang.short}</span>
                 <svg className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
               </button>
-              {langOpen && (
-                <div role="menu" className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-slate-200 py-1 w-40 z-50" style={{ animation: 'slideDown 0.15s ease-out' }}>
+              {langOpen && langPosition && (
+                <div 
+                  role="menu" 
+                  className="fixed bg-white rounded-lg shadow-xl border border-slate-200 py-1 w-40 z-[9999]" 
+                  style={{ top: `${langPosition.top}px`, right: `${langPosition.right}px`, animation: 'slideDown 0.15s ease-out' }}
+                >
                   {LANGUAGES.map((lng) => (
                     <button
                       key={lng.code}

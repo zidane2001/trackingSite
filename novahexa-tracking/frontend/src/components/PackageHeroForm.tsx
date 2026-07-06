@@ -303,10 +303,11 @@ export function PackageHeroForm() {
          </Labeled>
          <Labeled text={t('packageHero.material')} icon={Package}>
            <select className={field} value={form.material} onChange={setField('material')}>
-             {Object.entries(MATERIAL_LABELS).map((entry) => {
-               const [v, l] = entry;
-               return <option key={v} value={v} className="bg-[#060f24]">{l}</option>;
-             })}
+             <option value="general" className="bg-[#060f24]">{t('packageHero.material_general')}</option>
+            <option value="auto_parts" className="bg-[#060f24]">{t('packageHero.material_auto_parts')}</option>
+            <option value="fragile" className="bg-[#060f24]">{t('packageHero.material_fragile')}</option>
+            <option value="electronique" className="bg-[#060f24]">{t('packageHero.material_electronique')}</option>
+            <option value="documents" className="bg-[#060f24]">{t('packageHero.material_documents')}</option>
            </select>
          </Labeled>
        </div>
@@ -325,18 +326,16 @@ export function PackageHeroForm() {
        <div className="grid grid-cols-2 gap-2 mb-2">
          <Labeled text={t('packageHero.mode')} icon={Package}>
            <select className={field} value={form.mode} onChange={setField('mode')}>
-             {Object.entries(MODE_LABELS).map((entry) => {
-               const [v, l] = entry;
-               return <option key={v} value={v} className="bg-[#060f24]">{l}</option>;
-             })}
+             <option value="route" className="bg-[#060f24]">{t('packageHero.mode_route')}</option>
+            <option value="mer" className="bg-[#060f24]">{t('packageHero.mode_mer')}</option>
+            <option value="air" className="bg-[#060f24]">{t('packageHero.mode_air')}</option>
            </select>
          </Labeled>
          <Labeled text={t('packageHero.delay')} icon={CalendarDays}>
            <select className={field} value={form.delay} onChange={setField('delay')}>
-             {Object.entries(DELAY_LABELS).map((entry) => {
-               const [v, l] = entry;
-               return <option key={v} value={v} className="bg-[#060f24]">{l}</option>;
-             })}
+             <option value="standard" className="bg-[#060f24]">{t('packageHero.delay_standard')}</option>
+            <option value="express" className="bg-[#060f24]">{t('packageHero.delay_express')}</option>
+            <option value="jour_meme" className="bg-[#060f24]">{t('packageHero.delay_jour_meme')}</option>
            </select>
          </Labeled>
        </div>
@@ -438,3 +437,6 @@ export function PackageHeroForm() {
      </form>
    );
  }
+
+
+

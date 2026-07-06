@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
 import { IMAGES } from '../config/images';
 
@@ -26,20 +27,20 @@ interface NavItem {
 }
 
 const adminNav: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Tableau de bord', path: '/admin' },
-  { icon: ClipboardCheck, label: 'Soumissions', path: '/admin/submissions' },
-  { icon: Package, label: 'Colis', path: '/admin/packages' },
-  { icon: Map, label: 'Carte globale', path: '/admin/map' },
-  { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
-  { icon: MessageSquare, label: 'Messagerie', path: '/admin/messages' },
-  { icon: Inbox, label: 'Messages contact', path: '/admin/contact-messages' },
-  { icon: HelpCircle, label: 'FAQ', path: '/admin/faq' },
+  { icon: LayoutDashboard, label: 'sidebar.admin_dashboard', path: '/admin' },
+  { icon: ClipboardCheck, label: 'sidebar.admin_submissions', path: '/admin/submissions' },
+  { icon: Package, label: 'sidebar.admin_packages', path: '/admin/packages' },
+  { icon: Map, label: 'sidebar.admin_map', path: '/admin/map' },
+  { icon: BarChart3, label: 'sidebar.admin_analytics', path: '/admin/analytics' },
+  { icon: MessageSquare, label: 'sidebar.admin_messages', path: '/admin/messages' },
+  { icon: Inbox, label: 'sidebar.admin_contact_messages', path: '/admin/contact-messages' },
+  { icon: HelpCircle, label: 'sidebar.admin_faq', path: '/admin/faq' },
 ];
 
 const clientNav: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Mon tableau de bord', path: '/client' },
-  { icon: MessageSquare, label: 'Messagerie', path: '/client/messages' },
-  { icon: User, label: 'Mon profil', path: '/client/profile' },
+  { icon: LayoutDashboard, label: 'sidebar.client_dashboard', path: '/client' },
+  { icon: MessageSquare, label: 'sidebar.client_messages', path: '/client/messages' },
+  { icon: User, label: 'sidebar.client_profile', path: '/client/profile' },
 ];
 
 interface Props {
@@ -52,6 +53,7 @@ interface Props {
 
 export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose }: Props) {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? adminNav : clientNav;
@@ -86,10 +88,10 @@ export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose
                   ? 'bg-gold/10 text-gold'
                   : 'text-slate-400 hover:text-white hover:bg-white/5',
               )}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? t(item.label) : undefined}
             >
               <item.icon className="w-5 h-5 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span>{t(item.label)}</span>}
             </Link>
           );
         })}
@@ -106,7 +108,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose
           ) : (
             <>
               <ChevronLeft className="w-5 h-5 shrink-0" />
-              <span>Réduire</span>
+              <span>{t('sidebar.collapse')}</span>
             </>
           )}
         </button>
@@ -119,10 +121,10 @@ export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose
         <button
           onClick={logout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:text-gold hover:bg-white/5 w-full transition-colors"
-          title="Déconnexion"
+          title={t('sidebar.logout')}
         >
           <LogOut className="w-5 h-5 shrink-0" />
-          {!collapsed && <span>Déconnexion</span>}
+          {!collapsed && <span>{t('sidebar.logout')}</span>}
         </button>
       </div>
     </>
@@ -184,7 +186,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose
                     )}
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                   </Link>
                 );
               })}
@@ -199,10 +201,10 @@ export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose
               <button
                 onClick={logout}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:text-gold hover:bg-white/5 w-full transition-colors"
-                title="Déconnexion"
+                title={t('sidebar.logout')}
               >
                 <LogOut className="w-5 h-5 shrink-0" />
-                <span>Déconnexion</span>
+                <span>{t('sidebar.logout')}</span>
               </button>
             </div>
           </aside>

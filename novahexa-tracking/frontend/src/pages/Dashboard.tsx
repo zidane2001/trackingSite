@@ -57,22 +57,22 @@ export function Dashboard() {
   };
 
   const statusSummary = [
-    { label: 'En attente', count: packages.filter((p) => p.status === 'PENDING').length, color: 'text-amber-600 bg-amber-50' },
-    { label: 'Validés', count: packages.filter((p) => p.status === 'VALIDATED').length, color: 'text-blue-600 bg-blue-50' },
-    { label: 'En transit', count: packages.filter((p) => p.status === 'IN_TRANSIT').length, color: 'text-indigo-600 bg-indigo-50' },
-    { label: 'Livrés', count: deliveredPkgs.length, color: 'text-emerald-600 bg-emerald-50' },
+    { label: t('dashboard.status_pending'), count: packages.filter((p) => p.status === 'PENDING').length, color: 'text-amber-600 bg-amber-50' },
+    { label: t('dashboard.status_validated'), count: packages.filter((p) => p.status === 'VALIDATED').length, color: 'text-blue-600 bg-blue-50' },
+    { label: t('dashboard.status_in_transit'), count: packages.filter((p) => p.status === 'IN_TRANSIT').length, color: 'text-indigo-600 bg-indigo-50' },
+    { label: t('dashboard.status_delivered'), count: deliveredPkgs.length, color: 'text-emerald-600 bg-emerald-50' },
   ];
 
   return (
-    <div className="min-h-screen bg-[#eef2f6] font-sans flex flex-col">
+    <div className="h-screen bg-[#eef2f6] font-sans flex flex-col overflow-hidden">
       {/* DARK HEADER */}
-      <div className="bg-[#060f24] text-white pb-32">
+      <div className="bg-[#060f24] text-white pb-32 shrink-0">
         <div className="px-8 py-8">
           <h1 className="text-[28px] font-semibold tracking-tight">
-            Tableau de bord
+            {t('dashboard.title')}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
-            Suivez vos envois en temps réel
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export function Dashboard() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Rechercher par nom, n° suivi, origine, destination…"
+              placeholder={t('dashboard.search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-[#0a1530] border border-white/10 rounded-lg pl-9 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-yellow-400/50"
@@ -112,7 +112,7 @@ export function Dashboard() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 px-8 -mt-20 pb-8 w-full flex flex-col">
+      <div className="flex-1 px-8 -mt-20 pb-8 w-full flex flex-col overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
@@ -124,22 +124,22 @@ export function Dashboard() {
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
               <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-slate-400">Aucun colis</h3>
+              <h3 className="text-lg font-bold text-slate-400">{t('dashboard.no_packages')}</h3>
               <p className="text-sm text-slate-300 mt-1">
-                Vous n'avez pas encore soumis de colis.
+                {t('dashboard.no_packages_desc')}
               </p>
               <Link
                 to="/"
                 className="mt-4 inline-block bg-yellow-400 text-[#060f24] px-5 py-2 rounded-lg text-sm font-bold hover:bg-yellow-300 transition"
               >
-                Soumettre un colis
+                {t('dashboard.submit_package')}
               </Link>
             </div>
           </div>
         ) : (
-          <div className="flex gap-6 flex-1 min-h-0">
+          <div className="flex gap-6 flex-1 min-h-0 relative">
             {/* Left: Package List */}
-            <div className="w-[380px] flex flex-col gap-3 overflow-y-auto pb-4 hide-scrollbar">
+            <div className="w-[380px] flex flex-col gap-3 overflow-y-auto pb-4 hide-scrollbar sticky top-0 self-start max-h-[calc(100vh-8rem)]">
               {filteredPkgs.map((pkg) => {
                 const isSelected = selectedPkg?.id === pkg.id;
                 const TransportIcon = getTransportIcon(pkg.transportMode);
@@ -162,7 +162,7 @@ export function Dashboard() {
                           </div>
                           <div>
                             <div className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
-                              N° de suivi
+                              {t('dashboard.tracking_number')}
                             </div>
                             <div className="font-bold text-slate-900 text-[13px] font-mono">
                               {pkg.trackingNumber}
@@ -217,7 +217,7 @@ export function Dashboard() {
                               : 'text-slate-500 hover:text-slate-700',
                           )}
                         >
-                          {tab === 'general' ? 'Général' : tab === 'tracking' ? 'Suivi' : 'Messages'}
+                          {tab === 'general' ? t('dashboard.tab_general') : tab === 'tracking' ? t('dashboard.tab_tracking') : t('dashboard.tab_messages')}
                         </button>
                       ))}
                     </div>
@@ -227,39 +227,39 @@ export function Dashboard() {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <p className="text-xs text-slate-400 uppercase font-semibold mb-1">Départ</p>
+                              <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('dashboard.departure')}</p>
                               <p className="text-sm text-slate-700 font-medium">{selectedPkg.originAddress}</p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-400 uppercase font-semibold mb-1">Arrivée</p>
+                              <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('dashboard.arrival')}</p>
                               <p className="text-sm text-slate-700 font-medium">{selectedPkg.destinationAddress}</p>
                             </div>
                           </div>
                           <div className="grid grid-cols-3 gap-4 pt-3 border-t border-slate-100">
                             {selectedPkg.transportMode && (
                               <div>
-                                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">Transport</p>
+                                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('dashboard.transport')}</p>
                                 <p className="text-sm text-slate-700 font-medium">{selectedPkg.transportMode}</p>
                               </div>
                             )}
                             {selectedPkg.weightKg != null && (
                               <div>
-                                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">Poids</p>
+                                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('dashboard.weight')}</p>
                                 <p className="text-sm text-slate-700 font-medium">{selectedPkg.weightKg} kg</p>
                               </div>
                             )}
                             {selectedPkg.estimatedDuration && (
                               <div>
-                                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">Durée estimée</p>
+                                <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('dashboard.estimated_duration')}</p>
                                 <p className="text-sm text-slate-700 font-medium">{selectedPkg.estimatedDuration}</p>
                               </div>
                             )}
                           </div>
                           <div className="flex items-center gap-2 text-xs text-slate-400 pt-3 border-t border-slate-100">
                             <Clock className="w-3.5 h-3.5" />
-                            Créé le {new Date(selectedPkg.createdAt).toLocaleDateString('fr-FR')}
+                            {t('dashboard.created_at')} {new Date(selectedPkg.createdAt).toLocaleDateString('fr-FR')}
                             {selectedPkg.validatedAt && (
-                              <> · Validé le {new Date(selectedPkg.validatedAt).toLocaleDateString('fr-FR')}</>
+                              <> · {t('dashboard.validated_at')} {new Date(selectedPkg.validatedAt).toLocaleDateString('fr-FR')}</>
                             )}
                           </div>
                         </div>
@@ -283,7 +283,7 @@ export function Dashboard() {
                             </div>
                           ) : (
                             <p className="text-sm text-slate-400 text-center py-8">
-                              Aucun événement de suivi pour le moment.
+                              {t('dashboard.no_tracking_events')}
                             </p>
                           )}
                         </div>
@@ -305,7 +305,7 @@ export function Dashboard() {
                             </div>
                           ) : (
                             <p className="text-sm text-slate-400 text-center py-8">
-                              Aucun message pour ce colis.
+                              {t('dashboard.no_messages')}
                             </p>
                           )}
                         </div>
@@ -317,7 +317,7 @@ export function Dashboard() {
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
                     <MapPin className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <p className="text-sm text-slate-400">Sélectionnez un colis pour voir les détails</p>
+                    <p className="text-sm text-slate-400">{t('dashboard.select_package')}</p>
                   </div>
                 </div>
               )}

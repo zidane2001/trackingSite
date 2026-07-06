@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const WHATSAPP_NUMBER = '33656817785';
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Bonjour Youms Logistics, je vous contacte depuis votre site web.')}`;
 
 export function WhatsAppButton() {
+  const { t } = useTranslation();
   const [tooltip, setTooltip] = useState(false);
+
+  const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('whatsapp.message'))}`;
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
@@ -18,9 +21,9 @@ export function WhatsAppButton() {
           >
             <X className="w-3.5 h-3.5" />
           </button>
-          <p className="text-sm font-semibold text-slate-900 mb-0.5">Besoin d'aide ?</p>
+          <p className="text-sm font-semibold text-slate-900 mb-0.5">{t('whatsapp.tooltip_title')}</p>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Écrivez-nous sur WhatsApp, nous vous répondrons rapidement !
+            {t('whatsapp.tooltip_text')}
           </p>
         </div>
       )}
