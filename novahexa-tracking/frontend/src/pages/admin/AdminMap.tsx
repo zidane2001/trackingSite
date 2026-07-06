@@ -41,14 +41,19 @@ export function AdminMap() {
     senderName: '',
     senderEmail: '',
     senderPhone: '',
+    senderAddress: '',
     receiverName: '',
     receiverEmail: '',
     receiverPhone: '',
+    receiverAddress: '',
     originAddress: '',
     destinationAddress: '',
     transportMode: 'ROUTE' as TransportMode,
     material: 'GENERAL' as string,
     weightKg: '',
+    heightCm: '',
+    widthCm: '',
+    lengthCm: '',
     estimatedCost: '',
     demoDurationMinutes: '',
     ownerId: '',
@@ -75,14 +80,19 @@ export function AdminMap() {
       senderName: pkg.senderName || '',
       senderEmail: pkg.senderEmail || '',
       senderPhone: pkg.senderPhone || '',
+      senderAddress: pkg.senderAddress || '',
       receiverName: pkg.receiverName || '',
       receiverEmail: pkg.receiverEmail || '',
       receiverPhone: pkg.receiverPhone || '',
+      receiverAddress: pkg.receiverAddress || '',
       originAddress: pkg.originAddress,
       destinationAddress: pkg.destinationAddress,
       transportMode: (pkg.transportMode as TransportMode) || 'ROUTE',
       material: pkg.material || 'GENERAL',
       weightKg: pkg.weightKg != null ? String(pkg.weightKg) : '',
+      heightCm: pkg.heightCm != null ? String(pkg.heightCm) : '',
+      widthCm: pkg.widthCm != null ? String(pkg.widthCm) : '',
+      lengthCm: pkg.lengthCm != null ? String(pkg.lengthCm) : '',
       estimatedCost: pkg.estimatedCost != null ? String(pkg.estimatedCost) : '',
       demoDurationMinutes: pkg.demoDurationMinutes != null ? String(pkg.demoDurationMinutes) : '',
       ownerId: pkg.ownerId || '',
@@ -206,9 +216,11 @@ export function AdminMap() {
         senderName: createForm.senderName,
         senderEmail: createForm.senderEmail,
         senderPhone: createForm.senderPhone,
+        senderAddress: createForm.senderAddress,
         receiverName: createForm.receiverName,
         receiverEmail: createForm.receiverEmail,
         receiverPhone: createForm.receiverPhone,
+        receiverAddress: createForm.receiverAddress,
         originAddress: createForm.originAddress,
         originLat: originCoords.lat,
         originLng: originCoords.lng,
@@ -218,6 +230,9 @@ export function AdminMap() {
         transportMode: createForm.transportMode,
         material: createForm.material,
         weightKg: createForm.weightKg ? parseFloat(createForm.weightKg) : null,
+        heightCm: createForm.heightCm ? parseInt(createForm.heightCm) : null,
+        widthCm: createForm.widthCm ? parseInt(createForm.widthCm) : null,
+        lengthCm: createForm.lengthCm ? parseInt(createForm.lengthCm) : null,
         estimatedCost: createForm.estimatedCost ? parseFloat(createForm.estimatedCost) : null,
         demoDurationMinutes: createForm.demoDurationMinutes ? parseInt(createForm.demoDurationMinutes) : null,
         ownerId: createForm.ownerId || null,
@@ -617,6 +632,22 @@ export function AdminMap() {
                   </div>
                 </div>
 
+                {/* Dimensions */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Hauteur (cm)</label>
+                    <input type="number" min="0" value={createForm.heightCm} onChange={setField('heightCm')} placeholder="H" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Largeur (cm)</label>
+                    <input type="number" min="0" value={createForm.widthCm} onChange={setField('widthCm')} placeholder="L" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Longueur (cm)</label>
+                    <input type="number" min="0" value={createForm.lengthCm} onChange={setField('lengthCm')} placeholder="P" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                  </div>
+                </div>
+
                 {/* Sender info */}
                 <div className="grid grid-cols-1 gap-3">
                   <div>
@@ -632,6 +663,10 @@ export function AdminMap() {
                       <label className="block text-xs font-semibold text-slate-500 mb-1">Téléphone de l'expéditeur</label>
                       <input type="tel" value={createForm.senderPhone} onChange={setField('senderPhone')} placeholder="+237 6XX XX XX XX" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Adresse de l'expéditeur</label>
+                    <input value={createForm.senderAddress} onChange={setField('senderAddress')} placeholder="Adresse complète de l'expéditeur" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                   </div>
                 </div>
 
@@ -650,6 +685,10 @@ export function AdminMap() {
                       <label className="block text-xs font-semibold text-slate-500 mb-1">Téléphone du destinataire</label>
                       <input type="tel" value={createForm.receiverPhone} onChange={setField('receiverPhone')} placeholder="+33 6XX XX XX XX" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Adresse du destinataire</label>
+                    <input value={createForm.receiverAddress} onChange={setField('receiverAddress')} placeholder="Adresse complète du destinataire" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                   </div>
                 </div>
 

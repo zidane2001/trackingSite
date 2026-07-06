@@ -255,7 +255,7 @@ public class PdfService {
         senderCell.addElement(new Paragraph(" ", SMALL_FONT));
         addFieldInline(senderCell, "Nom de l'expéditeur :", safe(p.getSenderName()));
         addFieldInline(senderCell, "Numéro de téléphone :", safe(p.getSenderPhone()));
-        addFieldInline(senderCell, "Adresse :", safe(p.getOriginAddress()));
+        addFieldInline(senderCell, "Adresse :", safe(p.getSenderAddress()));
         addFieldInline(senderCell, "E-mail :", safe(p.getSenderEmail()));
         block.addCell(senderCell);
 
@@ -266,7 +266,7 @@ public class PdfService {
         receiverCell.addElement(new Paragraph(" ", SMALL_FONT));
         addFieldInline(receiverCell, "Nom du destinataire :", safe(p.getReceiverName()));
         addFieldInline(receiverCell, "Numéro de téléphone :", safe(p.getReceiverPhone()));
-        addFieldInline(receiverCell, "Adresse :", safe(p.getDestinationAddress()));
+        addFieldInline(receiverCell, "Adresse :", safe(p.getReceiverAddress()));
         addFieldInline(receiverCell, "E-mail :", safe(p.getReceiverEmail()));
         block.addCell(receiverCell);
 

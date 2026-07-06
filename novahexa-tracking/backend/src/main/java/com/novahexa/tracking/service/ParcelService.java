@@ -293,9 +293,11 @@ public class ParcelService {
         p.setSenderName(req.senderName());
         p.setSenderEmail(req.senderEmail());
         p.setSenderPhone(req.senderPhone());
+        p.setSenderAddress(req.senderAddress());
         p.setReceiverName(req.receiverName());
         p.setReceiverEmail(req.receiverEmail());
         p.setReceiverPhone(req.receiverPhone());
+        p.setReceiverAddress(req.receiverAddress());
         p.setOriginAddress(req.originAddress());
         p.setOriginLat(req.originLat());
         p.setOriginLng(req.originLng());
@@ -305,6 +307,9 @@ public class ParcelService {
         p.setTransportMode(req.transportMode());
         p.setMaterial(req.material());
         p.setWeightKg(req.weightKg());
+        p.setHeightCm(req.heightCm());
+        p.setWidthCm(req.widthCm());
+        p.setLengthCm(req.lengthCm());
         p.setEstimatedCost(req.estimatedCost());
         p.setDemoDurationMinutes(req.demoDurationMinutes());
         if (req.estimatedDurationMinutes() != null) p.setEstimatedDurationMinutes(req.estimatedDurationMinutes());
@@ -325,12 +330,13 @@ public class ParcelService {
     }
 
     public record AdminCreateRequest(
-        String name, String description, String senderName, String senderEmail, String senderPhone,
-        String receiverName, String receiverEmail, String receiverPhone,
+        String name, String description, String senderName, String senderEmail, String senderPhone, String senderAddress,
+        String receiverName, String receiverEmail, String receiverPhone, String receiverAddress,
         String originAddress, Double originLat, Double originLng,
         String destinationAddress, Double destinationLat, Double destinationLng,
         TransportMode transportMode, MaterialType material,
-        java.math.BigDecimal weightKg, java.math.BigDecimal estimatedCost,
+        java.math.BigDecimal weightKg, Integer heightCm, Integer widthCm, Integer lengthCm,
+        java.math.BigDecimal estimatedCost,
         Integer demoDurationMinutes, Integer estimatedDurationMinutes,
         java.util.UUID ownerId, List<String> imageUrls
     ) {}

@@ -77,9 +77,11 @@ export interface PackageItem {
   senderName?: string;
   senderEmail?: string;
   senderPhone?: string;
+  senderAddress?: string;
   receiverName?: string;
   receiverEmail?: string;
   receiverPhone?: string;
+  receiverAddress?: string;
   ownerId?: string;
   ownerName?: string;
   ownerEmail?: string;
