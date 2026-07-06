@@ -293,6 +293,9 @@ public class ParcelService {
         p.setSenderName(req.senderName());
         p.setSenderEmail(req.senderEmail());
         p.setSenderPhone(req.senderPhone());
+        p.setReceiverName(req.receiverName());
+        p.setReceiverEmail(req.receiverEmail());
+        p.setReceiverPhone(req.receiverPhone());
         p.setOriginAddress(req.originAddress());
         p.setOriginLat(req.originLat());
         p.setOriginLng(req.originLng());
@@ -323,6 +326,7 @@ public class ParcelService {
 
     public record AdminCreateRequest(
         String name, String description, String senderName, String senderEmail, String senderPhone,
+        String receiverName, String receiverEmail, String receiverPhone,
         String originAddress, Double originLat, Double originLng,
         String destinationAddress, Double destinationLat, Double destinationLng,
         TransportMode transportMode, MaterialType material,

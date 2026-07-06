@@ -41,6 +41,9 @@ export function AdminMap() {
     senderName: '',
     senderEmail: '',
     senderPhone: '',
+    receiverName: '',
+    receiverEmail: '',
+    receiverPhone: '',
     originAddress: '',
     destinationAddress: '',
     transportMode: 'ROUTE' as TransportMode,
@@ -72,6 +75,9 @@ export function AdminMap() {
       senderName: pkg.senderName || '',
       senderEmail: pkg.senderEmail || '',
       senderPhone: pkg.senderPhone || '',
+      receiverName: pkg.receiverName || '',
+      receiverEmail: pkg.receiverEmail || '',
+      receiverPhone: pkg.receiverPhone || '',
       originAddress: pkg.originAddress,
       destinationAddress: pkg.destinationAddress,
       transportMode: (pkg.transportMode as TransportMode) || 'ROUTE',
@@ -199,6 +205,10 @@ export function AdminMap() {
         description: createForm.description,
         senderName: createForm.senderName,
         senderEmail: createForm.senderEmail,
+        senderPhone: createForm.senderPhone,
+        receiverName: createForm.receiverName,
+        receiverEmail: createForm.receiverEmail,
+        receiverPhone: createForm.receiverPhone,
         originAddress: createForm.originAddress,
         originLat: originCoords.lat,
         originLng: originCoords.lng,
@@ -211,9 +221,6 @@ export function AdminMap() {
         estimatedCost: createForm.estimatedCost ? parseFloat(createForm.estimatedCost) : null,
         demoDurationMinutes: createForm.demoDurationMinutes ? parseInt(createForm.demoDurationMinutes) : null,
         ownerId: createForm.ownerId || null,
-        senderName: createForm.senderName || undefined,
-        senderEmail: createForm.senderEmail || undefined,
-        senderPhone: createForm.senderPhone || undefined,
         imageUrls: adminImages.length > 0 ? adminImages : undefined,
       });
 
@@ -613,17 +620,35 @@ export function AdminMap() {
                 {/* Sender info */}
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1">Nom du client</label>
-                    <input value={createForm.senderName} onChange={setField('senderName')} placeholder="Nom complet du client" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Nom de l'expéditeur</label>
+                    <input value={createForm.senderName} onChange={setField('senderName')} placeholder="Nom complet de l'expéditeur" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-500 mb-1">Email du client</label>
-                      <input type="email" value={createForm.senderEmail} onChange={setField('senderEmail')} placeholder="client@email.com" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">Email de l'expéditeur</label>
+                      <input type="email" value={createForm.senderEmail} onChange={setField('senderEmail')} placeholder="expediteur@email.com" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-500 mb-1">Téléphone du client</label>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">Téléphone de l'expéditeur</label>
                       <input type="tel" value={createForm.senderPhone} onChange={setField('senderPhone')} placeholder="+237 6XX XX XX XX" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Receiver info */}
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Nom du destinataire</label>
+                    <input value={createForm.receiverName} onChange={setField('receiverName')} placeholder="Nom complet du destinataire" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">Email du destinataire</label>
+                      <input type="email" value={createForm.receiverEmail} onChange={setField('receiverEmail')} placeholder="destinataire@email.com" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">Téléphone du destinataire</label>
+                      <input type="tel" value={createForm.receiverPhone} onChange={setField('receiverPhone')} placeholder="+33 6XX XX XX XX" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                     </div>
                   </div>
                 </div>

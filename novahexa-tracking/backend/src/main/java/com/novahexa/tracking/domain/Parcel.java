@@ -32,6 +32,9 @@ public class Parcel {
     private String senderName;
     private String senderEmail;
     private String senderPhone;
+    private String receiverName;
+    private String receiverEmail;
+    private String receiverPhone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -113,6 +116,12 @@ public class Parcel {
     public void setSenderEmail(String v) { this.senderEmail = v; }
     public String getSenderPhone() { return senderPhone; }
     public void setSenderPhone(String v) { this.senderPhone = v; }
+    public String getReceiverName() { return receiverName; }
+    public void setReceiverName(String v) { this.receiverName = v; }
+    public String getReceiverEmail() { return receiverEmail; }
+    public void setReceiverEmail(String v) { this.receiverEmail = v; }
+    public String getReceiverPhone() { return receiverPhone; }
+    public void setReceiverPhone(String v) { this.receiverPhone = v; }
     public ParcelStatus getStatus() { return status; }
     public void setStatus(ParcelStatus v) { this.status = v; }
     public String getRefusalReason() { return refusalReason; }

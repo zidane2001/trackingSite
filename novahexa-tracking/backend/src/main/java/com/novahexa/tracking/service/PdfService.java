@@ -264,11 +264,10 @@ public class PdfService {
         receiverCell.setPadding(6);
         receiverCell.addElement(new Paragraph("DÉTAILS DU RÉCEPTEUR :", SECTION_FONT));
         receiverCell.addElement(new Paragraph(" ", SMALL_FONT));
-        String destCity = p.getDestinationAddress() != null ? p.getDestinationAddress().split(",")[0].trim() : "—";
-        addFieldInline(receiverCell, "Nom du destinataire :", destCity);
-        addFieldInline(receiverCell, "Numéro de téléphone :", "—");
+        addFieldInline(receiverCell, "Nom du destinataire :", safe(p.getReceiverName()));
+        addFieldInline(receiverCell, "Numéro de téléphone :", safe(p.getReceiverPhone()));
         addFieldInline(receiverCell, "Adresse :", safe(p.getDestinationAddress()));
-        addFieldInline(receiverCell, "E-mail :", "—");
+        addFieldInline(receiverCell, "E-mail :", safe(p.getReceiverEmail()));
         block.addCell(receiverCell);
 
         doc.add(block);
