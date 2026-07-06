@@ -6,7 +6,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { WhatsAppButton } from './components/WhatsAppButton';
 
 // Public pages (lazy loaded)
 const Home = React.lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
@@ -68,7 +67,6 @@ export function App() {
     <AuthProvider>
       <Router>
         <div className="min-h-screen flex flex-col font-sans text-slate-900 overflow-x-hidden">
-          <WhatsAppButton />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* ── Public pages ── */}

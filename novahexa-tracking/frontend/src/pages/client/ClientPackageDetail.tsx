@@ -137,6 +137,24 @@ export function ClientPackageDetail() {
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
               <h3 className="font-bold text-slate-900 text-sm mb-4">{t('client.detail_info')}</h3>
               <div className="space-y-2 text-sm">
+                {pkg.senderName && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">{t('client.detail_sender_name')}</span>
+                    <span className="font-medium text-slate-700">{pkg.senderName}</span>
+                  </div>
+                )}
+                {pkg.senderEmail && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">{t('client.detail_sender_email')}</span>
+                    <span className="font-medium text-slate-700">{pkg.senderEmail}</span>
+                  </div>
+                )}
+                {pkg.senderPhone && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">{t('client.detail_sender_phone')}</span>
+                    <span className="font-medium text-slate-700">{pkg.senderPhone}</span>
+                  </div>
+                )}
                 {pkg.transportMode && (
                   <div className="flex justify-between">
                     <span className="text-slate-500">{t('client.detail_transport')}</span>

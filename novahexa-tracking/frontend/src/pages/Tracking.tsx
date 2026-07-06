@@ -141,6 +141,34 @@ export function Tracking() {
                 </div>
               </div>
 
+              {result.senderName && (
+                <div className="pt-3 border-t border-slate-100">
+                  <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('tracking.sender_name')}</p>
+                  <p className="text-sm text-slate-700 font-medium">{result.senderName}</p>
+                </div>
+              )}
+
+              {result.senderEmail && (
+                <div className="pt-2">
+                  <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('tracking.sender_email')}</p>
+                  <p className="text-sm text-slate-700 font-medium">{result.senderEmail}</p>
+                </div>
+              )}
+
+              {result.senderPhone && (
+                <div className="pt-2">
+                  <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('tracking.sender_phone')}</p>
+                  <p className="text-sm text-slate-700 font-medium">{result.senderPhone}</p>
+                </div>
+              )}
+
+              {result.weightKg && (
+                <div className="pt-2">
+                  <p className="text-xs text-slate-400 uppercase font-semibold mb-1">{t('tracking.weight')}</p>
+                  <p className="text-sm text-slate-700 font-medium">{result.weightKg} kg</p>
+                </div>
+              )}
+
               {result.transportMode && (
                 <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
                   {renderTransportIcon(result.transportMode)}

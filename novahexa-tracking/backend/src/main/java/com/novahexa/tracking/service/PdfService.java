@@ -37,10 +37,10 @@ public class PdfService {
     private static final String DATE_FMT = "dd/MM/yyyy HH:mm";
 
     // ════════════════════════════════════════════════════════════
-    //  DEVIS (Quote)
+    //  FACTURE (Invoice)
     // ════════════════════════════════════════════════════════════
     public byte[] generateQuote(Parcel p) {
-        return buildDocument("DEVIS", p, "Erreur génération devis PDF");
+        return buildDocument("FACTURE", p, "Erreur génération facture PDF");
     }
 
     public byte[] generateInvoice(Parcel p) {
@@ -140,7 +140,7 @@ public class PdfService {
             doc.add(new Paragraph(" "));
             doc.add(new Paragraph(" "));
 
-            Paragraph footer = new Paragraph("youmslogistics.com  |  youmslogistics@gmail.com",
+            Paragraph footer = new Paragraph("youmslogistics.fr  |  youmslogistics@gmail.com",
                     new Font(Font.HELVETICA, 6, Font.NORMAL, GRAY));
             footer.setAlignment(Element.ALIGN_CENTER);
             doc.add(footer);
@@ -378,7 +378,7 @@ public class PdfService {
 
         Paragraph footer = new Paragraph(
                 "Youms Logistics — youmslogistics@gmail.com\n" +
-                "https://youmslogistics.com",
+                "https://youmslogistics.fr",
                 SMALL_FONT);
         footer.setAlignment(Element.ALIGN_CENTER);
         footer.setSpacingBefore(4);
