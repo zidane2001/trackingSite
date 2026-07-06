@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2, Plus, Pencil } from 'lucide-react';
+import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2, Plus, Pencil, ImageIcon } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TrackingQR } from '../../components/TrackingQR';
@@ -150,6 +150,17 @@ export function AdminPackages() {
                   </div>
                   <div className="text-xs text-slate-500 mb-1">{pkg.originAddress} → {pkg.destinationAddress}</div>
                   <div className="text-xs text-slate-400 mb-3">{pkg.ownerName || pkg.ownerEmail || '—'}</div>
+                  {pkg.imageUrls && pkg.imageUrls.length > 0 && (
+                    <div className="flex items-center gap-1 mb-2">
+                      <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-[11px] text-slate-400">{pkg.imageUrls.length} photo{pkg.imageUrls.length > 1 ? 's' : ''}</span>
+                      <div className="flex -space-x-1.5 ml-1">
+                        {pkg.imageUrls.slice(0, 3).map((url, i) => (
+                          <img key={i} src={url} alt="" className="w-6 h-6 rounded object-cover border border-white" loading="lazy" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 flex-wrap">
                     {pkg.status === 'VALIDATED' && (
                       <button onClick={(e) => { e.stopPropagation(); handleSetInTransit(pkg); }} disabled={actionLoading === pkg.id} className="text-indigo-500 hover:text-indigo-700 p-1.5 rounded-lg hover:bg-indigo-50 transition" title="Mettre en transit">
@@ -194,6 +205,7 @@ export function AdminPackages() {
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Colis</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">QR</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Client</th>
+                    <th className="text-left px-6 py-3 font-semibold text-slate-500">Photos</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Trajet</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Transport</th>
                     <th className="text-left px-6 py-3 font-semibold text-slate-500">Statut</th>
@@ -212,6 +224,22 @@ export function AdminPackages() {
                         <TrackingQR trackingNumber={pkg.trackingNumber} size={48} showActions={false} />
                       </td>
                       <td className="px-6 py-3 text-slate-600">{pkg.ownerName || pkg.ownerEmail || '—'}</td>
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-2">
+                          {pkg.imageUrls && pkg.imageUrls.length > 0 ? (
+                            <div className="flex -space-x-1">
+                              {pkg.imageUrls.slice(0, 2).map((url, i) => (
+                                <img key={i} src={url} alt="" className="w-7 h-7 rounded object-cover border border-white" loading="lazy" />
+                              ))}
+                              {pkg.imageUrls.length > 2 && (
+                                <span className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 border border-white">+{pkg.imageUrls.length - 2}</span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-slate-300">—</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-3 text-slate-600 text-xs">{pkg.originAddress} → {pkg.destinationAddress}</td>
                       <td className="px-6 py-3 text-slate-500 text-xs">{pkg.transportMode || '—'}</td>
                       <td className="px-6 py-3"><StatusBadge status={pkg.status} size="sm" /></td>

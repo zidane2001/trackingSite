@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "packages")
@@ -94,7 +92,7 @@ public class Parcel {
 
     @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")
-    private List<TrackingEvent> events = new ArrayList<>();
+    private Set<TrackingEvent> events = new LinkedHashSet<>();
 
     @PreUpdate
     public void touch() { this.updatedAt = Instant.now(); }
@@ -164,5 +162,5 @@ public class Parcel {
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
     public List<Waypoint> getWaypoints() { return waypoints; }
-    public List<TrackingEvent> getEvents() { return events; }
+    public Set<TrackingEvent> getEvents() { return events; }
 }

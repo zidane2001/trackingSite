@@ -7,6 +7,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { TransitInfoPanel } from '../../components/TransitInfoPanel';
 import { packagesApi, adminUsersApi } from '../../lib/api';
 import { useImageUpload } from '../../hooks/useImageUpload';
+import { PhotoGallery } from '../../components/PhotoGallery';
 import type { ClientSummary } from '../../lib/api';
 import type { PackageItem, TransportMode } from '../../types';
 import { reverseGeocode } from '../../lib/mapUtils';
@@ -666,6 +667,9 @@ export function AdminMap() {
               /* ── Package detail with TransitInfoPanel ── */
               <>
                 <TransitInfoPanel pkg={selectedPkg} onRefresh={loadPackages} />
+
+                {/* Photos */}
+                <PhotoGallery imageUrls={selectedPkg.imageUrls ?? []} />
 
                 {/* Quick actions */}
                 {selectedPkg.status === 'VALIDATED' && (

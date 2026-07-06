@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Package, Clock, FileText, Download, Tag, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Package, Clock, FileText, Download, Tag } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
 import { ParcelMap } from '../../components/ParcelMap';
 import { TrackingQR } from '../../components/TrackingQR';
 import { MessagingPanel } from '../../components/MessagingPanel';
+import { PhotoGallery } from '../../components/PhotoGallery';
 import { packagesApi, pdfApi } from '../../lib/api';
 import type { PackageItem } from '../../types';
 
@@ -114,25 +115,7 @@ export function ClientPackageDetail() {
             </div>
 
             {/* Package images */}
-            {pkg.imageUrls && pkg.imageUrls.length > 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                <h3 className="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4" /> Photos du colis
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {pkg.imageUrls.map((url, i) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <img
-                        src={url}
-                        alt={`Photo ${i + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border border-slate-200 hover:border-yellow-400 transition cursor-pointer"
-                        loading="lazy"
-                      />
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
+            <PhotoGallery imageUrls={pkg.imageUrls ?? []} />
 
             {/* Route info */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">

@@ -5,6 +5,7 @@ import { ParcelMap } from '../components/ParcelMap';
 import { TrackingQR } from '../components/TrackingQR';
 import type { PackageItem } from '../types';
 import { STATUS_LABELS, STATUS_COLORS } from '../types';
+import { PhotoGallery } from '../components/PhotoGallery';
 
 export function Tracking() {
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -109,6 +110,9 @@ export function Tracking() {
             <div className="relative">
               <ParcelMap pkg={result} height="280px" showPosition={true} />
             </div>
+
+            {/* Photos */}
+            <PhotoGallery imageUrls={result.imageUrls ?? []} className="!rounded-none !border-0 !border-b !border-slate-100" />
 
             {/* QR Code */}
             <div className="px-6 py-4 border-b border-slate-100">
