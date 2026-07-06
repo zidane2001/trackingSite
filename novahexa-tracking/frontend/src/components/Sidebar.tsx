@@ -14,6 +14,7 @@ import {
   ChevronRight,
   LogOut,
   X,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +36,7 @@ const adminNav: NavItem[] = [
   { icon: MessageSquare, label: 'sidebar.admin_messages', path: '/admin/messages' },
   { icon: Inbox, label: 'sidebar.admin_contact_messages', path: '/admin/contact-messages' },
   { icon: HelpCircle, label: 'sidebar.admin_faq', path: '/admin/faq' },
+  { icon: Settings, label: 'sidebar.admin_settings', path: '/admin/settings' },
 ];
 
 const clientNav: NavItem[] = [

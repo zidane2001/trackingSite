@@ -375,6 +375,7 @@
     "admin_messages": "Messagerie",
     "admin_contact_messages": "Messages contact",
     "admin_faq": "FAQ",
+    "admin_settings": "Paramètres",
     "client_dashboard": "Mon tableau de bord",
     "client_messages": "Messagerie",
     "client_profile": "Mon profil",
@@ -494,5 +495,25 @@
     "set_delivered": "✅ Marquer comme livré",
     "close_button": "Fermer",
     "select_package": "Sélectionnez un colis ou créez-en un nouveau"
+  },
+  "adminSettings": {
+    "title": "Paramètres du site",
+    "subtitle": "Gérez la configuration de votre site et les informations de contact",
+    "save": "Enregistrer",
+    "reset": "Réinitialiser",
+    "contactInfo": "Informations de contact",
+    "address": "Adresse",
+    "whatsapp": "Numéro WhatsApp",
+    "email": "Email",
+    "hours": "Horaires d'ouverture",
+    "companyInfo": "Informations entreprise",
+    "companyName": "Nom de l'entreprise",
+    "companyDescription": "Description de l'entreprise",
+    "socialMedia": "Réseaux sociaux",
+    "metrics": "Statistiques",
+    "packagesDelivered": "Colis livrés",
+    "countriesCovered": "Pays couverts",
+    "footer": "Pied de page",
+    "copyrightText": "Texte copyright"
   }
 }

@@ -255,6 +255,32 @@ export const faqApi = {
   delete: (id: string) => api.delete(`/api/admin/faq/${id}`),
 };
 
+// ── Site Settings ──────────────────────────────────────
+export interface SiteSettings {
+  id: string;
+  address: string;
+  whatsappNumber: string;
+  email: string;
+  hours: string;
+  companyName: string;
+  companyDescription: string;
+  facebookUrl: string;
+  twitterUrl: string;
+  instagramUrl: string;
+  linkedinUrl: string;
+  packagesDelivered: number;
+  countriesCovered: number;
+  copyrightText: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const siteSettingsApi = {
+  get: () => api.get<SiteSettings>('/api/admin/settings'),
+  update: (data: Partial<SiteSettings>) => api.put<SiteSettings>('/api/admin/settings', data),
+  reset: () => api.post<SiteSettings>('/api/admin/settings/reset', {}),
+};
+
 // ── Legacy submitPackage (used by PackageHeroForm) ──────
 export async function submitPackage(
   payload: Record<string, unknown>,

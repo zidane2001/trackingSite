@@ -41,6 +41,7 @@ const AdminContactMessages = React.lazy(() => import('./pages/admin/AdminContact
 const AdminMap = React.lazy(() => import('./pages/admin/AdminMap').then(m => ({ default: m.AdminMap })));
 const AdminAnalytics = React.lazy(() => import('./pages/admin/AdminAnalytics').then(m => ({ default: m.AdminAnalytics })));
 const AdminFaq = React.lazy(() => import('./pages/admin/AdminFaq').then(m => ({ default: m.AdminFaq })));
+const AdminSettings = React.lazy(() => import('./pages/admin/AdminSettings').then(m => ({ default: m.AdminSettings })));
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -184,6 +185,14 @@ export function App() {
                 element={
                   <ProtectedRoute roles={['ADMIN']}>
                     <AdminFaq />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <ProtectedRoute roles={['ADMIN']}>
+                    <AdminSettings />
                   </ProtectedRoute>
                 }
               />

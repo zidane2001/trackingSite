@@ -375,6 +375,7 @@
     "admin_messages": "Messaging",
     "admin_contact_messages": "Contact Messages",
     "admin_faq": "FAQ",
+    "admin_settings": "Settings",
     "client_dashboard": "My Dashboard",
     "client_messages": "Messaging",
     "client_profile": "My Profile",
@@ -494,5 +495,25 @@
     "set_delivered": "✅ Mark as delivered",
     "close_button": "Close",
     "select_package": "Select a package or create a new one"
+  },
+  "adminSettings": {
+    "title": "Site Settings",
+    "subtitle": "Manage your site configuration and contact information",
+    "save": "Save",
+    "reset": "Reset to defaults",
+    "contactInfo": "Contact Information",
+    "address": "Address",
+    "whatsapp": "WhatsApp Number",
+    "email": "Email",
+    "hours": "Business Hours",
+    "companyInfo": "Company Information",
+    "companyName": "Company Name",
+    "companyDescription": "Company Description",
+    "socialMedia": "Social Media",
+    "metrics": "Metrics",
+    "packagesDelivered": "Packages Delivered",
+    "countriesCovered": "Countries Covered",
+    "footer": "Footer",
+    "copyrightText": "Copyright Text"
   }
 }
