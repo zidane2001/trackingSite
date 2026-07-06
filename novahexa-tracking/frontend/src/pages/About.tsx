@@ -10,7 +10,7 @@ const VALUES = [
 ];
 
 const MILESTONES = [
-  { year: '2018', title: 'Création', text: "Fondation de Youms Logistics à Calais, spécialisée en transport routier européen." },
+  { year: '2018', title: 'Création', text: "Fondation de Youms Logistics à Perpignan, spécialisée en transport routier européen." },
   { year: '2020', title: 'Expansion maritime', text: 'Lancement des services de fret maritime vers l\'Afrique et l\'Asie.' },
   { year: '2022', title: 'Fret aérien', text: 'Ajout du fret aérien express avec couverture mondiale.' },
   { year: '2024', title: 'Plateforme digitale', text: 'Mise en ligne de la plateforme de suivi en temps réel.' },
@@ -49,7 +49,7 @@ export function About() {
               permet à chacun de soumettre, suivre et gérer ses envois en toute confiance.
             </p>
             <p className="text-slate-500 leading-relaxed">
-              De Calais au monde entier, nous mettons à votre disposition notre expertise
+              De Perpignan au monde entier, nous mettons à votre disposition notre expertise
               logistique, nos partenariats avec les meilleurs transporteurs et une technologie
               de pointe pour offrir une expérience de suivi sans pareil.
             </p>

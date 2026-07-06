@@ -97,7 +97,7 @@ const METRICS = [
 
 const TESTIMONIALS = [
   { name: 'Amina K.', city: 'Paris', text: "Service impeccable ! Mon colis est arrivé à Dakar en 4 jours. Le suivi en temps réel m'a rassuré tout au long du trajet.", stars: 5 },
-  { name: 'Jean-Pierre M.', city: 'Calais', text: "Très professionnel. L'équipe a été réactive pour la validation de ma soumission. Je recommande vivement Youms Logistics.", stars: 5 },
+  { name: 'Jean-Pierre M.', city: 'Perpignan', text: "Très professionnel. L'équipe a été réactive pour la validation de ma soumission. Je recommande vivement Youms Logistics.", stars: 5 },
   { name: 'Fatou D.', city: 'Bruxelles', text: "J'ai envoyé des pièces auto au Cameroun. Le transport routier était la bonne solution et tout s'est bien passé. Merci !", stars: 5 },
 ];
 

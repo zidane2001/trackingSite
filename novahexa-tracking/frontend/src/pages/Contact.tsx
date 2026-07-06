@@ -130,21 +130,28 @@ export function Contact() {
                   <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900">Adresse</p>
-                    <p className="text-sm text-slate-500">5 Rue du Beau Marais, 62100 Calais, France</p>
+                    <p className="text-sm text-slate-500">26 Rue Charles Fabry, 66000 Perpignan, France</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">Téléphone</p>
-                    <p className="text-sm text-slate-500">+33 3 21 00 00 00</p>
+                    <p className="text-sm font-semibold text-slate-900">WhatsApp</p>
+                    <a
+                      href="https://wa.me/33656817785"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-slate-500 hover:text-green-600 transition-colors duration-200"
+                    >
+                      +33 6 56 81 77 85
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900">Email</p>
-                    <p className="text-sm text-slate-500">contact@youmslogistics.com</p>
+                    <p className="text-sm text-slate-500">youmslogistics@gmail.com</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -160,7 +167,7 @@ export function Contact() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-48">
               <iframe
                 title="Localisation Youms Logistics"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=1.85,50.94,1.87,50.95&layer=mapnik&marker=50.945,1.855"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=2.88,42.69,2.91,42.71&layer=mapnik&marker=42.6988,2.8959"
                 className="w-full h-full border-0"
                 loading="lazy"
               />

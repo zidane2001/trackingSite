@@ -80,10 +80,10 @@ export function Footer() {
           <FooterSection>
             <h3 className="font-bold text-lg mb-6">Contact</h3>
             <div className="space-y-3 text-sm text-slate-300">
-              <p>5 Rue du Beau Marais</p>
-              <p>62100 Calais, France</p>
-              <p>+33 3 21 00 00 00</p>
-              <p className="text-gold">contact@youmslogistics.com</p>
+              <p>26 Rue Charles Fabry</p>
+              <p>66000 Perpignan, France</p>
+              <p>+33 6 56 81 77 85</p>
+              <p className="text-gold">youmslogistics@gmail.com</p>
             </div>
           </FooterSection>
         </div>
