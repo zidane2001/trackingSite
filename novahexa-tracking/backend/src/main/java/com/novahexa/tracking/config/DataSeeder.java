@@ -3,6 +3,7 @@ package com.novahexa.tracking.config;
 import com.novahexa.tracking.domain.*;
 import com.novahexa.tracking.repository.AppUserRepository;
 import com.novahexa.tracking.repository.ParcelRepository;
+import com.novahexa.tracking.repository.SiteSettingsRepository;
 import com.novahexa.tracking.service.TrackingNumberService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -26,6 +27,7 @@ public class DataSeeder implements CommandLineRunner {
     private final JdbcTemplate jdbc;
     private final ParcelRepository parcels;
     private final TrackingNumberService trackingNumbers;
+    private final SiteSettingsRepository siteSettings;
 
     @Value("${app.admin.email:admin@youmslogistics.local}")
     private String adminEmail;
@@ -34,12 +36,14 @@ public class DataSeeder implements CommandLineRunner {
     private String adminPassword;
 
     public DataSeeder(AppUserRepository users, PasswordEncoder encoder, JdbcTemplate jdbc,
-                       ParcelRepository parcels, TrackingNumberService trackingNumbers) {
+                       ParcelRepository parcels, TrackingNumberService trackingNumbers,
+                       SiteSettingsRepository siteSettings) {
         this.users = users;
         this.encoder = encoder;
         this.jdbc = jdbc;
         this.parcels = parcels;
         this.trackingNumbers = trackingNumbers;
+        this.siteSettings = siteSettings;
     }
 
     @Override
@@ -113,5 +117,32 @@ public class DataSeeder implements CommandLineRunner {
         } else {
             log.info(">>> Compte admin déjà existant et à jour : {}", adminEmail);
         }
+
+        // Créer les settings par défaut seulement s'ils n'existent pas
+        if (siteSettings.findFirstByOrderByIdAsc().isEmpty()) {
+            SiteSettings defaultSettings = createDefaultSettings();
+            siteSettings.save(defaultSettings);
+            log.info(">>> Site settings par défaut créés");
+        } else {
+            log.info(">>> Site settings déjà existants (non modifiés)");
+        }
+    }
+
+    private SiteSettings createDefaultSettings() {
+        SiteSettings settings = new SiteSettings();
+        settings.setAddress("26 Rue Charles Fabry, 66000 Perpignan, France");
+        settings.setWhatsappNumber("+33 6 00 00 00 00");
+        settings.setEmail("youmslogistic@gmail.com");
+        settings.setHours("Mon - Sat: 8:00 AM - 7:00 PM");
+        settings.setCompanyName("Youms Logistics");
+        settings.setCompanyDescription("International transport & logistics. Track your packages in real time across 150+ countries.");
+        settings.setFacebookUrl("");
+        settings.setTwitterUrl("");
+        settings.setInstagramUrl("");
+        settings.setLinkedinUrl("");
+        settings.setPackagesDelivered(50000);
+        settings.setCountriesCovered(150);
+        settings.setCopyrightText("All rights reserved.");
+        return settings;
     }
 }
