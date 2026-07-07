@@ -57,6 +57,35 @@ function createTransportIcon(mode?: string, bearing?: number): L.DivIcon {
   });
 }
 
+/** Paused transport-mode icon: shows transport emoji with blinking amber indicator next to it. */
+function createPausedTransportIcon(mode?: string, bearing?: number): L.DivIcon {
+  const transportIcon = mode === 'AIR' ? '✈️' : mode === 'MER' ? '🚢' : mode === 'ROUTE' ? '🚛' : '📦';
+  const color = '#f59e0b'; // Amber color for paused state
+  const transportColor = getTransportColor(mode);
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;transform:rotate(${bearing ?? 0}deg);">
+        <div style="position:absolute;width:40px;height:40px;background:${transportColor}22;border:2px solid ${transportColor}66;border-radius:50%;animation:pulse-ring 2s infinite;"></div>
+        <div style="width:32px;height:32px;background:#fff;border:3px solid ${transportColor};border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;position:relative;z-index:2;transform:rotate(-${bearing ?? 0}deg);">
+          ${transportIcon}
+        </div>
+        <div style="position:absolute;top:-10px;right:-10px;width:24px;height:24px;background:${color};border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.4);animation:blink-paused 1s ease-in-out infinite;transform:rotate(-${bearing ?? 0}deg);z-index:3;">
+          ⏸
+        </div>
+      </div>
+      <style>
+        @keyframes blink-paused {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(0.85); }
+        }
+      </style>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+}
+
 function createWaypointIcon(reached: boolean): L.DivIcon {
   return L.divIcon({
     className: 'custom-marker',
@@ -219,8 +248,9 @@ export function ParcelMap({
         const initialPos = simulatePosition(p, routeForSim);
         if (initialPos) {
           const bearing = getBearing(p, routeForSim) ?? 0;
+          const isPaused = p.status === 'PAUSED';
           const animMarker = L.marker([initialPos.lat, initialPos.lng], {
-            icon: createTransportIcon(p.transportMode, bearing),
+            icon: isPaused ? createPausedTransportIcon(p.transportMode, bearing) : createTransportIcon(p.transportMode, bearing),
           }).addTo(map);
 
           const iconLabel = p.transportMode === 'AIR' ? '✈️ Avion' : p.transportMode === 'MER' ? '🚢 Bateau' : p.transportMode === 'ROUTE' ? '🚛 Camion' : '📦 Colis';
@@ -254,7 +284,8 @@ export function ParcelMap({
       if (showAll && showPosition && p.status !== 'PENDING' && p.status !== 'REFUSED') {
         const pos = simulatePosition(p, routeForSim);
         if (pos) {
-          L.marker([pos.lat, pos.lng], { icon: createTransportIcon(p.transportMode, 0) })
+          const isPaused = p.status === 'PAUSED';
+          L.marker([pos.lat, pos.lng], { icon: isPaused ? createPausedTransportIcon(p.transportMode, 0) : createTransportIcon(p.transportMode, 0) })
             .addTo(map)
             .bindPopup(`<div style="font-size:12px;"><strong>${getTransportIcon(p.transportMode)} ${p.name}</strong><br/>${p.trackingNumber}</div>`);
           allPoints.push([pos.lat, pos.lng]);

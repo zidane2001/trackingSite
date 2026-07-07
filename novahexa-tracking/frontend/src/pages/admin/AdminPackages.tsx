@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2, Plus, Pencil, ImageIcon } from 'lucide-react';
+import { Package, Trash2, Search, X, FileText, Tag, Truck, CheckCircle2, Loader2, Plus, Pencil, ImageIcon, Pause, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -60,6 +60,32 @@ export function AdminPackages() {
       loadPackages();
     } catch (err: any) {
       setActionError(err?.message || 'Erreur lors de la marquer comme livré');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handlePause = async (pkg: PackageItem) => {
+    setActionLoading(pkg.id);
+    setActionError(null);
+    try {
+      await packagesApi.pause(pkg.trackingNumber);
+      loadPackages();
+    } catch (err: any) {
+      setActionError(err?.message || 'Erreur lors de la mise en pause');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleResume = async (pkg: PackageItem) => {
+    setActionLoading(pkg.id);
+    setActionError(null);
+    try {
+      await packagesApi.resume(pkg.trackingNumber);
+      loadPackages();
+    } catch (err: any) {
+      setActionError(err?.message || 'Erreur lors de la reprise');
     } finally {
       setActionLoading(null);
     }
@@ -170,8 +196,18 @@ export function AdminPackages() {
                       </button>
                     )}
                     {pkg.status === 'IN_TRANSIT' && (
-                      <button onClick={(e) => { e.stopPropagation(); handleSetDelivered(pkg); }} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition" title="Marquer livré">
-                        {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); handlePause(pkg); }} disabled={actionLoading === pkg.id} className="text-amber-500 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50 transition" title="Mettre en pause">
+                          {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Pause className="w-4 h-4" />}
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); handleSetDelivered(pkg); }} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition" title="Marquer livré">
+                          {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                        </button>
+                      </>
+                    )}
+                    {pkg.status === 'PAUSED' && (
+                      <button onClick={(e) => { e.stopPropagation(); handleResume(pkg); }} disabled={actionLoading === pkg.id} className="text-green-500 hover:text-green-700 p-1.5 rounded-lg hover:bg-green-50 transition" title="Reprendre">
+                        {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                       </button>
                     )}
                     <button onClick={(e) => { e.stopPropagation(); pdfApi.downloadQuote(pkg.trackingNumber); }} className="text-slate-400 hover:text-blue-500 p-1.5 rounded-lg hover:bg-blue-50 transition" title="Devis PDF">
@@ -254,8 +290,18 @@ export function AdminPackages() {
                             </button>
                           )}
                           {pkg.status === 'IN_TRANSIT' && (
-                            <button onClick={(e) => { e.stopPropagation(); handleSetDelivered(pkg); }} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 transition-colors p-1" title="Marquer livré">
-                              {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                            <>
+                              <button onClick={(e) => { e.stopPropagation(); handlePause(pkg); }} disabled={actionLoading === pkg.id} className="text-amber-500 hover:text-amber-700 transition-colors p-1" title="Mettre en pause">
+                                {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Pause className="w-4 h-4" />}
+                              </button>
+                              <button onClick={(e) => { e.stopPropagation(); handleSetDelivered(pkg); }} disabled={actionLoading === pkg.id} className="text-emerald-500 hover:text-emerald-700 transition-colors p-1" title="Marquer livré">
+                                {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                              </button>
+                            </>
+                          )}
+                          {pkg.status === 'PAUSED' && (
+                            <button onClick={(e) => { e.stopPropagation(); handleResume(pkg); }} disabled={actionLoading === pkg.id} className="text-green-500 hover:text-green-700 transition-colors p-1" title="Reprendre">
+                              {actionLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                             </button>
                           )}
                           <button onClick={(e) => { e.stopPropagation(); pdfApi.downloadQuote(pkg.trackingNumber); }} className="text-slate-400 hover:text-blue-500 transition-colors p-1" title="Devis PDF">

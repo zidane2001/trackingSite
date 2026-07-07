@@ -93,6 +93,10 @@ export const packagesApi = {
     api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/in-transit`, {}),
   setDelivered: (trackingNumber: string) =>
     api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/delivered`, {}),
+  pause: (trackingNumber: string) =>
+    api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/pause`, {}),
+  resume: (trackingNumber: string) =>
+    api.patch<PackageItem>(`/api/admin/packages/${trackingNumber}/resume`, {}),
   addWaypoint: (id: string, data: { label: string; lat: number; lng: number; stopDurationMinutes?: number }) =>
     api.post<PackageItem>(`/api/admin/packages/${id}/waypoints`, data),
   deleteWaypoint: (packageId: string, waypointId: string) =>

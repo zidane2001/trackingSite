@@ -22,6 +22,7 @@ export type PackageStatus =
   | 'VALIDATED'
   | 'REFUSED'
   | 'IN_TRANSIT'
+  | 'PAUSED'
   | 'DELIVERED';
 
 export const STATUS_LABELS: Record<PackageStatus, string> = {
@@ -29,6 +30,7 @@ export const STATUS_LABELS: Record<PackageStatus, string> = {
   VALIDATED: 'Validé',
   REFUSED: 'Refusé',
   IN_TRANSIT: 'En transit',
+  PAUSED: 'En pause',
   DELIVERED: 'Livré',
 };
 
@@ -37,6 +39,7 @@ export const STATUS_COLORS: Record<PackageStatus, string> = {
   VALIDATED: 'bg-blue-100 text-blue-700 border-blue-200',
   REFUSED: 'bg-red-100 text-red-700 border-red-200',
   IN_TRANSIT: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+  PAUSED: 'bg-orange-100 text-orange-700 border-orange-200',
   DELIVERED: 'bg-emerald-100 text-emerald-700 border-emerald-200',
 };
 

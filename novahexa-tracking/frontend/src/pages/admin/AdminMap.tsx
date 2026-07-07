@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Map as MapIcon, Plus, X, Loader2, Save, Package, MapPin, Trash2, ImagePlus } from 'lucide-react';
+import { Map as MapIcon, Plus, X, Loader2, Save, Package, MapPin, Trash2, ImagePlus, Pause, Play } from 'lucide-react';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { ParcelMap } from '../../components/ParcelMap';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -136,7 +136,7 @@ export function AdminMap() {
   }, [mode, clients.length]);
 
   const activePkgs = packages.filter(
-    (p) => p.status === 'IN_TRANSIT' || p.status === 'VALIDATED',
+    (p) => p.status === 'IN_TRANSIT' || p.status === 'VALIDATED' || p.status === 'PAUSED',
   );
 
   const resetForm = () => {
@@ -764,15 +764,39 @@ export function AdminMap() {
                   </button>
                 )}
                 {selectedPkg.status === 'IN_TRANSIT' && (
+                  <>
+                    <button
+                      onClick={async () => {
+                        await packagesApi.pause(selectedPkg.trackingNumber);
+                        loadPackages();
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl font-bold text-sm hover:bg-amber-600 transition"
+                    >
+                      <Pause className="w-4 h-4" />
+                      Mettre en pause
+                    </button>
+                    <button
+                      onClick={async () => {
+                        await packagesApi.setDelivered(selectedPkg.trackingNumber);
+                        loadPackages();
+                        setSelectedPkg(null);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition"
+                    >
+                      ✅ Marquer comme livré
+                    </button>
+                  </>
+                )}
+                {selectedPkg.status === 'PAUSED' && (
                   <button
                     onClick={async () => {
-                      await packagesApi.setDelivered(selectedPkg.trackingNumber);
+                      await packagesApi.resume(selectedPkg.trackingNumber);
                       loadPackages();
-                      setSelectedPkg(null);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 text-white rounded-xl font-bold text-sm hover:bg-green-600 transition"
                   >
-                    ✅ Marquer comme livré
+                    <Play className="w-4 h-4" />
+                    Reprendre le colis
                   </button>
                 )}
                 <button

@@ -85,6 +85,18 @@ public class AdminParcelController {
         return ParcelView.of(parcels.setDelivered(trackingNumber, resolveAdmin(auth)));
     }
 
+    /** Mettre le colis en pause. */
+    @PatchMapping("/{trackingNumber}/pause")
+    public ParcelView pause(@PathVariable String trackingNumber, Authentication auth) {
+        return ParcelView.of(parcels.pause(trackingNumber, resolveAdmin(auth)));
+    }
+
+    /** Reprendre le colis (play). */
+    @PatchMapping("/{trackingNumber}/resume")
+    public ParcelView resume(@PathVariable String trackingNumber, Authentication auth) {
+        return ParcelView.of(parcels.resume(trackingNumber, resolveAdmin(auth)));
+    }
+
     /** Ajouter un waypoint. */
     @PostMapping("/{parcelId}/waypoints")
     public ParcelView addWaypoint(@PathVariable String parcelId, @RequestBody AddWaypointRequest body) {

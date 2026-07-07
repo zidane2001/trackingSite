@@ -235,6 +235,32 @@ public class ParcelService {
         return saved;
     }
 
+    /** Mettre le colis en pause. */
+    @Transactional
+    public Parcel pause(String trackingNumber, AppUser admin) {
+        Parcel p = getByTrackingNumber(trackingNumber);
+        if (p.getStatus() != ParcelStatus.IN_TRANSIT) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le colis n'est pas en transit");
+        }
+        p.setStatus(ParcelStatus.PAUSED);
+        p.getEvents().add(new TrackingEvent(p, EventType.IN_TRANSIT,
+                "Colis mis en pause par l'administrateur"));
+        return parcels.save(p);
+    }
+
+    /** Reprendre le colis (play). */
+    @Transactional
+    public Parcel resume(String trackingNumber, AppUser admin) {
+        Parcel p = getByTrackingNumber(trackingNumber);
+        if (p.getStatus() != ParcelStatus.PAUSED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le colis n'est pas en pause");
+        }
+        p.setStatus(ParcelStatus.IN_TRANSIT);
+        p.getEvents().add(new TrackingEvent(p, EventType.IN_TRANSIT,
+                "Colis repris par l'administrateur"));
+        return parcels.save(p);
+    }
+
     /** Ajouter un waypoint à un colis. */
     @Transactional
     public Waypoint addWaypoint(String parcelId, String label, double lat, double lng, Integer stopDurationMinutes) {

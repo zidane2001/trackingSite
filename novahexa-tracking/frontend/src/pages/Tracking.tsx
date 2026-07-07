@@ -107,6 +107,13 @@ export function Tracking() {
                 </p>
               </div>
             )}
+            {result.status === 'PAUSED' && (
+              <div className="px-6 py-4 bg-orange-50 border-b border-orange-100">
+                <p className="text-sm text-orange-700">
+                  Ce colis est actuellement en pause. La livraison reprendra bientôt.
+                </p>
+              </div>
+            )}
 
             {/* Real Leaflet map */}
             <div className="relative">
