@@ -71,7 +71,7 @@ public class AdminSiteSettingsController {
         SiteSettings settings = new SiteSettings();
         settings.setAddress("26 Rue Charles Fabry, 66000 Perpignan, France");
         settings.setWhatsappNumber("+33 6 00 00 00 00");
-        settings.setEmail("contact@youmslogistics.com");
+        settings.setEmail("youmslogistic@gmail.com");
         settings.setHours("Mon - Sat: 8:00 AM - 7:00 PM");
         settings.setCompanyName("Youms Logistics");
         settings.setCompanyDescription("International transport & logistics. Track your packages in real time across 150+ countries.");

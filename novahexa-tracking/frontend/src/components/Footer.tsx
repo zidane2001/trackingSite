@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { IMAGES } from '../config/images';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useSettings } from '../contexts/SettingsContext';
 
 function FooterSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
@@ -17,6 +18,7 @@ function FooterSection({ children, className = '' }: { children: React.ReactNode
 
 export function Footer() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
 
   const NAV_LINKS = [
     { to: '/', label: t('footer.home') },
@@ -47,9 +49,9 @@ export function Footer() {
                 className="h-20 w-20 sm:h-24 sm:w-24 rounded-2xl object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <div>
-                <span className="font-bold text-lg transition-colors duration-300 group-hover:text-gold block">Youms Logistics</span>
+                <span className="font-bold text-lg transition-colors duration-300 group-hover:text-gold block">{settings?.companyName || 'Youms Logistics'}</span>
                 <p className="text-xs sm:text-sm text-slate-400 leading-relaxed hidden sm:block">
-                  {t('footer.company_short')}
+                  {settings?.companyDescription || t('footer.company_short')}
                 </p>
               </div>
             </Link>
@@ -99,15 +101,15 @@ export function Footer() {
                   <div className="flex items-start gap-2">
                     <svg className="w-4 h-4 text-gold/60 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     <div>
-                      <p>26 Rue Charles Fabry</p>
+                      <p>{settings?.address || '26 Rue Charles Fabry'}</p>
                       <p>66000 Perpignan, France</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <svg className="w-4 h-4 text-gold/60 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                     <div>
-                      <a href="https://wa.me/33656817785" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors duration-300">+33 6 56 81 77 85</a>
-                      <p className="text-gold">youmslogistics@gmail.com</p>
+                      <a href={`https://wa.me/${settings?.whatsappNumber?.replace(/\D/g, '') || '33656817785'}`} target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors duration-300">{settings?.whatsappNumber || '+33 6 56 81 77 85'}</a>
+                      <p className="text-gold">{settings?.email || 'youmslogistic@gmail.com'}</p>
                     </div>
                   </div>
                 </div>
@@ -119,7 +121,7 @@ export function Footer() {
         <div className="mt-6 sm:mt-10 pt-5 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <img src={IMAGES.LOGO_WITH_BG} alt="Youms Logistics" className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg object-contain opacity-60" />
-            <span className="text-[11px] sm:text-xs text-slate-500">© {new Date().getFullYear()} Youms Logistics. {t('footer.copyright')}</span>
+            <span className="text-[11px] sm:text-xs text-slate-500">© {new Date().getFullYear()} {settings?.companyName || 'Youms Logistics'}. {settings?.copyrightText || t('footer.copyright')}</span>
           </div>
           <div className="hidden sm:flex items-center gap-4">
             <div className="h-2 w-2 rounded-full bg-gold/40 animate-pulse-glow" />

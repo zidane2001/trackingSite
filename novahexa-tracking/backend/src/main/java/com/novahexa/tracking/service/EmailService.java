@@ -24,7 +24,7 @@ public class EmailService {
     @Value("${resend.api-key:}")
     private String apiKey;
 
-    @Value("${resend.from-email:noreply@youmslogistics.com}")
+    @Value("${resend.from-email:noreply@youmslogistics.fr}")
     private String fromEmail;
 
     @Value("${resend.from-name:Youms Logistics}")
@@ -203,7 +203,7 @@ public class EmailService {
             + "</td></tr>"
             + "<tr><td style='background:#f9fafb;padding:20px 32px;text-align:center;'>"
             + "<p style='margin:0;color:#aaa;font-size:11px;'>Youms Logistics — 5 Rue du Beau Marais, 62100 Calais</p>"
-            + "<p style='margin:4px 0 0;color:#aaa;font-size:11px;'>contact@youmslogistics.com | +33 3 21 00 00 00</p>"
+            + "<p style='margin:4px 0 0;color:#aaa;font-size:11px;'>youmslogistic@gmail.com | +33 3 21 00 00 00</p>"
             + "</td></tr></table></td></tr></table></body></html>";
         return tpl
             .replace("{{accent}}", accentColor)

@@ -43,7 +43,7 @@ cloudinary:
 # Créer un compte sur https://resend.com et obtenir une clé API
 resend:
   api-key: ${RESEND_API_KEY:}
-  from-email: ${RESEND_FROM_EMAIL:noreply@youmslogistics.com}
+  from-email: ${RESEND_FROM_EMAIL:noreply@youmslogistic.fr}
   from-name: ${RESEND_FROM_NAME:Youms Logistics}
 
 app:

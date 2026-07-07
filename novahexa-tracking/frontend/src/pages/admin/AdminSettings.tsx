@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../../components/DashboardLayout';
 import { siteSettingsApi, type SiteSettings } from '../../lib/api';
+import { useSettings } from '../../contexts/SettingsContext';
 import {
   Settings,
   MapPin,
@@ -24,6 +25,7 @@ import {
 
 export function AdminSettings() {
   const { t } = useTranslation();
+  const { settings: contextSettings, refreshSettings } = useSettings();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,6 +54,7 @@ export function AdminSettings() {
       await siteSettingsApi.update(settings);
       setMessage({ type: 'success', text: 'Settings saved successfully' });
       await loadSettings();
+      await refreshSettings();
     } catch (error) {
       setMessage({ type: 'error', text: 'Error saving settings' });
     } finally {

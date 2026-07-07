@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Send, MapPin, Phone, Mail, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { contactApi } from '../lib/api';
+import { useSettings } from '../contexts/SettingsContext';
 
 export function Contact() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -132,7 +134,7 @@ export function Contact() {
                   <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{t('contact.address_label')}</p>
-                    <p className="text-sm text-slate-500">{t('contact.address_value')}</p>
+                    <p className="text-sm text-slate-500">{settings?.address || t('contact.address_value')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -140,12 +142,12 @@ export function Contact() {
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{t('contact.whatsapp_label')}</p>
                     <a
-                      href="https://wa.me/33656817785"
+                      href={`https://wa.me/${settings?.whatsappNumber?.replace(/\D/g, '') || '33656817785'}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-slate-500 hover:text-green-600 transition-colors duration-200"
                     >
-                      +33 6 56 81 77 85
+                      {settings?.whatsappNumber || '+33 6 56 81 77 85'}
                     </a>
                   </div>
                 </div>
@@ -153,14 +155,14 @@ export function Contact() {
                   <Mail className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{t('contact.email_label')}</p>
-                    <p className="text-sm text-slate-500">youmslogistics@gmail.com</p>
+                    <p className="text-sm text-slate-500">{settings?.email || 'youmslogistic@gmail.com'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{t('contact.hours_label')}</p>
-                    <p className="text-sm text-slate-500">{t('contact.hours_value')}</p>
+                    <p className="text-sm text-slate-500">{settings?.hours || t('contact.hours_value')}</p>
                   </div>
                 </div>
               </div>

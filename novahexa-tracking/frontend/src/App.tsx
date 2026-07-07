@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './i18n';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -65,7 +66,8 @@ function PageLoader() {
 export function App() {
   return (
     <AuthProvider>
-      <Router>
+      <SettingsProvider>
+        <Router>
         <div className="min-h-screen flex flex-col font-sans text-slate-900 overflow-x-hidden">
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -216,6 +218,7 @@ export function App() {
           </Suspense>
         </div>
       </Router>
+      </SettingsProvider>
     </AuthProvider>
   );
 }
