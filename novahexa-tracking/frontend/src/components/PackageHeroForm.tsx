@@ -7,7 +7,6 @@ import {
   MapPin,
   Ruler,
   Weight,
-  CalendarDays,
   Loader2,
   CheckCircle2,
   Copy,
@@ -20,9 +19,6 @@ import {
 import {
   estimatePrice,
   formatEUR,
-  MODE_LABELS,
-  DELAY_LABELS,
-  MATERIAL_LABELS,
   type TransportMode,
   type DeliveryDelay,
   type MaterialType,
@@ -324,22 +320,13 @@ export function PackageHeroForm() {
          <Labeled text={t('packageHero.destination')} icon={MapPin}>
            <input className={field} value={form.destinationAddress} onChange={setField('destinationAddress')} placeholder={t('packageHero.destination_placeholder')} required />
          </Labeled>
-       </div>
-
-       {/* Row 4: Mode + Delay */}
-       <div className="grid grid-cols-2 gap-2 mb-2">
-         <Labeled text={t('packageHero.mode')} icon={Package}>
-           <select className={field} value={form.mode} onChange={setField('mode')}>
+       </div>      {/* Row 4: Mode */}
+      <div className="grid grid-cols-2 gap-2 mb-2">
+        <Labeled text={t('packageHero.mode')} icon={Package}>
+          <select className={field} value={form.mode} onChange={setField('mode')}>
              <option value="ROUTE" className="bg-[#060f24]">{t('packageHero.mode_route')}</option>
             <option value="MER" className="bg-[#060f24]">{t('packageHero.mode_mer')}</option>
             <option value="AIR" className="bg-[#060f24]">{t('packageHero.mode_air')}</option>
-           </select>
-         </Labeled>
-         <Labeled text={t('packageHero.delay')} icon={CalendarDays}>
-           <select className={field} value={form.delay} onChange={setField('delay')}>
-             <option value="STANDARD" className="bg-[#060f24]">{t('packageHero.delay_standard')}</option>
-            <option value="EXPRESS" className="bg-[#060f24]">{t('packageHero.delay_express')}</option>
-            <option value="JOUR_MEME" className="bg-[#060f24]">{t('packageHero.delay_jour_meme')}</option>
            </select>
          </Labeled>
        </div>
