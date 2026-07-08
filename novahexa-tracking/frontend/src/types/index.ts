@@ -30,7 +30,7 @@ export const STATUS_LABELS: Record<PackageStatus, string> = {
   VALIDATED: 'Validé',
   REFUSED: 'Refusé',
   IN_TRANSIT: 'En transit',
-  PAUSED: 'En pause',
+  PAUSED: 'En attente',
   DELIVERED: 'Livré',
 };
 
@@ -44,6 +44,7 @@ export const STATUS_COLORS: Record<PackageStatus, string> = {
 };
 
 export type TransportMode = 'ROUTE' | 'AIR' | 'MER';
+export type DeliveryDelay = 'STANDARD' | 'EXPRESS' | 'JOUR_MEME';
 
 export interface Waypoint {
   id: string;
@@ -98,6 +99,7 @@ export interface PackageItem {
   destinationLng?: number;
   transportMode?: TransportMode;
   deliveryDelay?: string;
+  customDeliveryDelay?: string;
   material?: string;
   weightKg?: number;
   heightCm?: number;

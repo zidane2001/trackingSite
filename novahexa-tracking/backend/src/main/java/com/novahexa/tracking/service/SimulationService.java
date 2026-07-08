@@ -258,6 +258,12 @@ public class SimulationService {
         double ratio = Math.min(1.0, (double) elapsedMs / totalDurationMs);
         if (parcel.getStatus() == ParcelStatus.DELIVERED) ratio = 1;
         if (parcel.getStatus() == ParcelStatus.PENDING || parcel.getStatus() == ParcelStatus.REFUSED) ratio = 0;
+        if (parcel.getStatus() == ParcelStatus.PAUSED) {
+            // Calculate ratio at pause time and freeze it
+            Instant pauseTime = parcel.getUpdatedAt() != null ? parcel.getUpdatedAt() : parcel.getCreatedAt();
+            long pauseElapsedMs = Math.max(0, pauseTime.toEpochMilli() - departureTime.toEpochMilli());
+            ratio = Math.min(1.0, (double) pauseElapsedMs / totalDurationMs);
+        }
 
         return interpolateRoute(parcel, ratio);
     }

@@ -145,7 +145,7 @@ public class ParcelService {
             allImages.addAll(imageUrls);
             p.setImageUrls(String.join(",", allImages));
         }
-        p.getEvents().add(new TrackingEvent(p, EventType.VALIDATED, "Validée par l'administrateur"));
+        p.getEvents().add(new TrackingEvent(p, EventType.VALIDATED, "Validée"));
         Parcel saved = parcels.save(p);
         notificationService.onValidation(saved);
         return saved;
@@ -167,7 +167,7 @@ public class ParcelService {
         p.setStatus(ParcelStatus.REFUSED);
         p.setRefusalReason(reason);
         p.getEvents().add(new TrackingEvent(p, EventType.REFUSED,
-                "Refusée par l'administrateur : " + reason));
+                "Refusée : " + reason));
         Parcel saved = parcels.save(p);
 
         // Cahier §9 : notification de refus avec motif
@@ -244,7 +244,7 @@ public class ParcelService {
         }
         p.setStatus(ParcelStatus.PAUSED);
         p.getEvents().add(new TrackingEvent(p, EventType.IN_TRANSIT,
-                "Colis mis en pause par l'administrateur"));
+                "Colis en attente"));
         return parcels.save(p);
     }
 
@@ -257,7 +257,7 @@ public class ParcelService {
         }
         p.setStatus(ParcelStatus.IN_TRANSIT);
         p.getEvents().add(new TrackingEvent(p, EventType.IN_TRANSIT,
-                "Colis repris par l'administrateur"));
+                "Colis repris"));
         return parcels.save(p);
     }
 
@@ -299,6 +299,7 @@ public class ParcelService {
         if (body.destinationAddress() != null) p.setDestinationAddress(body.destinationAddress());
         if (body.transportMode() != null) p.setTransportMode(body.transportMode());
         if (body.deliveryDelay() != null) p.setDeliveryDelay(body.deliveryDelay());
+        if (body.customDeliveryDelay() != null) p.setCustomDeliveryDelay(body.customDeliveryDelay());
         if (body.material() != null) p.setMaterial(body.material());
         if (body.weightKg() != null) p.setWeightKg(body.weightKg());
         if (body.heightCm() != null) p.setHeightCm(body.heightCm());
@@ -331,6 +332,7 @@ public class ParcelService {
         p.setDestinationLat(req.destinationLat());
         p.setDestinationLng(req.destinationLng());
         p.setTransportMode(req.transportMode());
+        p.setDeliveryDelay(req.deliveryDelay());
         p.setMaterial(req.material());
         p.setWeightKg(req.weightKg());
         p.setHeightCm(req.heightCm());
@@ -348,7 +350,8 @@ public class ParcelService {
         if (req.imageUrls() != null && !req.imageUrls().isEmpty()) {
             p.setImageUrls(String.join(",", req.imageUrls()));
         }
-        p.getEvents().add(new TrackingEvent(p, EventType.VALIDATED, "Créé et validé par l'administrateur"));
+        p.setCustomDeliveryDelay(req.customDeliveryDelay());
+        p.getEvents().add(new TrackingEvent(p, EventType.VALIDATED, "Créé et validé"));
         Parcel saved = parcels.save(p);
         // Notifier le client si un propriétaire est assigné
         notificationService.onValidation(saved);
@@ -360,11 +363,12 @@ public class ParcelService {
         String receiverName, String receiverEmail, String receiverPhone, String receiverAddress,
         String originAddress, Double originLat, Double originLng,
         String destinationAddress, Double destinationLat, Double destinationLng,
-        TransportMode transportMode, MaterialType material,
+        TransportMode transportMode, DeliveryDelay deliveryDelay, MaterialType material,
         java.math.BigDecimal weightKg, Integer heightCm, Integer widthCm, Integer lengthCm,
         java.math.BigDecimal estimatedCost,
         Integer demoDurationMinutes, Integer estimatedDurationMinutes,
-        java.util.UUID ownerId, List<String> imageUrls
+        java.util.UUID ownerId, List<String> imageUrls,
+        String customDeliveryDelay
     ) {}
 
     /** Supprimer un colis. */

@@ -133,6 +133,7 @@ public class AdminParcelController {
             String destinationAddress,
             TransportMode transportMode,
             DeliveryDelay deliveryDelay,
+            String customDeliveryDelay,
             MaterialType material,
             BigDecimal weightKg,
             Integer heightCm,

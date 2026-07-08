@@ -55,15 +55,16 @@ const initial: FormState = {
   senderEmail: '',
   senderPhone: '',
   name: '',
-  material: 'general',
+  material: 'GENERAL',
   weightKg: '',
   heightCm: '',
   widthCm: '',
   lengthCm: '',
   originAddress: '',
   destinationAddress: '',
-  mode: 'route',
-  delay: 'standard',
+  mode: 'ROUTE',
+  delay: 'STANDARD',
+
   shippingDate: '',
 };
 
@@ -141,6 +142,7 @@ export function PackageHeroForm() {
       estimatePrice({
         mode: form.mode,
         delay: form.delay,
+
         material: form.material,
         weightKg: num(form.weightKg),
         heightCm: num(form.heightCm),
@@ -163,6 +165,7 @@ export function PackageHeroForm() {
         .estimate({
           mode: form.mode,
           delay: form.delay,
+
           material: form.material,
           weightKg: num(form.weightKg) || undefined,
           heightCm: num(form.heightCm) || undefined,
@@ -213,6 +216,7 @@ export function PackageHeroForm() {
         destinationLng: destCoords?.[1],
         mode: form.mode,
         delay: form.delay,
+
         shippingDate: form.shippingDate || undefined,
         estimatedCost,
         imageUrls: images.length > 0 ? images : undefined,
@@ -303,11 +307,11 @@ export function PackageHeroForm() {
          </Labeled>
          <Labeled text={t('packageHero.material')} icon={Package}>
            <select className={field} value={form.material} onChange={setField('material')}>
-             <option value="general" className="bg-[#060f24]">{t('packageHero.material_general')}</option>
-            <option value="auto_parts" className="bg-[#060f24]">{t('packageHero.material_auto_parts')}</option>
-            <option value="fragile" className="bg-[#060f24]">{t('packageHero.material_fragile')}</option>
-            <option value="electronique" className="bg-[#060f24]">{t('packageHero.material_electronique')}</option>
-            <option value="documents" className="bg-[#060f24]">{t('packageHero.material_documents')}</option>
+             <option value="GENERAL" className="bg-[#060f24]">{t('packageHero.material_general')}</option>
+            <option value="AUTO_PARTS" className="bg-[#060f24]">{t('packageHero.material_auto_parts')}</option>
+            <option value="FRAGILE" className="bg-[#060f24]">{t('packageHero.material_fragile')}</option>
+            <option value="ELECTRONIQUE" className="bg-[#060f24]">{t('packageHero.material_electronique')}</option>
+            <option value="DOCUMENTS" className="bg-[#060f24]">{t('packageHero.material_documents')}</option>
            </select>
          </Labeled>
        </div>
@@ -326,117 +330,114 @@ export function PackageHeroForm() {
        <div className="grid grid-cols-2 gap-2 mb-2">
          <Labeled text={t('packageHero.mode')} icon={Package}>
            <select className={field} value={form.mode} onChange={setField('mode')}>
-             <option value="route" className="bg-[#060f24]">{t('packageHero.mode_route')}</option>
-            <option value="mer" className="bg-[#060f24]">{t('packageHero.mode_mer')}</option>
-            <option value="air" className="bg-[#060f24]">{t('packageHero.mode_air')}</option>
+             <option value="ROUTE" className="bg-[#060f24]">{t('packageHero.mode_route')}</option>
+            <option value="MER" className="bg-[#060f24]">{t('packageHero.mode_mer')}</option>
+            <option value="AIR" className="bg-[#060f24]">{t('packageHero.mode_air')}</option>
            </select>
          </Labeled>
          <Labeled text={t('packageHero.delay')} icon={CalendarDays}>
            <select className={field} value={form.delay} onChange={setField('delay')}>
-             <option value="standard" className="bg-[#060f24]">{t('packageHero.delay_standard')}</option>
-            <option value="express" className="bg-[#060f24]">{t('packageHero.delay_express')}</option>
-            <option value="jour_meme" className="bg-[#060f24]">{t('packageHero.delay_jour_meme')}</option>
+             <option value="STANDARD" className="bg-[#060f24]">{t('packageHero.delay_standard')}</option>
+            <option value="EXPRESS" className="bg-[#060f24]">{t('packageHero.delay_express')}</option>
+            <option value="JOUR_MEME" className="bg-[#060f24]">{t('packageHero.delay_jour_meme')}</option>
            </select>
          </Labeled>
        </div>
 
-       {/* Advanced toggle */}
-       <button
-         type="button"
-         onClick={() => setExpanded(!expanded)}
-         className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-300 transition mb-2"
-       >
-         {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-         {expanded ? t('packageHero.less_options') : t('packageHero.more_options')}
-       </button>
+        {/* Advanced toggle */}
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-300 transition mb-2"
+        >
+          {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          {expanded ? t('packageHero.less_options') : t('packageHero.more_options')}
+        </button>
 
-       {/* Image upload (only for authenticated users) */}
-       {isAuthenticated && (
-         <div className="mb-2">
-           <button
-             type="button"
-             onClick={() => fileRef.current?.click()}
-             disabled={uploading}
-             className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-yellow-400 transition"
-           >
-             {uploading ? (
-               <><Loader2 className="w-3 h-3 animate-spin" /> {t('packageHero.uploading')}</>
-             ) : (
-               <><ImagePlus className="w-3 h-3" /> {t('packageHero.photos')}</>
-             )}
-           </button>
-           <input
-             ref={fileRef}
-             type="file"
-             accept="image/*"
-             multiple
-             className="hidden"
-             onChange={handleUpload}
-           />
-           {previews.length > 0 && (
-             <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
-               {previews.map((src, i) => (
-                 <div key={i} className="relative shrink-0 group">
-                   <img src={src} alt={t('packageHero.photo_alt', { index: i + 1 })} className="w-16 h-16 object-cover rounded-lg border border-white/10" />
-                   <button
-                     type="button"
-                     onClick={() => remove(i)}
-                     className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                   >
-                     <X className="w-3 h-3 text-white" />
-                   </button>
-                 </div>
-               ))}
-             </div>
-           )}
-         </div>
-       )}
-       {!isAuthenticated && (
-         <div className="mb-2 text-[10px] text-slate-500">
-           <ImagePlus className="inline w-3 h-3 -mt-0.5 mr-0.5" />
-           {t('packageHero.login_for_photos')}
-         </div>
-       )}
+        {/* Image upload (only for authenticated users) */}
+        {isAuthenticated && (
+          <div className="mb-2">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-yellow-400 transition"
+            >
+              {uploading ? (
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('packageHero.uploading')}</>
+              ) : (
+                <><ImagePlus className="w-3.5 h-3.5" /> {t('packageHero.photos')}</>
+              )}
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleUpload}
+            />
+            {previews.length > 0 && (
+              <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
+                {previews.map((src, i) => (
+                  <div key={i} className="relative shrink-0 group">
+                    <img src={src} alt={t('packageHero.photo_alt', { index: i + 1 })} className="w-16 h-16 object-cover rounded-lg border border-white/10" />
+                    <button
+                      type="button"
+                      onClick={() => remove(i)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {!isAuthenticated && (
+          <div className="mb-2 text-[10px] text-slate-500">
+            <ImagePlus className="inline w-3 h-3 -mt-0.5 mr-0.5" />
+            {t('packageHero.login_for_photos')}
+          </div>
+        )}
 
-       {/* Advanced fields (collapsible) */}
-       {expanded && (
-         <div className="grid grid-cols-4 gap-2 mb-2">
-           <Labeled text={t('packageHero.weight')} icon={Weight}>
-             <input type="number" min="0" step="0.1" className={field} value={form.weightKg} onChange={setField('weightKg')} placeholder={t('packageHero.weight_placeholder')} />
-           </Labeled>
-           <Labeled text={t('packageHero.height')} icon={Ruler}>
-             <input type="number" min="0" className={field} value={form.heightCm} onChange={setField('heightCm')} placeholder={t('packageHero.height_placeholder')} />
-           </Labeled>
-           <Labeled text={t('packageHero.width')} icon={Ruler}>
-             <input type="number" min="0" className={field} value={form.widthCm} onChange={setField('widthCm')} placeholder={t('packageHero.width_placeholder')} />
-           </Labeled>
-           <Labeled text={t('packageHero.length')} icon={Ruler}>
-             <input type="number" min="0" className={field} value={form.lengthCm} onChange={setField('lengthCm')} placeholder={t('packageHero.length_placeholder')} />
-           </Labeled>
-         </div>
-       )}
+        {/* Advanced fields (collapsible) */}
+        {expanded && (
+          <div className="grid grid-cols-4 gap-2 mb-2">
+            <Labeled text={t('packageHero.weight')} icon={Weight}>
+              <input type="number" min="0" step="0.1" className={field} value={form.weightKg} onChange={setField('weightKg')} placeholder={t('packageHero.weight_placeholder')} />
+            </Labeled>
+            <Labeled text={t('packageHero.height')} icon={Ruler}>
+              <input type="number" min="0" className={field} value={form.heightCm} onChange={setField('heightCm')} placeholder={t('packageHero.height_placeholder')} />
+            </Labeled>
+            <Labeled text={t('packageHero.width')} icon={Ruler}>
+              <input type="number" min="0" className={field} value={form.widthCm} onChange={setField('widthCm')} placeholder={t('packageHero.width_placeholder')} />
+            </Labeled>
+            <Labeled text={t('packageHero.length')} icon={Ruler}>
+              <input type="number" min="0" className={field} value={form.lengthCm} onChange={setField('lengthCm')} placeholder={t('packageHero.length_placeholder')} />
+            </Labeled>
+          </div>
+        )}
 
-       {/* Live estimate + CTA */}
-       <div className="flex items-center gap-2 mt-1">
-         <div className="flex-1 bg-[#060f24] border border-yellow-400/20 rounded-md px-3 py-1.5 flex items-center justify-between">
-           <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('packageHero.quote')}</span>
-           <span className="text-lg font-bold text-yellow-400 leading-none">{formatEUR(estimatedCost)}</span>
-         </div>
-         <button
-           type="submit"
-           disabled={submitting}
-           className="bg-yellow-400 text-[#060f24] px-5 py-2 rounded-md font-bold text-sm hover:bg-yellow-300 transition disabled:opacity-60 flex items-center justify-center gap-1.5 whitespace-nowrap"
-         >
-           {submitting ? (
-             <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('packageHero.submitting')}</>
-           ) : (
-             <>{t('packageHero.submit')} <ArrowRight className="w-3.5 h-3.5" /></>
-           )}
-         </button>
-       </div>
-     </form>
-   );
- }
-
-
-
+        {/* Live estimate + CTA */}
+        <div className="flex items-center gap-2 mt-1">
+          <div className="flex-1 bg-[#060f24] border border-yellow-400/20 rounded-md px-3 py-1.5 flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('packageHero.quote')}</span>
+            <span className="text-lg font-bold text-yellow-400 leading-none">{formatEUR(estimatedCost)}</span>
+          </div>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="bg-yellow-400 text-[#060f24] px-5 py-2 rounded-md font-bold text-sm hover:bg-yellow-300 transition disabled:opacity-60 flex items-center justify-center gap-1.5 whitespace-nowrap"
+          >
+            {submitting ? (
+              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('packageHero.submitting')}</>
+            ) : (
+              <>{t('packageHero.submit')} <ArrowRight className="w-3.5 h-3.5" /></>
+            )}
+          </button>
+        </div>
+      </form>
+    );
+  }

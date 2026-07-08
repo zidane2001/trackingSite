@@ -24,15 +24,17 @@ public class PdfService {
     private static final Color GRAY       = new Color(120, 120, 120);
     private static final Color LTGRAY     = new Color(220, 220, 220);
     private static final Color HEADER_BG  = new Color(245, 245, 245);
+    private static final Color ALERT_BG   = new Color(255, 245, 200);  // Jaune clair pour alerte
+    private static final Color ALERT_BORDER = new Color(200, 169, 81);    // Or pour bordure alerte
 
     private static final Font SECTION_FONT = new Font(Font.HELVETICA, 10, Font.BOLD, BRAND_BLUE);
     private static final Font LABEL_FONT   = new Font(Font.HELVETICA, 8, Font.NORMAL, GRAY);
     private static final Font VALUE_FONT   = new Font(Font.HELVETICA, 9, Font.NORMAL, BRAND_BLUE);
     private static final Font BOLD_FONT    = new Font(Font.HELVETICA, 9, Font.BOLD, BRAND_BLUE);
     private static final Font SMALL_FONT   = new Font(Font.HELVETICA, 7, Font.NORMAL, GRAY);
-    private static final Font TITLE_FONT   = new Font(Font.HELVETICA, 20, Font.BOLD, Color.WHITE);
     private static final Font TOTAL_FONT   = new Font(Font.HELVETICA, 9, Font.BOLD, BRAND_BLUE);
     private static final Font BARCODE_FONT = new Font(Font.HELVETICA, 12, Font.BOLD, BRAND_BLUE);
+    private static final Font ALERT_FONT   = new Font(Font.HELVETICA, 10, Font.BOLD, BRAND_BLUE);
 
     private static final String DATE_FMT = "dd/MM/yyyy HH:mm";
 
@@ -40,11 +42,11 @@ public class PdfService {
     //  FACTURE (Invoice)
     // ════════════════════════════════════════════════════════════
     public byte[] generateQuote(Parcel p) {
-        return buildDocument("FACTURE", p, "Erreur génération facture PDF");
+        return buildDocument("FACTURE", p, "Erreur generation facture PDF");
     }
 
     public byte[] generateInvoice(Parcel p) {
-        return buildDocument("FACTURE", p, "Erreur génération facture PDF");
+        return buildDocument("FACTURE", p, "Erreur generation facture PDF");
     }
 
     private byte[] buildDocument(String title, Parcel p, String errorMsg) {
@@ -53,6 +55,9 @@ public class PdfService {
         try {
             PdfWriter.getInstance(doc, out);
             doc.open();
+            // Diagnostic log: afficher le délai renseigné pour ce colis
+            log.info("[PdfService] Generating PDF '{}' for tracking={} deliveryDelay={} customDelay={}",
+                    title, p.getTrackingNumber(), p.getDeliveryDelay(), p.getCustomDeliveryDelay());
             addDocumentHeader(doc, title, p);
             addSenderReceiverBlock(doc, p);
             addParcelDetailsTable(doc, p);
@@ -66,7 +71,7 @@ public class PdfService {
     }
 
     // ════════════════════════════════════════════════════════════
-    //  ÉTIQUETTE SHIPPING (barcode label)
+    //  ETIQUETTE SHIPPING (barcode label)
     // ════════════════════════════════════════════════════════════
     public byte[] generateShippingLabel(Parcel p) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -147,7 +152,7 @@ public class PdfService {
 
             doc.close();
         } catch (Exception e) {
-            throw new PdfException("Erreur génération étiquette PDF", e);
+            throw new PdfException("Erreur generation etiquette PDF", e);
         }
         return out.toByteArray();
     }
@@ -165,7 +170,7 @@ public class PdfService {
                 }
             }
         } catch (Exception e) {
-            log.warn("[PdfService] Logo non chargé: {}", e.getMessage());
+            log.warn("[PdfService] Logo non charge: {}", e.getMessage());
         }
         return null;
     }
@@ -281,11 +286,19 @@ public class PdfService {
         title.setSpacingAfter(4);
         doc.add(title);
 
+        // Display delivery delay: show an alert box when provided, otherwise show a labeled fallback
+        String delayText = getDeliveryDelayText(p);
+        if (delayText != null) {
+            addAlertBox(doc, "⚠ DÉLAI DE LIVRAISON : " + delayText);
+        } else {
+            addLabelField(doc, "DÉLAI DE LIVRAISON :", "Non renseigné");
+        }
+
         PdfPTable table = new PdfPTable(7);
         table.setWidthPercentage(100);
         table.setWidths(new float[]{6, 12, 30, 13, 13, 13, 13});
 
-        String[] headers = {"Qté", "Type de pièce", "Description", "Longueur(cm)", "Largeur(cm)", "Hauteur(cm)", "Tétimac(kg)"};
+        String[] headers = {"Qté", "Type de pièce", "Description", "Longueur(cm)", "Largeur(cm)", "Hauteur(cm)", "Poids(kg)"};
         for (String h : headers) {
             PdfPCell hc = new PdfPCell(new Paragraph(h, new Font(Font.HELVETICA, 7, Font.BOLD, BRAND_BLUE)));
             hc.setBackgroundColor(HEADER_BG);
@@ -323,6 +336,43 @@ public class PdfService {
         table.addCell(wCell);
 
         doc.add(table);
+    }
+
+    /** Returns the delivery delay text: custom number of days as "X jours", or enum label. */
+    private String getDeliveryDelayText(Parcel p) {
+        if (p.getCustomDeliveryDelay() != null && !p.getCustomDeliveryDelay().isBlank()) {
+            try {
+                int days = Integer.parseInt(p.getCustomDeliveryDelay().trim());
+                return days + " jour" + (days > 1 ? "s" : "");
+            } catch (NumberFormatException e) {
+                // If not a plain number, display as-is
+                return p.getCustomDeliveryDelay();
+            }
+        }
+        if (p.getDeliveryDelay() != null) {
+            return formatEnum(p.getDeliveryDelay().name());
+        }
+        return null;
+    }
+
+    /** Adds an alert box with colored background for important information. */
+    private void addAlertBox(Document doc, String text) throws DocumentException {
+        PdfPTable alertTable = new PdfPTable(1);
+        alertTable.setWidthPercentage(100);
+        
+        PdfPCell alertCell = new PdfPCell();
+        alertCell.setBackgroundColor(ALERT_BG);
+        alertCell.setBorderColor(ALERT_BORDER);
+        alertCell.setBorderWidth(1.5f);
+        alertCell.setPadding(10);
+        
+        Paragraph alertPara = new Paragraph(text, ALERT_FONT);
+        alertPara.setAlignment(Element.ALIGN_CENTER);
+        alertCell.addElement(alertPara);
+        
+        alertTable.addCell(alertCell);
+        doc.add(alertTable);
+        doc.add(new Paragraph(" ")); // Spacing after alert
     }
 
     /** Totals row: Poids volumétrique, Volume, Poids total réel. */

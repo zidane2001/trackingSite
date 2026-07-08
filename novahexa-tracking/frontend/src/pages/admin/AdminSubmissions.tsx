@@ -77,7 +77,7 @@ export function AdminSubmissions() {
       originAddress: pkg.originAddress || '',
       destinationAddress: pkg.destinationAddress || '',
       transportMode: pkg.transportMode || '',
-      deliveryDelay: pkg.deliveryDelay || '',
+      customDeliveryDelay: pkg.customDeliveryDelay || '',
       material: pkg.material || '',
       weightKg: pkg.weightKg?.toString() || '',
       heightCm: pkg.heightCm?.toString() || '',
@@ -96,7 +96,7 @@ export function AdminSubmissions() {
         originAddress: editForm.originAddress,
         destinationAddress: editForm.destinationAddress,
         transportMode: editForm.transportMode || undefined,
-        deliveryDelay: editForm.deliveryDelay || undefined,
+        customDeliveryDelay: editForm.customDeliveryDelay || undefined,
         material: editForm.material || undefined,
         weightKg: editForm.weightKg ? parseFloat(editForm.weightKg) : undefined,
         heightCm: editForm.heightCm ? parseInt(editForm.heightCm) : undefined,
@@ -210,6 +210,10 @@ export function AdminSubmissions() {
                             </select>
                           </div>
                           <div>
+                            <label className="block text-xs font-semibold text-slate-500 mb-1">Jours de livraison</label>
+                            <input type="number" min="1" value={editForm.customDeliveryDelay} onChange={setEditField('customDeliveryDelay')} placeholder="Ex: 7" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
+                          </div>
+                          <div>
                             <label className="block text-xs font-semibold text-slate-500 mb-1">Poids (kg)</label>
                             <input type="number" min="0" step="0.1" value={editForm.weightKg} onChange={setEditField('weightKg')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                           </div>
@@ -252,6 +256,10 @@ export function AdminSubmissions() {
                             <div className="text-sm">
                               <span className="text-slate-500">Transport souhaité : </span>
                               <span className="font-medium">{pkg.transportMode || '—'}</span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-slate-500">Délai de livraison : </span>
+                              <span className="font-medium">{pkg.customDeliveryDelay ? (() => { const n = parseInt(pkg.customDeliveryDelay); return !isNaN(n) ? `${n} jour${n > 1 ? 's' : ''}` : pkg.customDeliveryDelay; })() : pkg.deliveryDelay || '—'}</span>
                             </div>
                           </div>
                           <div className="space-y-2">

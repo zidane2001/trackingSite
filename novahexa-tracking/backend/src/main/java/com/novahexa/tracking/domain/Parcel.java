@@ -59,6 +59,9 @@ public class Parcel {
     @Enumerated(EnumType.STRING)
     private DeliveryDelay deliveryDelay;
 
+    @Column(columnDefinition = "text")
+    private String customDeliveryDelay;
+
     @Enumerated(EnumType.STRING)
     private MaterialType material;
 
@@ -148,6 +151,8 @@ public class Parcel {
     public void setTransportMode(TransportMode v) { this.transportMode = v; }
     public DeliveryDelay getDeliveryDelay() { return deliveryDelay; }
     public void setDeliveryDelay(DeliveryDelay v) { this.deliveryDelay = v; }
+    public String getCustomDeliveryDelay() { return customDeliveryDelay; }
+    public void setCustomDeliveryDelay(String v) { this.customDeliveryDelay = v; }
     public MaterialType getMaterial() { return material; }
     public void setMaterial(MaterialType v) { this.material = v; }
     public BigDecimal getWeightKg() { return weightKg; }

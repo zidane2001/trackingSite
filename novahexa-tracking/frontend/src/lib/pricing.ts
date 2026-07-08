@@ -6,14 +6,14 @@
  * client (il ne recalcule pas : la formule de référence vit ici).
  */
 
-export type TransportMode = 'route' | 'mer' | 'air';
-export type DeliveryDelay = 'standard' | 'express' | 'jour_meme';
+export type TransportMode = 'ROUTE' | 'MER' | 'AIR';
+export type DeliveryDelay = 'STANDARD' | 'EXPRESS' | 'JOUR_MEME';
 export type MaterialType =
-  | 'general'
-  | 'auto_parts'
-  | 'fragile'
-  | 'electronique'
-  | 'documents';
+  | 'GENERAL'
+  | 'AUTO_PARTS'
+  | 'FRAGILE'
+  | 'ELECTRONIQUE'
+  | 'DOCUMENTS';
 
 export interface PriceInput {
   mode: TransportMode;
@@ -26,36 +26,36 @@ export interface PriceInput {
 }
 
 // --- Paramètres ajustables -------------------------------------------------
-const MODE_BASE: Record<TransportMode, number> = { route: 10, mer: 25, air: 40 };
-const MODE_RATE_PER_KG: Record<TransportMode, number> = { route: 1.2, mer: 0.9, air: 3.5 };
-const DELAY_MULT: Record<DeliveryDelay, number> = { standard: 1, express: 1.5, jour_meme: 2.2 };
+const MODE_BASE: Record<TransportMode, number> = { ROUTE: 10, MER: 25, AIR: 40 };
+const MODE_RATE_PER_KG: Record<TransportMode, number> = { ROUTE: 1.2, MER: 0.9, AIR: 3.5 };
+const DELAY_MULT: Record<DeliveryDelay, number> = { STANDARD: 1, EXPRESS: 1.5, JOUR_MEME: 2.2 };
 const MATERIAL_SURCHARGE: Record<MaterialType, number> = {
-  general: 0,
-  documents: 0,
-  auto_parts: 8,
-  fragile: 12,
-  electronique: 15,
+  GENERAL: 0,
+  DOCUMENTS: 0,
+  AUTO_PARTS: 8,
+  FRAGILE: 12,
+  ELECTRONIQUE: 15,
 };
 // Poids volumétrique : cm³ ramenés en kg (standard aérien = 5000).
 const VOLUMETRIC_DIVISOR = 5000;
 // --------------------------------------------------------------------------
 
 export const MODE_LABELS: Record<TransportMode, string> = {
-  route: 'Routier',
-  mer: 'Maritime',
-  air: 'Aérien',
+  ROUTE: 'Routier',
+  MER: 'Maritime',
+  AIR: 'Aérien',
 };
 export const DELAY_LABELS: Record<DeliveryDelay, string> = {
-  standard: 'Standard (4 jours)',
-  express: 'Express (48 h)',
-  jour_meme: 'Jour même',
+  STANDARD: 'Standard (4 jours)',
+  EXPRESS: 'Express (48 h)',
+  JOUR_MEME: 'Jour même',
 };
 export const MATERIAL_LABELS: Record<MaterialType, string> = {
-  general: 'Marchandise générale',
-  auto_parts: "Pièces auto",
-  fragile: 'Fragile',
-  electronique: 'Électronique',
-  documents: 'Documents',
+  GENERAL: 'Marchandise générale',
+  AUTO_PARTS: "Pièces auto",
+  FRAGILE: 'Fragile',
+  ELECTRONIQUE: 'Électronique',
+  DOCUMENTS: 'Documents',
 };
 
 /** Poids facturable = max(poids réel, poids volumétrique). */

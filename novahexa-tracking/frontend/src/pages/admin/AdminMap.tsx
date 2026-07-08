@@ -10,6 +10,7 @@ import { useImageUpload } from '../../hooks/useImageUpload';
 import { PhotoGallery } from '../../components/PhotoGallery';
 import type { ClientSummary } from '../../lib/api';
 import type { PackageItem, TransportMode } from '../../types';
+import { type DeliveryDelay } from '../../lib/pricing';
 import { reverseGeocode } from '../../lib/mapUtils';
 import { useTranslation } from 'react-i18next';
 
@@ -57,6 +58,8 @@ export function AdminMap() {
     estimatedCost: '',
     demoDurationMinutes: '',
     ownerId: '',
+    delay: 'STANDARD' as DeliveryDelay,
+    customDeliveryDelay: '',
   });
   const [originCoords, setOriginCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [destCoords, setDestCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -96,7 +99,9 @@ export function AdminMap() {
       estimatedCost: pkg.estimatedCost != null ? String(pkg.estimatedCost) : '',
       demoDurationMinutes: pkg.demoDurationMinutes != null ? String(pkg.demoDurationMinutes) : '',
       ownerId: pkg.ownerId || '',
-    });
+       delay: (pkg.deliveryDelay as DeliveryDelay) || 'STANDARD',
+       customDeliveryDelay: pkg.customDeliveryDelay || '',
+     });
     setPendingWaypoints([]);
     setWaypointCoords(null);
     setWaypointLabel('');
@@ -144,7 +149,7 @@ export function AdminMap() {
       name: '', description: '', senderName: '', senderEmail: '',
       originAddress: '', destinationAddress: '',
       transportMode: 'ROUTE', material: 'GENERAL', weightKg: '',
-      estimatedCost: '', demoDurationMinutes: '', ownerId: '',
+      estimatedCost: '', demoDurationMinutes: '', ownerId: '', delay: 'STANDARD', customDeliveryDelay: '',
     });
     setOriginCoords(null);
     setDestCoords(null);
@@ -229,6 +234,8 @@ export function AdminMap() {
         destinationLng: destCoords.lng,
         transportMode: createForm.transportMode,
         material: createForm.material,
+        deliveryDelay: createForm.delay,
+        customDeliveryDelay: createForm.customDeliveryDelay || undefined,
         weightKg: createForm.weightKg ? parseFloat(createForm.weightKg) : null,
         heightCm: createForm.heightCm ? parseInt(createForm.heightCm) : null,
         widthCm: createForm.widthCm ? parseInt(createForm.widthCm) : null,
@@ -280,6 +287,8 @@ export function AdminMap() {
         destinationAddress: createForm.destinationAddress || undefined,
         transportMode: createForm.transportMode as TransportMode || undefined,
         material: createForm.material || undefined,
+        deliveryDelay: createForm.delay,
+        customDeliveryDelay: createForm.customDeliveryDelay || undefined,
         weightKg: createForm.weightKg ? parseFloat(createForm.weightKg) : undefined,
         estimatedCost: createForm.estimatedCost ? parseFloat(createForm.estimatedCost) : undefined,
       });
@@ -614,6 +623,12 @@ export function AdminMap() {
                       <option value="DOCUMENTS">Documents</option>
                     </select>
                   </div>
+                </div>
+
+                {/* Delivery Delay */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1">Jours de livraison</label>
+                  <input type="number" min="1" value={createForm.customDeliveryDelay} onChange={setField('customDeliveryDelay')} placeholder="Ex: 7" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-yellow-400 transition" />
                 </div>
 
                 {/* Weight & Cost & Duration */}
