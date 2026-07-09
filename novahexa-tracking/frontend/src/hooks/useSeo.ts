@@ -69,3 +69,29 @@ export function useSeo({ titleKey, descKey, path = '/' }: SeoOptions) {
     upsertMeta('name', 'twitter:image', image);
   }, [t, i18n.language, titleKey, descKey, path]);
 }
+
+/**
+ * Injecte un bloc de données structurées JSON-LD dans le <head>, identifié par
+ * `id`. Le contenu est mis à jour quand `data` change et le bloc est retiré au
+ * démontage du composant. Passer `null` pour ne rien injecter (ex : données pas
+ * encore chargées).
+ */
+export function useJsonLd(id: string, data: object | null) {
+  useEffect(() => {
+    if (!data) return;
+
+    const scriptId = `ld-${id}`;
+    let el = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!el) {
+      el = document.createElement('script');
+      el.id = scriptId;
+      el.type = 'application/ld+json';
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(data);
+
+    return () => {
+      document.getElementById(scriptId)?.remove();
+    };
+  }, [id, data]);
+}

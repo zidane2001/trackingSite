@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useSeo } from '../hooks/useSeo';
+import { useSeo, useJsonLd } from '../hooks/useSeo';
 import { cn } from '../lib/utils';
 import { faqApi } from '../lib/api';
 
@@ -42,6 +42,21 @@ export function FAQ() {
       item.q.toLowerCase().includes(search.toLowerCase()) ||
       item.a.toLowerCase().includes(search.toLowerCase()),
   );
+
+  // Données structurées FAQPage (rich snippets Google) générées depuis les Q/R.
+  const faqJsonLd = useMemo(() => {
+    if (items.length === 0) return null;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: items.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    };
+  }, [items]);
+  useJsonLd('faq', faqJsonLd);
 
   return (
     <div className="bg-[#eef2f6]">
