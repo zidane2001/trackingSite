@@ -1,9 +1,11 @@
 import { Shield, Heart, Globe2, Award } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 import { IMAGES } from '../config/images';
 
 export function About() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.about_title', descKey: 'seo.about_desc', path: '/about' });
 
   const VALUES = [
     { icon: Shield, title: t('about.v1_title'), text: t('about.v1_text') },

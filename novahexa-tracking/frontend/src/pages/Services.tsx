@@ -1,10 +1,12 @@
 import { Truck, Ship, Plane, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 import { IMAGES } from '../config/images';
 
 export function Services() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.services_title', descKey: 'seo.services_desc', path: '/services' });
 
   const SERVICES = [
     {

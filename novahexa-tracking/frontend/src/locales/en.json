@@ -1,4 +1,24 @@
 {
+  "seo": {
+    "home_title": "Youms Logistics — International transport & logistics",
+    "home_desc": "International transport and logistics: real-time parcel tracking, air, sea and road freight. Get an instant quote.",
+    "services_title": "Our services — Air, sea and road freight | Youms Logistics",
+    "services_desc": "Discover our transport solutions: national and European road freight, international sea freight and express air freight with real-time tracking.",
+    "about_title": "About — Youms Logistics, your logistics partner",
+    "about_desc": "Since 2018, Youms Logistics has supported individuals and businesses with their national and international shipments, with reliability and innovation.",
+    "tracking_title": "Track my parcel — Real-time tracking | Youms Logistics",
+    "tracking_desc": "Track your shipment in real time with your Youms Logistics tracking number. Location, history and delivery status of your parcel.",
+    "faq_title": "FAQ — Frequently asked questions | Youms Logistics",
+    "faq_desc": "All answers about our transport services, parcel tracking, delivery times and creating a Youms Logistics account.",
+    "contact_title": "Contact — Get in touch | Youms Logistics",
+    "contact_desc": "A question or a quote request? Contact the Youms Logistics team, reply within 24h. Perpignan, France.",
+    "cgu_title": "Terms of Use | Youms Logistics",
+    "cgu_desc": "Terms and conditions of use of the Youms Logistics website and services.",
+    "privacy_title": "Privacy Policy | Youms Logistics",
+    "privacy_desc": "Learn how Youms Logistics collects, uses and protects your personal data in accordance with the GDPR.",
+    "cookies_title": "Cookie Policy | Youms Logistics",
+    "cookies_desc": "Information about the use of cookies on the Youms Logistics website and how to manage your preferences."
+  },
   "header": {
     "home": "Home",
     "about": "About",

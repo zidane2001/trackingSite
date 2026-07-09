@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 
 export function Legal() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.cgu_title', descKey: 'seo.cgu_desc', path: '/legal/cgu' });
 
   return (
     <div className="bg-[#eef2f6]">
@@ -53,6 +55,7 @@ export function Legal() {
 
 export function PrivacyPolicy() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.privacy_title', descKey: 'seo.privacy_desc', path: '/legal/privacy' });
 
   return (
     <div className="bg-[#eef2f6]">
@@ -99,6 +102,7 @@ export function PrivacyPolicy() {
 
 export function CookiePolicy() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.cookies_title', descKey: 'seo.cookies_desc', path: '/legal/cookies' });
 
   return (
     <div className="bg-[#eef2f6]">

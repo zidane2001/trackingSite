@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Send, MapPin, Phone, Mail, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 import { contactApi } from '../lib/api';
 import { useSettings } from '../contexts/SettingsContext';
 
 export function Contact() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.contact_title', descKey: 'seo.contact_desc', path: '/contact' });
   const { settings } = useSettings();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [agreed, setAgreed] = useState(false);

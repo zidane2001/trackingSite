@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 import { cn } from '../lib/utils';
 import { faqApi } from '../lib/api';
 
 export function FAQ() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.faq_title', descKey: 'seo.faq_desc', path: '/faq' });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<{ q: string; a: string }[]>([]);
