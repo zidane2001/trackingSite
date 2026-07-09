@@ -17,6 +17,7 @@ import {
   Quote,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 import { IMAGES } from '../config/images';
 import { PackageHeroForm } from '../components/PackageHeroForm';
 import { useScrollReveal } from '../hooks/useScrollReveal';
@@ -47,6 +48,7 @@ function Reveal({
 
 export function Home() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.home_title', descKey: 'seo.home_desc', path: '/' });
 
   const STEPS = [
     { icon: FileText, title: t('home.step1_title'), text: t('home.step1_text') },

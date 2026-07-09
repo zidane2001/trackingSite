@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Package, Clock, Truck, Plane, Ship } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSeo } from '../hooks/useSeo';
 import { packagesApi } from '../lib/api';
 import { ParcelMap } from '../components/ParcelMap';
 import { TrackingQR } from '../components/TrackingQR';
@@ -10,6 +11,7 @@ import { PhotoGallery } from '../components/PhotoGallery';
 
 export function Tracking() {
   const { t } = useTranslation();
+  useSeo({ titleKey: 'seo.tracking_title', descKey: 'seo.tracking_desc', path: '/tracking' });
   const [trackingNumber, setTrackingNumber] = useState('');
   const [result, setResult] = useState<PackageItem | null>(null);
   const [loading, setLoading] = useState(false);

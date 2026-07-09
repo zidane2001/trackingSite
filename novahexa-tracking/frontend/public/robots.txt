@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Espaces privés / pages d'action — pas de valeur SEO
+Disallow: /login
+Disallow: /register
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /client
+Disallow: /admin
+
+Sitemap: https://youmslogistic.fr/sitemap.xml

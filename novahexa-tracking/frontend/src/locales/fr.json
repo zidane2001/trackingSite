@@ -1,4 +1,25 @@
 {
+
+  "seo": {
+    "home_title": "Youms Logistics — Transport & logistique international",
+    "home_desc": "Transport et logistique internationale : suivi de colis en temps réel, fret aérien, maritime et routier. Obtenez un devis instantané.",
+    "services_title": "Nos services — Fret aérien, maritime et routier | Youms Logistics",
+    "services_desc": "Découvrez nos solutions de transport : routier national et européen, fret maritime international et fret aérien express avec suivi en temps réel.",
+    "about_title": "À propos — Youms Logistics, votre partenaire logistique",
+    "about_desc": "Depuis 2018, Youms Logistics accompagne particuliers et entreprises dans leurs expéditions nationales et internationales avec fiabilité et innovation.",
+    "tracking_title": "Suivre mon colis — Suivi en temps réel | Youms Logistics",
+    "tracking_desc": "Suivez votre envoi en temps réel avec votre numéro de suivi Youms Logistics. Position, historique et statut de livraison de votre colis.",
+    "faq_title": "FAQ — Questions fréquentes | Youms Logistics",
+    "faq_desc": "Toutes les réponses sur nos services de transport, le suivi de colis, les délais de livraison et la création de compte Youms Logistics.",
+    "contact_title": "Contact — Nous joindre | Youms Logistics",
+    "contact_desc": "Une question ou une demande de devis ? Contactez l'équipe Youms Logistics, réponse sous 24h. Perpignan, France.",
+    "cgu_title": "Conditions Générales d'Utilisation | Youms Logistics",
+    "cgu_desc": "Conditions générales d'utilisation du site et des services Youms Logistics.",
+    "privacy_title": "Politique de confidentialité | Youms Logistics",
+    "privacy_desc": "Découvrez comment Youms Logistics collecte, utilise et protège vos données personnelles conformément au RGPD.",
+    "cookies_title": "Politique de cookies | Youms Logistics",
+    "cookies_desc": "Informations sur l'utilisation des cookies sur le site Youms Logistics et gestion de vos préférences."
+  },
   "header": {
     "home": "Accueil",
     "about": "À propos",
