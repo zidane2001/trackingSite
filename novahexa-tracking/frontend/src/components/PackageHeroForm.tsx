@@ -180,6 +180,13 @@ export function PackageHeroForm() {
 
   const estimatedCost = serverCost ?? clientCost;
 
+  // Only show a price once the user has entered something that drives it.
+  const hasEstimate =
+    num(form.weightKg) > 0 ||
+    num(form.heightCm) > 0 ||
+    num(form.widthCm) > 0 ||
+    num(form.lengthCm) > 0;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -411,7 +418,7 @@ export function PackageHeroForm() {
         <div className="flex items-center gap-2 mt-1">
           <div className="flex-1 bg-[#060f24] border border-yellow-400/20 rounded-md px-3 py-1.5 flex items-center justify-between">
             <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t('packageHero.quote')}</span>
-            <span className="text-lg font-bold text-yellow-400 leading-none">{formatEUR(estimatedCost)}</span>
+            <span className="text-lg font-bold text-yellow-400 leading-none">{hasEstimate ? formatEUR(estimatedCost) : '—'}</span>
           </div>
           <button
             type="submit"

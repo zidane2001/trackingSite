@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, FileText, LogIn, UserPlus, Menu, X, Globe, Mail, Phone, MessageSquare } from 'lucide-react';
+import { MapPin, FileText, LogIn, UserPlus, Menu, X, Globe, Mail, Phone, MessageSquare, Truck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { IMAGES } from '../config/images';
 import { useAuth } from '../contexts/AuthContext';
@@ -249,6 +249,17 @@ export function Header() {
         </div>
       </div>
 
+      {/* ── Mobile tracking bar ─────────────────────── */}
+      <div className="lg:hidden bg-[#000a2d] border-t border-white/10 px-4 py-2.5">
+        <Link
+          to="/tracking"
+          className="flex items-center justify-center gap-2 w-full bg-gold text-[#060f24] px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-gold-400 transition-colors"
+        >
+          <Truck className="w-4 h-4" />
+          <span>{t('header.tracking')}</span>
+        </Link>
+      </div>
+
       {/* ── Mobile dropdown menu ──────────────────── */}
       {mobileOpen && (
         <div className="lg:hidden bg-[#0a1530] border-t border-white/10" style={{ animation: 'slideDown 0.2s ease-out' }}>
@@ -273,13 +284,6 @@ export function Header() {
           <div className="px-4 py-3 border-t border-white/5 space-y-2">
             {!isAuthenticated && (
               <>
-                <Link
-                  to="/tracking"
-                  onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center border border-white text-white px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-white hover:text-[#060f24] transition-all"
-                >
-                  {t('header.tracking')}
-                </Link>
                 <div className="flex gap-2">
                   <Link
                     to="/login"
