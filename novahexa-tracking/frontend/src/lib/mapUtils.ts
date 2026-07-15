@@ -212,6 +212,7 @@ function getDepartureTimeMs(pkg: PackageItem): number {
 export function getTraveledRatio(pkg: PackageItem): number {
   if (pkg.status === 'DELIVERED') return 1;
   if (pkg.status === 'PENDING' || pkg.status === 'REFUSED') return 0;
+  if (pkg.status === 'VALIDATED') return 0; // Validé mais pas encore en transit — reste à l'origine
 
   const departureMs = getDepartureTimeMs(pkg);
   const elapsed = Math.max(0, Date.now() - departureMs);

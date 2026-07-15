@@ -237,7 +237,9 @@ public class SimulationService {
         if (parcel.getOriginLat() == null || parcel.getOriginLng() == null) return null;
         if (parcel.getDestinationLat() == null || parcel.getDestinationLng() == null) return null;
 
-        Instant departureTime = parcel.getValidatedAt() != null ? parcel.getValidatedAt() : parcel.getCreatedAt();
+        // Utiliser transitStartedAt (pas validatedAt) comme point de départ de la simulation
+        Instant departureTime = parcel.getTransitStartedAt() != null ? parcel.getTransitStartedAt()
+                : parcel.getValidatedAt() != null ? parcel.getValidatedAt() : parcel.getCreatedAt();
         long elapsedMs = Math.max(0, Instant.now().toEpochMilli() - departureTime.toEpochMilli());
 
         double totalDurationMs = parcel.getEstimatedDurationMinutes() != null
@@ -258,6 +260,7 @@ public class SimulationService {
         double ratio = Math.min(1.0, (double) elapsedMs / totalDurationMs);
         if (parcel.getStatus() == ParcelStatus.DELIVERED) ratio = 1;
         if (parcel.getStatus() == ParcelStatus.PENDING || parcel.getStatus() == ParcelStatus.REFUSED) ratio = 0;
+        if (parcel.getStatus() == ParcelStatus.VALIDATED) ratio = 0; // Validé mais pas encore en transit — reste à l'origine
         if (parcel.getStatus() == ParcelStatus.PAUSED) {
             // Calculate ratio at pause time and freeze it
             Instant pauseTime = parcel.getUpdatedAt() != null ? parcel.getUpdatedAt() : parcel.getCreatedAt();
