@@ -280,7 +280,7 @@ export interface SiteSettings {
 }
 
 export const siteSettingsApi = {
-  get: () => api.get<SiteSettings>('/api/admin/settings'),
+  get: () => api.get<SiteSettings>('/api/settings'),
   update: (data: Partial<SiteSettings>) => api.put<SiteSettings>('/api/admin/settings', data),
   reset: () => api.post<SiteSettings>('/api/admin/settings/reset', {}),
 };

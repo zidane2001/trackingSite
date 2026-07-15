@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-const WHATSAPP_NUMBER = '33656817785';
+import { useSettings } from '../contexts/SettingsContext';
 
 export function WhatsAppButton() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const [tooltip, setTooltip] = useState(false);
 
-  const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('whatsapp.message'))}`;
+  const whatsappNumber = settings?.whatsappNumber?.replace(/\D/g, '') || '33656817785';
+  const WHATSAPP_URL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(t('whatsapp.message'))}`;
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">

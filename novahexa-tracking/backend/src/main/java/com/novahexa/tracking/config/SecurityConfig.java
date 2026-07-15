@@ -49,6 +49,8 @@ public class SecurityConfig {    @Value("${app.cors.allowed-origins:http://local
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/faq").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
                 .requestMatchers("/api/pricing/**").permitAll()
                 .requestMatchers("/api/pdf/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/notifications").authenticated()
